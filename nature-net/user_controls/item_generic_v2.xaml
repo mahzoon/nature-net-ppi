@@ -1,0 +1,39 @@
+﻿<UserControl x:Class="nature_net.user_controls.item_generic_v2"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             mc:Ignorable="d" 
+             d:DesignHeight="110" d:DesignWidth="280">
+    
+    <Border Name="item_border" BorderBrush="Gray">
+        <DockPanel Name="item_panel" DockPanel.Dock="Top" LastChildFill="True">
+            <StackPanel Name="left_panel">
+                <Image Name="avatar" Width="75" Height="75"></Image>
+                <Label Name="num_likes" HorizontalAlignment="Center" FontWeight="Bold">17</Label>
+            </StackPanel>
+            <Border Name="right_panel_border" DockPanel.Dock="Right">
+                <DockPanel Name="right_panel">
+                    <StackPanel Name="contribution_panel" Orientation="Horizontal" HorizontalAlignment="Center" DockPanel.Dock="Top">
+                        <TextBlock Name="number" TextWrapping="Wrap" VerticalAlignment="Center" FontWeight="Bold">5</TextBlock>
+                        <Image Name="number_icon" Width="25" Height="25"></Image>
+                    </StackPanel>
+                    <TextBlock Name="txt_level1" TextWrapping="Wrap" HorizontalAlignment="Center" DockPanel.Dock="Top">replies</TextBlock>
+                    <StackPanel Name="info_panel" DockPanel.Dock="Bottom" VerticalAlignment="Bottom">
+                        <TextBlock Name="txt_level2" TextWrapping="Wrap" HorizontalAlignment="Center">25 Nov 2013</TextBlock>
+                        <TextBlock Name="txt_level3" TextWrapping="Wrap" HorizontalAlignment="Center">View Replies</TextBlock>
+                    </StackPanel>
+                </DockPanel>
+            </Border>
+            <StackPanel Name="center_panel" DockPanel.Dock="Left">
+                <TextBlock Name="title" HorizontalAlignment="Left" TextWrapping="Wrap" FontWeight="Bold">I'd like to see rubber hand effect.</TextBlock>
+                <TextBlock Name="description" HorizontalAlignment="Left" TextWrapping="Wrap">Description</TextBlock>
+                <DockPanel Name="user_info">
+                    <Image Name="user_info_icon" Width="20" Height="20" DockPanel.Dock="Left" VerticalAlignment="Center"></Image>
+                    <TextBlock Name="user_info_name" DockPanel.Dock="Left" TextWrapping="Wrap" VerticalAlignment="Center">Steph</TextBlock>
+                    <TextBlock Name="user_info_date" DockPanel.Dock="Right" TextWrapping="Wrap" VerticalAlignment="Center" HorizontalAlignment="Right">25 Nov 2013</TextBlock>
+                </DockPanel>
+            </StackPanel>
+        </DockPanel>
+    </Border>
+</UserControl>

@@ -1,0 +1,36 @@
+﻿<UserControl x:Class="nature_net.user_controls.window_content"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:uc="clr-namespace:nature_net.user_controls"
+             xmlns:s="http://schemas.microsoft.com/surface/2008"
+             mc:Ignorable="d" 
+             d:DesignWidth="300">
+    <DockPanel LastChildFill="False">
+        <ContentControl Name="the_item" DockPanel.Dock="Top"></ContentControl>
+        <Button Name="expander" DockPanel.Dock="Top" HorizontalAlignment="Center" Width="38" Height="38"
+                         VerticalContentAlignment="Center" HorizontalContentAlignment="Center"
+                         Background="#FF3E9D3E" Foreground="White">v</Button>
+        <uc:custom_listbox_v2 x:Name="comments_listbox" Height="250" DockPanel.Dock="Top" />
+        <StackPanel DockPanel.Dock="Top" Orientation="Vertical" AllowDrop="True" Name="leave_comment_area">
+            <DockPanel Name="leave_comment_panel" LastChildFill="True">
+                <Image DockPanel.Dock="Left" Name="avatar" Height="75"></Image>
+                <Button DockPanel.Dock="Right" Name="submit_comment" Width="65" HorizontalContentAlignment="Center"
+                                 VerticalContentAlignment="Center" FontFamily="Segoe UI" FontSize="14" Background="Green"
+                                 Foreground="White">
+                    Submit
+                </Button>
+                <TextBox DockPanel.Dock="Left" Name="comment_textbox" TextWrapping="Wrap" AcceptsReturn="True"
+                         FontSize="15" FontFamily="Segoe UI" Background="White" Foreground="Black"></TextBox>
+            </DockPanel>
+            <Image Name="add_comment_img" Height="75" Stretch="Fill" ></Image>
+            <!--<InkCanvas Name="leave_comment_canvas" Height="95" IsManipulationEnabled="False" Background="Gray">
+                <InkCanvas.DefaultDrawingAttributes>
+                    <DrawingAttributes Color="White" Width="1" IgnorePressure="False" FitToCurve="True" />
+                </InkCanvas.DefaultDrawingAttributes>
+            </InkCanvas>-->
+        </StackPanel>
+        
+    </DockPanel>
+</UserControl>

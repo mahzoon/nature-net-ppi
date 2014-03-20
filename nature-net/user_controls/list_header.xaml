@@ -1,0 +1,51 @@
+﻿<UserControl x:Class="nature_net.user_controls.list_header"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             mc:Ignorable="d" 
+             d:DesignHeight="85" d:DesignWidth="256">
+    
+    <UserControl.Resources>
+        <Style TargetType="{x:Type ToggleButton}">
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate>
+                        <Border x:Name="outer" BorderBrush="DarkGreen" BorderThickness="2"
+                                Background="{Binding Background, RelativeSource={RelativeSource TemplatedParent}}">
+                                    <TextBlock x:Name="display" 
+                                               Text="{Binding Content, RelativeSource={RelativeSource TemplatedParent}}"
+                                               Foreground="Black" FontStyle="Normal"
+                                               FontWeight="Normal" Margin="0,0,0,0" HorizontalAlignment="Center"
+                                               VerticalAlignment="Center"/>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="ToggleButton.IsChecked" Value="True">
+                                <Setter TargetName="outer" Property="Background" Value="DarkGreen"/>
+                                <Setter TargetName="display" Property="Foreground" Value="White"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+    </UserControl.Resources>
+    
+    <StackPanel Background="LightGreen">
+        <Label Name="title" HorizontalAlignment="Center" VerticalAlignment="Center"
+               FontSize="20">Title</Label>
+        <Grid Margin="7,5,8,15">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="30" />
+            </Grid.RowDefinitions>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="*" />
+            </Grid.ColumnDefinitions>
+            <RadioButton Grid.Column="0" Style="{DynamicResource {x:Type ToggleButton}}" Name="atoz" DockPanel.Dock="Left" Background="White" BorderBrush="DarkGreen" BorderThickness="2,2,1,2" Height="30" IsChecked="True" Checked="atoz_Checked">A - Z</RadioButton>
+            <RadioButton Grid.Column="1" Style="{DynamicResource {x:Type ToggleButton}}" Name="top" DockPanel.Dock="Right" Background="White" BorderBrush="DarkGreen" BorderThickness="1,2,2,2" Height="30" Checked="top_Checked">Top</RadioButton>
+            <RadioButton Grid.Column="2" Style="{StaticResource {x:Type ToggleButton}}" Name="recent" Background="White" BorderBrush="DarkGreen" BorderThickness="1,2,1,2" Height="30" Checked="recent_Checked">Recent</RadioButton>
+        </Grid>
+    </StackPanel>
+</UserControl>

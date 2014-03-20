@@ -1,0 +1,284 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Windows.Controls;
+using nature_net.user_controls;
+using System.Windows;
+using System.Windows.Media;
+using System.ComponentModel;
+using System.IO;
+using System.Windows.Media.Imaging;
+
+namespace nature_net
+{
+    public class window_manager
+    {
+        public static Canvas main_canvas;
+        public static tab_control left_tab;
+        public static tab_control right_tab;
+
+        public static List<int> downloaded_contributions = new List<int>();
+        public static Dictionary<int, ImageSource> thumbnails = new Dictionary<int, ImageSource>();
+        public static Dictionary<int, ImageSource> contributions = new Dictionary<int, ImageSource>();
+        public static Dictionary<int, MediaPlayer> media = new Dictionary<int, MediaPlayer>();
+        public static List<window_frame> collection_frames = new List<window_frame>();
+        public static List<window_frame> signup_frames = new List<window_frame>();
+        public static List<window_frame> design_ideas_frames = new List<window_frame>();
+        public static List<window_frame> image_display_frames = new List<window_frame>();
+        public static List<window_frame> activity_frames = new List<window_frame>();
+
+        public static Dictionary<string, ImageSource> avatars = new Dictionary<string, ImageSource>();
+
+        public static void open_location_collection_window(string location, int location_id, double pos_x, double pos_y)
+        {
+            if (window_manager.collection_frames.Count + 1 > configurations.max_collection_frame)
+                return;
+
+            window_frame frame = new window_frame();
+            window_content content = new window_content();
+            collection_listbox c_listbox = new collection_listbox();
+            c_listbox.parent = frame;
+            c_listbox.list_contributions_in_location(location_id);
+            //content.initialize_contents(c_listbox);
+            content.initialize_contents(c_listbox, Type.GetType("nature_net.Location"), location_id, frame);
+            frame.window_content.Content = content;
+            
+            content.list_all_comments();
+
+            window_manager.collection_frames.Add(frame);
+            open_window(frame, pos_x, pos_y);
+            frame.set_title("Contributions in " + location_id.ToString() + ": " + location);
+        }
+
+        public static void open_collection_window(string username, int userid, double pos_x, double pos_y)
+        {
+            if (window_manager.collection_frames.Count + 1 > configurations.max_collection_frame)
+                return;
+
+            window_frame frame = new window_frame();
+            window_content content = new window_content();
+            collection_listbox c_listbox = new collection_listbox();
+            c_listbox.parent = frame;
+            c_listbox.list_all_contributions(username);
+            content.initialize_contents(c_listbox, Type.GetType("nature_net.User"), userid, frame);
+            frame.window_content.Content = content;
+            content.list_all_comments();
+
+            window_manager.collection_frames.Add(frame);
+            open_window(frame, pos_x, pos_y);
+            frame.set_title(username + "'s contributions");
+        }
+
+        public static void open_contribution_window(collection_item citem, double pos_x, double pos_y, string ctype)
+        {
+            if (window_manager.image_display_frames.Count + 1 > configurations.max_image_display_frame)
+                return;
+
+            window_frame frame = new window_frame();
+            window_content content = new window_content();
+            contribution_view m = new contribution_view();
+            m.view_contribution(citem);
+            content.initialize_comments(citem._contribution);
+            content.initialize_contents(m, Type.GetType("nature_net.Contribution"), citem._contribution.id, frame);
+            frame.window_content.Content = content;
+            window_manager.image_display_frames.Add(frame);
+            open_window(frame, pos_x, pos_y);
+            m.center_image();
+            frame.hide_change_view();
+            frame.set_title(ctype);
+        }
+
+        public static void open_design_idea_window(string[] idea_item, double pos_x, double pos_y, string title = "Design Idea")
+        {
+            if (window_manager.design_ideas_frames.Count + 1 > configurations.max_design_ideas_frame)
+                return;
+
+            window_frame frame = new window_frame();
+            window_content content = new window_content();
+
+            item_generic_v2 i = new item_generic_v2();
+            i.title.Text = idea_item[3]; i.description.Visibility = Visibility.Collapsed;
+            i.title.FontSize = 17;
+            i.user_info.Margin = new Thickness(5);
+            i.user_info_name.Text = idea_item[5]; i.user_info_date.Text = idea_item[4];
+            i.user_info_name.Margin = new Thickness(2, 0, 0, 0); i.user_info_date.Margin = new Thickness(2, 0, 2, 0);
+            i.user_info_name.FontSize = 10; i.user_info_date.FontSize = 10;
+            i.user_info_icon.Source = new BitmapImage(new Uri(idea_item[2])); i.number.Text = idea_item[7]; i.number_icon.Visibility = Visibility.Collapsed;
+            i.txt_level1.Text = configurations.designidea_num_desc;
+            i.txt_level2.Visibility = Visibility.Collapsed; i.txt_level3.Visibility = Visibility.Collapsed;
+            i.avatar.Source = configurations.img_thumbs_up_icon; i.num_likes.Content = idea_item[8]; i.avatar.Tag = i;
+            i.avatar.Width = 45; i.avatar.Height = 45; i.avatar.Margin = new Thickness(5);
+            i.right_panel.Width = configurations.design_idea_right_panel_width;
+            i.set_like_handler();
+            i.Tag = idea_item[1]; i.top_value = Convert.ToInt32(idea_item[8]);
+
+            i.Background = new SolidColorBrush(Colors.White);
+            i.Width = frame.Width;
+            content.initialize_contents(i, Type.GetType("nature_net.Contribution"), Convert.ToInt32(idea_item[1]), frame);
+
+            frame.window_content.Content = content;
+
+            window_manager.design_ideas_frames.Add(frame);
+            open_window(frame, pos_x, pos_y);
+            frame.hide_change_view();
+            frame.set_title(title);
+        }
+
+        public static void open_design_idea_window_ext(design_ideas_listbox parent, double pos_x, double pos_y)
+        {
+            if (window_manager.design_ideas_frames.Count + 1 > configurations.max_design_ideas_frame)
+                return;
+
+            window_frame frame = new window_frame();
+            window_content content = new window_content();
+            design_ideas_listbox list = new design_ideas_listbox();
+            list.parent = parent;
+            content.initialize_contents(list, true, frame);
+            frame.window_content.Content = content;
+
+            window_manager.design_ideas_frames.Add(frame);
+            open_window(frame, pos_x, pos_y);
+            frame.hide_change_view();
+            frame.set_title("Submit Design Idea");
+        }
+
+        public static void open_signup_window(double pos_x, double pos_y)
+        {
+            if (window_manager.signup_frames.Count + 1 > configurations.max_signup_frame)
+                return;
+
+            window_frame frame = new window_frame();
+            signup s = new signup();
+            s.parent = frame;
+            s.load_window();
+            frame.window_content.Content = s;
+            
+            window_manager.signup_frames.Add(frame);
+            open_window(frame, pos_x, pos_y);
+            frame.hide_change_view();
+            frame.set_title("Sign up");
+            frame.set_icon(configurations.img_signup_window_icon);
+        }
+
+        public static void open_activity_window(string activity_name, int activity_id, double pos_x, double pos_y)
+        {
+            if (window_manager.activity_frames.Count + 1 > configurations.max_activity_frame)
+                return;
+
+            window_frame frame = new window_frame();
+            window_content content = new window_content();
+            collection_listbox c_listbox = new collection_listbox();
+            c_listbox.parent = frame;
+            c_listbox.list_contributions_in_activity(activity_id);
+            content.initialize_contents(c_listbox, Type.GetType("nature_net.Activity"), activity_id, frame);
+            frame.window_content.Content = content;
+            content.list_all_comments();
+
+            window_manager.collection_frames.Add(frame);
+            open_window(frame, pos_x, pos_y);
+            string title = activity_name;
+            if (activity_name.Length > configurations.max_activity_frame_title_chars)
+                title = activity_name.Substring(0, 10) + "...";
+            frame.set_title(title + "'s contributions");
+        }
+
+        private static void open_window(window_frame frame, double pos_x, double pos_y)
+        {
+            main_canvas.Children.Add(frame);
+            frame.IsManipulationEnabled = true;
+            frame.UpdateLayout();
+
+            if (pos_y > window_manager.main_canvas.ActualHeight - frame.ActualHeight)
+                pos_y = window_manager.main_canvas.ActualHeight - frame.ActualHeight;
+            TranslateTransform m = new TranslateTransform(pos_x, pos_y);
+            Matrix matrix = m.Value;
+            frame.RenderTransform = new MatrixTransform(matrix);
+        }
+
+        public static void close_window(window_frame frame)
+        {
+            collection_frames.Remove(frame);
+            image_display_frames.Remove(frame);
+            signup_frames.Remove(frame);
+            design_ideas_frames.Remove(frame);
+            main_canvas.Children.Remove(frame);
+        }
+
+        public static void refresh_downloaded_contributions()
+        {
+
+            DirectoryInfo d = new DirectoryInfo(configurations.GetAbsoluteContributionPath());
+            FileInfo[] files = d.GetFiles();
+            window_manager.downloaded_contributions.Clear();
+            foreach (FileInfo f in files)
+            {
+                try
+                {
+                    window_manager.downloaded_contributions.Add(Convert.ToInt32(f.Name.Split(new char[] { '.' })[0]));
+                }
+                catch (Exception e3)
+                {
+                    log.WriteErrorLog(e3);
+                }
+            }
+        }
+
+        public static void refresh_thumbnails()
+        {
+            DirectoryInfo d = new DirectoryInfo(configurations.GetAbsoluteThumbnailPath());
+            FileInfo[] files = d.GetFiles();
+            window_manager.thumbnails.Clear();
+            foreach (FileInfo f in files)
+                window_manager.thumbnails.Add(Convert.ToInt32(f.Name.Split(new char[] { '.' })[0]),
+                    new BitmapImage(new Uri(configurations.GetAbsoluteThumbnailPath() + f.Name)));
+        }
+
+        public static void load_avatars()
+        {
+            DirectoryInfo d = new DirectoryInfo(configurations.GetAbsoluteAvatarPath());
+            FileInfo[] files = d.GetFiles();
+            window_manager.avatars.Clear();
+            foreach (FileInfo f in files)
+            {
+                ImageSource img = new BitmapImage(new Uri(f.FullName));
+                //avatars.Add(f.Name.Split(new char[] { '.' })[0], img);
+                avatars.Add(f.Name, img);
+            }
+        }
+
+        public static void load_users()
+        {
+            if (left_tab != null)
+                left_tab.load_users();
+            if (right_tab != null)
+                right_tab.load_users();
+            ///
+        }
+
+        public static void load_activities()
+        {
+            if (left_tab != null)
+                left_tab.load_activities();
+            if (right_tab != null)
+                right_tab.load_activities();
+        }
+
+        public static void load_design_ideas()
+        {
+            if (left_tab != null)
+                left_tab.load_design_ideas();
+            if (right_tab != null)
+                right_tab.load_design_ideas();
+        }
+
+    }
+
+    public partial class Collection : INotifyPropertyChanging, INotifyPropertyChanged
+    {
+        public override string ToString()
+        {
+            return this.name;
+        }
+    }
+}

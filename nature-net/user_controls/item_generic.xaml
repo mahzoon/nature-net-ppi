@@ -1,0 +1,45 @@
+﻿<UserControl x:Class="nature_net.user_controls.item_generic"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             mc:Ignorable="d" 
+             d:DesignWidth="250">
+    
+    <Border Name="first_border" BorderBrush="Gray">
+        <DockPanel LastChildFill="True">
+            <Border Name="second_border" BorderBrush="Gray">
+                <DockPanel LastChildFill="True">
+                    <DockPanel DockPanel.Dock="Top" LastChildFill="True" Name="top_panel" Margin="5,10,5,0">
+                        <Image Name="avatar" Width="75" Height="75"></Image>
+                        <StackPanel Name="topleft_panel" Margin="5,0,5,0" Orientation="Vertical"
+                                    HorizontalAlignment="Left" VerticalAlignment="Center">
+                            <TextBlock Name="username" HorizontalAlignment="Left" TextWrapping="Wrap" Width="100"> The NatureNet project is</TextBlock>
+                            <Label Name="user_desc" HorizontalAlignment="Left" FontStyle="Italic" FontSize="10" Margin="0" Padding="0,3,0,3" >Description</Label>
+                        </StackPanel>
+                        <TextBlock Name="number" HorizontalAlignment="Right" TextWrapping="Wrap" Margin="5,0,0,0" DockPanel.Dock="Right">
+                            The NatureNet project
+                        </TextBlock>
+                    </DockPanel>
+
+                    <Label Name="desc" Margin="5,0,5,0" DockPanel.Dock="Top">Contributes/Suggests:</Label>
+                    <TextBlock Name="content" Margin="5,0,5,5" DockPanel.Dock="Top" TextWrapping="Wrap" TextAlignment="Justify">
+                The NatureNet project is a citizen science project that incorporates crowdsourced interaction design.  Participants can collect and analyse scientific data using their mobile computing devices and a multi-touch tabletop, and they can also participate in the re-design of the interface by which their scientific contributions are made.  The role of the crowd in Naturenet is extended to include interaction design in addition to data collection and analysis.
+                    </TextBlock>
+                    <!--<Label Name="content" Margin="10,0,10,10" DockPanel.Dock="Top">
+                <AccessText TextWrapping="Wrap" TextAlignment="Justify" Margin="0,0,0,0">
+                    The NatureNet project is a citizen science project that incorporates crowdsourced interaction design.  Participants can collect and analyse scientific data using their mobile computing devices and a multi-touch tabletop, and they can also participate in the re-design of the interface by which their scientific contributions are made.  The role of the crowd in Naturenet is extended to include interaction design in addition to data collection and analysis.
+                </AccessText>
+            </Label>-->
+                    <StackPanel Name="toolbar" Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Center" Margin="5,0,5,10">
+                        <Label Name="label_like" VerticalAlignment="Center">0</Label>
+                        <Image Name="img_like"></Image>
+                            <Label Name="label_dislike" VerticalAlignment="Center">0</Label>
+                        <Image Name="img_dislike"></Image>
+                    </StackPanel>
+                    
+                </DockPanel>
+        </Border>
+        </DockPanel>
+    </Border>
+</UserControl>

@@ -1,0 +1,45 @@
+﻿<Window x:Class="nature_net.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:uc="clr-namespace:nature_net.user_controls"
+        xmlns:s ="http://schemas.microsoft.com/surface/2008"
+        Title="Nature Net" Height="200" Width="800" Name="main_window" WindowStyle="None" WindowState="Maximized">
+    
+    <Window.Resources>
+        
+        <Style x:Key="CursorStyle" TargetType="{x:Type ContentControl}">
+            <Setter Property="BorderThickness" Value="3"/>
+            <Setter Property="BorderBrush" Value="{DynamicResource {x:Static s:SurfaceColors.Accent1BrushKey}}"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="{x:Type ContentControl}">
+                        <Border 
+					BorderThickness="{TemplateBinding BorderThickness}" 
+					BorderBrush="{TemplateBinding BorderBrush}">
+                            <ContentPresenter Margin="0"
+						Content="{TemplateBinding Content}" 
+						ContentTemplate="{TemplateBinding ContentTemplate}">
+                            </ContentPresenter>
+                        </Border>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>        
+    </Window.Resources>
+    
+    <DockPanel LastChildFill="True" Name="application_panel">
+        <uc:tab_control x:Name="left_tab" DockPanel.Dock="Left" Margin="0,0,0,0" Panel.ZIndex="1"></uc:tab_control>
+        <!--
+		<uc:tab_control x:Name="right_tab" DockPanel.Dock="Right" Margin="0,0,0,0" Panel.ZIndex="2">
+            
+			<uc:tab_control.LayoutTransform>
+                <RotateTransform Angle="180"></RotateTransform>
+            </uc:tab_control.LayoutTransform>
+        </uc:tab_control>-->
+        <Canvas Name="workspace" AllowDrop="True" Margin="-65,0,0,0" Panel.ZIndex="0">
+            <Label Name="label_update" Width="15" Height="15" />
+        </Canvas>
+        
+    </DockPanel>
+    
+</Window>

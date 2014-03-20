@@ -1,0 +1,1 @@
+works in win8, surface sdk 2.0 just for dragging

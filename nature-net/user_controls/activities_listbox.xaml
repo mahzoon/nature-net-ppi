@@ -1,0 +1,15 @@
+﻿<UserControl x:Class="nature_net.user_controls.activities_listbox"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             mc:Ignorable="d" 
+             xmlns:uc="clr-namespace:nature_net.user_controls"
+             d:DesignHeight="300" d:DesignWidth="300">
+    <DockPanel LastChildFill="True">
+        <Border DockPanel.Dock="Top" BorderThickness="1" BorderBrush="Gray">
+            <uc:list_header x:Name="header"></uc:list_header>
+        </Border>
+        <uc:custom_listbox_v2 x:Name="activities_list" />
+    </DockPanel>
+</UserControl>

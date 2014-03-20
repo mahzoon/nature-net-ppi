@@ -1,0 +1,13 @@
+﻿<UserControl x:Class="nature_net.user_controls.contribution_view"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:uc="clr-namespace:nature_net.user_controls"
+             mc:Ignorable="d">
+    
+    <Canvas Name="contribution_canvas" Background="White">
+        <Image x:Name="the_image" Width="210" IsManipulationEnabled="True"></Image>
+        <MediaElement x:Name="the_media" Width="210" IsManipulationEnabled="True"></MediaElement>
+    </Canvas>
+</UserControl>
