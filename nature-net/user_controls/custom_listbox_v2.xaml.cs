@@ -112,6 +112,8 @@ namespace nature_net.user_controls
 
         UIElement HitTestOverItem(TouchEventArgs e, bool drag, bool v2, bool v1, bool other)
         {
+            if (e.Handled)
+                return null;
             TouchPoint pt = e.GetTouchPoint(this._list as IInputElement);
             hitResultsList.Clear();
 
@@ -138,19 +140,21 @@ namespace nature_net.user_controls
                 if (hitResultsList[hitResultsList.Count - 1].GetType() == t_item)
                 {
                     if (!drag)
+                    {
                         return (UIElement)hitResultsList[hitResultsList.Count - 1];
+                    }
                     if (hitResultsList.Count > 1)
                     {
                         Type t1 = hitResultsList[hitResultsList.Count - 2].GetType();
                         Type t2 = null;
                         if (!other)
-                            t2 = Type.GetType("System.Windows.Controls.DockPanel, PresentationFramework, Version=4.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35");
+                            t2 = Type.GetType("System.Windows.Controls.Border, PresentationFramework, Version=4.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35");
                         else
                             t2 = Type.GetType("System.Windows.Controls.Image, PresentationFramework, Version=4.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35");
                         if (hitResultsList[hitResultsList.Count - 2].GetType() == t2)
                         {
                             FrameworkElement i2 = (FrameworkElement)hitResultsList[hitResultsList.Count - 2];
-                            if (i2.Name == "right_panel" || i2.Name == "drag")
+                            if (i2.Name == "right_panel_border" || i2.Name == "drag")
                                 return (UIElement)hitResultsList[hitResultsList.Count - 1];
                         }
                     }
@@ -381,11 +385,6 @@ namespace nature_net.user_controls
 
         private void _list_PreviewTouchDown(object sender, TouchEventArgs e)
         {
-            if (test_thumb_feedback(e))
-            {
-                e.Handled = true;
-                return;
-            }
             if (!touch_points.ContainsKey(e.TouchDevice.Id))
             {
                 touch_info t = new touch_info();
@@ -535,6 +534,11 @@ namespace nature_net.user_controls
         }
         private void _list_PreviewTouchUp(object sender, TouchEventArgs e)
         {
+            if (test_thumb_feedback(e))
+            {
+                e.Handled = true;
+                return;
+            }
             //double dv = 0;
             //if (touch_points.Count > 0)
             //    dv = e.GetTouchPoint(this._list).Position.Y - touch_points[0].Position.Y;
@@ -615,8 +619,10 @@ namespace nature_net.user_controls
                     try { i2 = (item_generic_v2)i.Tag; }
                     catch (Exception) { return false; }
                     if (populator.thumbs_up_handler != null)
+                    {
                         populator.thumbs_up_handler(i2, e);
-                    return true;
+                        return true;
+                    }
                 }
                 //if (i.Name == "img_dislike")
                 //{
@@ -625,6 +631,7 @@ namespace nature_net.user_controls
                 //        populator.thumbs_down_handler(i2, e);
                 //    return true;
                 //}
+                return false;
             }
             catch (Exception) { return false; }
             return false;

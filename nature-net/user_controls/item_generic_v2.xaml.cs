@@ -33,7 +33,7 @@ namespace nature_net.user_controls
             right_panel_border.BorderThickness = new Thickness(1, 0, 0, 0);
             this.title.Margin = new Thickness(7, 0, 7, 0);
             this.item_border.BorderThickness = new Thickness(0, 0, 0, 1);
-            this.right_panel.Background = configurations.right_panel_background;
+            this.right_panel_border.Background = configurations.right_panel_background;
             right_panel.Width = configurations.right_panel_width;
         }
 
@@ -100,7 +100,7 @@ namespace nature_net.user_controls
             return new PointHitTestResult(this, hitTestParameters.HitPoint);
         }
 
-        public void like_touched(object sender, EventArgs te)
+        public void like_touched(object sender, TouchEventArgs te)
         {
             this.num_likes.Content = (Convert.ToInt32(this.num_likes.Content) + 1).ToString();
             naturenet_dataclassDataContext db = new naturenet_dataclassDataContext();
@@ -109,6 +109,8 @@ namespace nature_net.user_controls
             f.object_type = "nature_net.Contribution"; f.object_id = Convert.ToInt32((string)this.Tag);
             db.Feedbacks.InsertOnSubmit(f);
             db.SubmitChanges();
+            window_manager.load_design_ideas();
+            te.Handled = true;
         }
     }
 }

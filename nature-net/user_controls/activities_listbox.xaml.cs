@@ -48,10 +48,7 @@ namespace nature_net.user_controls
         {
             item_generic_v2 item = (item_generic_v2)i;
             string[] activity_item = ("activity;" + item.ToString()).Split(new Char[] { ';' });
-            window_manager.open_activity_window(activity_item[3], Convert.ToInt32(activity_item[1]),
-                configurations.RANDOM((int)(window_manager.main_canvas.ActualWidth - item.ActualWidth) - 20,
-                (int)(window_manager.main_canvas.ActualWidth - item.ActualWidth)),
-                item.PointToScreen(new Point(0, 0)).Y);
+            window_manager.open_activity_window(activity_item[3], Convert.ToInt32(activity_item[1]), 0, item.PointToScreen(new Point(0, 0)).Y);
             return true;
         }
 

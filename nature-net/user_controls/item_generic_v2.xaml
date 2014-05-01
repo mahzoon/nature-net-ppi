@@ -4,24 +4,26 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              mc:Ignorable="d" 
-             d:DesignHeight="110" d:DesignWidth="280">
+             d:DesignHeight="190" d:DesignWidth="280">
     
     <Border Name="item_border" BorderBrush="Gray">
         <DockPanel Name="item_panel" DockPanel.Dock="Top" LastChildFill="True">
-            <StackPanel Name="left_panel">
+            <StackPanel Name="left_panel" VerticalAlignment="Center">
                 <Image Name="avatar" Width="75" Height="75"></Image>
                 <Label Name="num_likes" HorizontalAlignment="Center" FontWeight="Bold">17</Label>
             </StackPanel>
             <Border Name="right_panel_border" DockPanel.Dock="Right">
-                <DockPanel Name="right_panel">
-                    <StackPanel Name="contribution_panel" Orientation="Horizontal" HorizontalAlignment="Center" DockPanel.Dock="Top">
-                        <TextBlock Name="number" TextWrapping="Wrap" VerticalAlignment="Center" FontWeight="Bold">5</TextBlock>
-                        <Image Name="number_icon" Width="25" Height="25"></Image>
-                    </StackPanel>
-                    <TextBlock Name="txt_level1" TextWrapping="Wrap" HorizontalAlignment="Center" DockPanel.Dock="Top">replies</TextBlock>
+                <DockPanel Name="right_panel" LastChildFill="True">
                     <StackPanel Name="info_panel" DockPanel.Dock="Bottom" VerticalAlignment="Bottom">
                         <TextBlock Name="txt_level2" TextWrapping="Wrap" HorizontalAlignment="Center">25 Nov 2013</TextBlock>
                         <TextBlock Name="txt_level3" TextWrapping="Wrap" HorizontalAlignment="Center">View Replies</TextBlock>
+                    </StackPanel>
+                    <StackPanel DockPanel.Dock="Top" VerticalAlignment="Center">
+                        <StackPanel Name="contribution_panel" Orientation="Horizontal" HorizontalAlignment="Center">
+                            <TextBlock Name="number" TextWrapping="Wrap" VerticalAlignment="Center" FontSize="22" FontWeight="Bold">5</TextBlock>
+                            <Image Name="number_icon" Margin="4,0,0,0" Width="20" Height="20"></Image>
+                        </StackPanel>
+                        <TextBlock Name="txt_level1" TextWrapping="Wrap" HorizontalAlignment="Center" DockPanel.Dock="Top">replies</TextBlock>
                     </StackPanel>
                 </DockPanel>
             </Border>

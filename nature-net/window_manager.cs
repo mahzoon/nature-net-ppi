@@ -27,6 +27,7 @@ namespace nature_net
         public static List<window_frame> design_ideas_frames = new List<window_frame>();
         public static List<window_frame> image_display_frames = new List<window_frame>();
         public static List<window_frame> activity_frames = new List<window_frame>();
+        public static List<image_frame> image_frames = new List<image_frame>();
 
         public static Dictionary<string, ImageSource> avatars = new Dictionary<string, ImageSource>();
 
@@ -72,21 +73,37 @@ namespace nature_net
 
         public static void open_contribution_window(collection_item citem, double pos_x, double pos_y, string ctype)
         {
-            if (window_manager.image_display_frames.Count + 1 > configurations.max_image_display_frame)
+            if (window_manager.image_frames.Count + 1 > configurations.max_image_display_frame)
                 return;
 
-            window_frame frame = new window_frame();
+            //window_frame frame = new window_frame();
             window_content content = new window_content();
-            contribution_view m = new contribution_view();
-            m.view_contribution(citem);
+            //contribution_view m = new contribution_view();
+            //m.view_contribution(citem);
+            image_frame iframe = new image_frame();
+            iframe.view_contribution(citem);
             content.initialize_comments(citem._contribution);
-            content.initialize_contents(m, Type.GetType("nature_net.Contribution"), citem._contribution.id, frame);
-            frame.window_content.Content = content;
-            window_manager.image_display_frames.Add(frame);
-            open_window(frame, pos_x, pos_y);
-            m.center_image();
-            frame.hide_change_view();
-            frame.set_title(ctype);
+            iframe.window_content.Content = content;
+            iframe.UpdateLayout();
+            content.initialize_contents(null, Type.GetType("nature_net.Contribution"), citem._contribution.id, iframe, iframe.the_content.Width);
+            //frame.window_content.Content = content;
+            //window_manager.image_display_frames.Add(frame);
+            //open_window(frame, pos_x, pos_y);
+            //m.center_image();
+            //frame.hide_change_view();
+            //frame.set_title(ctype);
+            main_canvas.Children.Add(iframe);
+            iframe.UpdateLayout();
+            window_manager.image_frames.Add(iframe);
+
+            double h = iframe.ActualHeight;
+            //try { h = ((window_content)(iframe.window_content.Content)).the_item.ActualHeight; }
+            //catch (Exception) { }
+            if (pos_y > window_manager.main_canvas.ActualHeight - h)
+                pos_y = window_manager.main_canvas.ActualHeight - h;
+            TranslateTransform m = new TranslateTransform(pos_x, pos_y);
+            Matrix matrix = m.Value;
+            iframe.RenderTransform = new MatrixTransform(matrix);
         }
 
         public static void open_design_idea_window(string[] idea_item, double pos_x, double pos_y, string title = "Design Idea")
@@ -124,6 +141,27 @@ namespace nature_net
             frame.hide_change_view();
             frame.set_title(title);
         }
+
+        //public static void open_design_idea_window(item_generic_v2 idea_item, double pos_x, double pos_y, string title = "Design Idea")
+        //{
+        //    if (window_manager.design_ideas_frames.Count + 1 > configurations.max_design_ideas_frame)
+        //        return;
+
+        //    window_frame frame = new window_frame();
+        //    window_content content = new window_content();
+
+        //    item_generic_v2 i = idea_item.get_clone();
+        //    i.Background = new SolidColorBrush(Colors.White);
+        //    i.Width = frame.Width;
+        //    content.initialize_contents(i, Type.GetType("nature_net.Contribution"), Convert.ToInt32(i.Tag), frame);
+
+        //    frame.window_content.Content = content;
+
+        //    window_manager.design_ideas_frames.Add(frame);
+        //    open_window(frame, pos_x, pos_y);
+        //    frame.hide_change_view();
+        //    frame.set_title(title);
+        //}
 
         public static void open_design_idea_window_ext(design_ideas_listbox parent, double pos_x, double pos_y)
         {
@@ -189,8 +227,11 @@ namespace nature_net
             frame.IsManipulationEnabled = true;
             frame.UpdateLayout();
 
-            if (pos_y > window_manager.main_canvas.ActualHeight - frame.ActualHeight)
-                pos_y = window_manager.main_canvas.ActualHeight - frame.ActualHeight;
+            double h = frame.ActualHeight;
+            try { h = ((window_content)(frame.window_content.Content)).the_item.ActualHeight; }
+            catch (Exception) { }
+            if (pos_y > window_manager.main_canvas.ActualHeight - h)
+                pos_y = window_manager.main_canvas.ActualHeight - h;
             TranslateTransform m = new TranslateTransform(pos_x, pos_y);
             Matrix matrix = m.Value;
             frame.RenderTransform = new MatrixTransform(matrix);
@@ -202,6 +243,12 @@ namespace nature_net
             image_display_frames.Remove(frame);
             signup_frames.Remove(frame);
             design_ideas_frames.Remove(frame);
+            main_canvas.Children.Remove(frame);
+        }
+
+        public static void close_window(image_frame frame)
+        {
+            
             main_canvas.Children.Remove(frame);
         }
 

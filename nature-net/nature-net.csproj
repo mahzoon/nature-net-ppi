@@ -127,6 +127,9 @@
     <Compile Include="user_controls\contribution_view.xaml.cs">
       <DependentUpon>contribution_view.xaml</DependentUpon>
     </Compile>
+    <Compile Include="user_controls\image_frame.xaml.cs">
+      <DependentUpon>image_frame.xaml</DependentUpon>
+    </Compile>
     <Compile Include="user_controls\item_generic.xaml.cs">
       <DependentUpon>item_generic.xaml</DependentUpon>
     </Compile>
@@ -192,6 +195,10 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="user_controls\contribution_view.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="user_controls\image_frame.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

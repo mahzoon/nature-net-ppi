@@ -259,17 +259,13 @@ namespace nature_net.user_controls
             if (list_design_ideas)
             {
                 string[] idea_item = ("design idea;" + item.ToString()).Split(new Char[] { ';' });
-                window_manager.open_design_idea_window(idea_item,
-                    configurations.RANDOM(20, (int)(window_manager.main_canvas.ActualWidth - item.ActualWidth)),
-                    item.PointToScreen(new Point(0, 0)).Y);
+                window_manager.open_design_idea_window(idea_item, 0, item.PointToScreen(new Point(0, 0)).Y);
                 _list.SelectedIndex = -1;
                 return;
             }
             if (list_users)
             {
-                window_manager.open_collection_window((string)item.username.Text, (int)item.Tag,
-                    configurations.RANDOM(20, (int)(window_manager.main_canvas.ActualWidth - item.ActualWidth)),
-                    item.PointToScreen(new Point(0, 0)).Y);
+                window_manager.open_collection_window((string)item.username.Text, (int)item.Tag, 0, item.PointToScreen(new Point(0, 0)).Y);
                 ///////window_manager.open_collections_balloon(item.PointToScreen(new Point(0, 0)).Y, (string)item.username.Content);
                 _list.SelectedIndex = -1;
                 return;
@@ -287,10 +283,7 @@ namespace nature_net.user_controls
             if (list_activities)
             {
                 string[] activity_item = ("activity;" + item.ToString()).Split(new Char[] { ';' });
-                window_manager.open_activity_window(activity_item[3], Convert.ToInt32(activity_item[1]),
-                    configurations.RANDOM((int)(window_manager.main_canvas.ActualWidth - item.ActualWidth) - 20,
-                    (int)(window_manager.main_canvas.ActualWidth - item.ActualWidth)),
-                    item.PointToScreen(new Point(0, 0)).Y);
+                window_manager.open_activity_window(activity_item[3], Convert.ToInt32(activity_item[1]), 0, item.PointToScreen(new Point(0, 0)).Y);
                 _list.SelectedIndex = -1;
                 return;
             }

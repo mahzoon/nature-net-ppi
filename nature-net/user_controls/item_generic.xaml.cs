@@ -107,6 +107,6 @@ namespace nature_net.user_controls
     public delegate void manipulation_starting_handler(object sender, ManipulationStartingEventArgs e);
     public delegate void manipulation_delta_handler(object sender, ManipulationDeltaEventArgs e);
     public delegate void avatar_touch_down_handler(object sender, TouchEventArgs e);
-    public delegate void thumbs_up(object sender, EventArgs e);
+    public delegate void thumbs_up(object sender, TouchEventArgs e);
     public delegate void thumbs_down(object sender, EventArgs e);
 }

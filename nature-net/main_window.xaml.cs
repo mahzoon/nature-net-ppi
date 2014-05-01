@@ -17,6 +17,7 @@ using Google.Apis.Drive.v2;
 using Google.Apis.Drive.v2.Data;
 using System.IO;
 using System.Drawing;
+using nature_net.user_controls;
 
 namespace nature_net
 {
@@ -45,7 +46,6 @@ namespace nature_net
 
                 InitializeComponent();
 
-                this.load_background();
                 this.Loaded += new RoutedEventHandler(MainWindow_Loaded);
                 this.Unloaded += new RoutedEventHandler(MainWindow_Unloaded);
                 this.Closing += new System.ComponentModel.CancelEventHandler(MainWindow_Closing);
@@ -227,6 +227,15 @@ namespace nature_net
             //}
             
             this.UpdateZOrder(element, true);
+            try
+            {
+                user_controls.window_frame f = (user_controls.window_frame)element;
+                try { window_content c = (window_content)f.window_content.Content; this.UpdateZOrder(c.GetKeyboardFrame(), true); }
+                catch (Exception) { }
+                try { signup s = (signup)f.window_content.Content; this.UpdateZOrder(s.GetKeyboardFrame(), true); }
+                catch (Exception) { }
+            }
+            catch (Exception) { }
         }
 
         void workspace_ManipulationDelta(object sender, ManipulationDeltaEventArgs e)
@@ -237,15 +246,38 @@ namespace nature_net
             ManipulationDelta deltaManipulation = e.DeltaManipulation;
             System.Windows.Point center = new System.Windows.Point(element.ActualWidth / 2, element.ActualHeight / 2);
             center = matrix.Transform(center);
-            //matrix.ScaleAt(deltaManipulation.Scale.X, deltaManipulation.Scale.Y, center.X, center.Y); 
+            image_frame iframe = null;
+            Matrix matrix2 = ((MatrixTransform)element.LayoutTransform).Matrix;
+            try
+            {
+                iframe = (image_frame)element;
+                matrix2.ScaleAt(deltaManipulation.Scale.X, deltaManipulation.Scale.Y, center.X, center.Y);
+            }
+            catch (Exception) { }
+
             matrix.RotateAt(e.DeltaManipulation.Rotation, e.ManipulationOrigin.X, e.ManipulationOrigin.Y);// center.X, center.Y);
             matrix.Translate(e.DeltaManipulation.Translation.X, e.DeltaManipulation.Translation.Y);
             element.RenderTransform = new MatrixTransform(matrix);
+            if (iframe != null)
+            {
+                //iframe.Width = iframe.Width * deltaManipulation.Scale.X;
+                //iframe.Height = iframe.Height * deltaManipulation.Scale.X;
+                iframe.the_item.Width = iframe.the_item.Width * deltaManipulation.Scale.X;
+                iframe.the_item.Height = iframe.the_item.Height * deltaManipulation.Scale.X;
+                //iframe.whole.Height = iframe.whole.Height * deltaManipulation.Scale.X;
+
+                iframe.title_bar.Height = configurations.frame_title_bar_height;
+                iframe.close.Height = 33;
+                iframe.close.Width = 33;
+                iframe.UpdateLayout();
+            }
             num_updates++;
             if (num_updates > configurations.max_num_content_update)
             {
                 num_updates = 0;
-                try { user_controls.window_frame w = (user_controls.window_frame)element; w.UpdateContents(); }
+                try { user_controls.window_frame w1 = (user_controls.window_frame)element; w1.UpdateContents(); }
+                catch (Exception) { }
+                try { user_controls.image_frame w2 = (user_controls.image_frame)element; w2.UpdateContents(); }
                 catch (Exception) { }
             }
         }
@@ -255,18 +287,22 @@ namespace nature_net
             var b = new ImageBrush();
             b.ImageSource = configurations.img_background_pic;
             this.workspace.Background = b;
-            //this.application_panel.Background = b;
-
+            BitmapImage background = (BitmapImage)configurations.img_background_pic;
+            System.Windows.Point pw = this.workspace.PointToScreen(new System.Windows.Point(0, 0));
+            double max_x = this.workspace.PointFromScreen(new System.Windows.Point(this.Width - pw.X, 0)).X;
             int i = 1;
             foreach (System.Windows.Point p in configurations.locations)
             {
+                double x = (p.X / background.PixelWidth) * max_x;
+                double y = (p.Y / background.PixelHeight) * this.workspace.ActualHeight;
+
                 Ellipse e = new Ellipse();
                 e.Fill = configurations.location_dot_color;
                 e.Stroke = configurations.location_dot_outline_color;
                 e.Width = configurations.location_dot_diameter;
                 e.Height = configurations.location_dot_diameter;
-                Canvas.SetLeft(e, p.X);
-                Canvas.SetTop(e, p.Y);
+                Canvas.SetLeft(e, x - (configurations.location_dot_diameter / 2));
+                Canvas.SetTop(e, y - (configurations.location_dot_diameter / 2));
                 e.Tag = i;
                 e.PreviewTouchDown += new EventHandler<TouchEventArgs>(reddot_PreviewTouchDown);
                 TextBlock tb = new TextBlock();
@@ -275,13 +311,13 @@ namespace nature_net
                 tb.PreviewTouchDown += new EventHandler<TouchEventArgs>(tb_PreviewTouchDown);
                 if (i > 9)
                 {
-                    Canvas.SetLeft(tb, p.X + configurations.location_dot_diameter / 2 - 12);
-                    Canvas.SetTop(tb, p.Y + configurations.location_dot_diameter / 2 - 15);
+                    Canvas.SetLeft(tb, x - 12);
+                    Canvas.SetTop(tb, y - 15);
                 }
                 else
                 {
-                    Canvas.SetLeft(tb, p.X + configurations.location_dot_diameter / 2 - 8);
-                    Canvas.SetTop(tb, p.Y + configurations.location_dot_diameter / 2 - 15);
+                    Canvas.SetLeft(tb, x - 8);
+                    Canvas.SetTop(tb, y - 15);
                 }
                 workspace.Children.Add(e);
                 workspace.Children.Add(tb);
@@ -313,6 +349,8 @@ namespace nature_net
 
         void MainWindow_Loaded(object sender, RoutedEventArgs e)
         {
+            this.load_background();
+
             window_manager.main_canvas = this.workspace;
             window_manager.left_tab = left_tab;
             //window_manager.right_tab = right_tab;
@@ -332,7 +370,7 @@ namespace nature_net
         private void UpdateZOrder(UIElement element, bool bringToFront)
         {
             if (element == null)return;
-            if (!this.workspace.Children.Contains(element))return;
+            if (!this.workspace.Children.Contains(element)) return;
 
             // Determine the Z-Index for the target UIElement.
             int elementNewZIndex = -1;

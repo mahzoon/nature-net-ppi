@@ -25,14 +25,17 @@ namespace nature_net.user_controls
 
         public design_ideas_listbox parent;
         public thumbs_up like_handler;
+        item_generic submit_idea;
 
         public design_ideas_listbox()
         {
             InitializeComponent();
 
             header.title.Content = "Design Ideas";
+            header.top.Content = "Popular";
             //Static Configuration Values:
-            item_generic submit_idea = new item_generic();
+            submit_idea = new item_generic();
+            submit_idea.Background = Brushes.White;
             submit_idea.user_desc.Visibility = System.Windows.Visibility.Collapsed;
             submit_idea.number.Visibility = System.Windows.Visibility.Collapsed;
             submit_idea.content.Visibility = System.Windows.Visibility.Collapsed;
@@ -60,7 +63,7 @@ namespace nature_net.user_controls
 
         void submit_Click(object sender, TouchEventArgs e)//RoutedEventArgs e)
         {
-            window_manager.open_design_idea_window_ext(this, configurations.RANDOM(0, (int)window_manager.main_canvas.ActualWidth), 0);
+            window_manager.open_design_idea_window_ext(this, 65, submit_idea.PointToScreen(new Point(0, 0)).Y);
                 //configurations.RANDOM((int)(window_manager.main_canvas.ActualWidth - this.ActualWidth) - 20,
                 //(int)(window_manager.main_canvas.ActualWidth - this.ActualWidth)),
                 //configurations.RANDOM((int)(window_manager.main_canvas.ActualHeight - this.submit_idea.Height - 20),
@@ -71,9 +74,8 @@ namespace nature_net.user_controls
         {
             item_generic_v2 item = (item_generic_v2)i;
             string[] idea_item = ("design idea;" + item.ToString()).Split(new Char[] { ';' });
-            window_manager.open_design_idea_window(idea_item,
-                    configurations.RANDOM(20, (int)(window_manager.main_canvas.ActualWidth - item.ActualWidth)),
-                    item.PointToScreen(new Point(0, 0)).Y);
+            window_manager.open_design_idea_window(idea_item, 0, item.PointToScreen(new Point(0, 0)).Y);
+            //window_manager.open_design_idea_window(item, 0, item.PointToScreen(new Point(0, 0)).Y);
             return true;
         }
 
@@ -104,12 +106,12 @@ namespace nature_net.user_controls
             //this.design_ideas_list._list.Items.Refresh();
         }
 
-        void like_touched(object sender, EventArgs te)
+        void like_touched(object sender, TouchEventArgs te)
         {
             item_generic_v2 i = (item_generic_v2)sender;
             i.like_touched(sender, te);
-            this.design_ideas_list._list.Items.Refresh();
-            this.design_ideas_list.populator.list_all_design_ideas();
+            //this.design_ideas_list._list.Items.Refresh();
+            //this.design_ideas_list.populator.list_all_design_ideas();
         }
 
         //void dislike_touched(object sender, EventArgs te)

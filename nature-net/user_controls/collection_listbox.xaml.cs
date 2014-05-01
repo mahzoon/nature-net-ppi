@@ -472,7 +472,7 @@ namespace nature_net.user_controls
             collection_listbox_item item = (collection_listbox_item)i;
             collection_item ci = (collection_item)item.img.Tag;
             window_manager.open_contribution_window(ci,
-                configurations.RANDOM(20, (int)(window_manager.main_canvas.ActualWidth - item.ActualWidth)),
+                item.PointToScreen(new Point(0, 0)).X - window_manager.main_canvas.PointToScreen(new Point(0,0)).X,
                 item.PointToScreen(new Point(0, 0)).Y, ci.ToString());
             return true;
         }

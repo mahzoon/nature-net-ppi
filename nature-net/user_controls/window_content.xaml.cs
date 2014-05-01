@@ -210,6 +210,8 @@ namespace nature_net.user_controls
                     catch (Exception) { }
                 }
                 this.list_all_comments();
+                if (this._object_type.ToString() == "nature_net.Contribution")
+                    window_manager.load_design_ideas();
             }
             this.comment_textbox.SelectAll();
         }
@@ -245,6 +247,23 @@ namespace nature_net.user_controls
             this.comments_listbox._list.Width = parent_frame.Width;
             this.list_all_comments();
             
+            //this.add_comment_img.Source = configurations.img_drop_avatar_pic;
+            //var brush = new ImageBrush();
+            //brush.ImageSource = configurations.img_drop_avatar_pic;
+            //brush.Stretch = Stretch.None;
+            //this.leave_comment_canvas.Background = brush;
+
+            this.parent = parent_frame;
+        }
+
+        public void initialize_contents(UserControl uc, Type obj_type, int obj_id, UserControl parent_frame, double width)
+        {
+            this.the_item.Content = uc;
+            this._object_id = obj_id;
+            this._object_type = obj_type;
+            this.comments_listbox._list.Width = width;
+            this.list_all_comments();
+
             //this.add_comment_img.Source = configurations.img_drop_avatar_pic;
             //var brush = new ImageBrush();
             //brush.ImageSource = configurations.img_drop_avatar_pic;
@@ -331,6 +350,11 @@ namespace nature_net.user_controls
                     }
                 }
             }
+        }
+
+        public UIElement GetKeyboardFrame()
+        {
+            return keyboard_frame;
         }
 
         public Control ControlToInjectInto

@@ -36,13 +36,21 @@ namespace nature_net.user_controls
             //textbox_email.LostFocus += new RoutedEventHandler(textbox_LostFocus);
             //textbox_password.LostFocus += new RoutedEventHandler(textbox_LostFocus);
             this.button_submit.PreviewTouchDown += new EventHandler<TouchEventArgs>(button_submit_Click);
+            this.button_next1.PreviewTouchDown += new EventHandler<TouchEventArgs>(button_next1_Click);
+            this.button_next2.PreviewTouchDown += new EventHandler<TouchEventArgs>(button_next2_Click);
+            this.button_back1.PreviewTouchDown += new EventHandler<TouchEventArgs>(button_back1_Click);
+            this.button_back2.PreviewTouchDown += new EventHandler<TouchEventArgs>(button_back2_Click);
             this.Unloaded += new RoutedEventHandler(signup_Unloaded);
 
-            this.checkbox_agreement.IsEnabled = true;
-            this.checkbox_agreement.PreviewTouchDown += new EventHandler<TouchEventArgs>(checkbox_agreement_PreviewTouchDown);
+            this.checkbox_agreement1.PreviewTouchDown += new EventHandler<TouchEventArgs>(checkbox_agreement_PreviewTouchDown);
+            this.checkbox_agreement2.PreviewTouchDown += new EventHandler<TouchEventArgs>(checkbox_agreement_PreviewTouchDown);
+            this.checkbox_agreement3.PreviewTouchDown += new EventHandler<TouchEventArgs>(checkbox_agreement_PreviewTouchDown);
+            this.checkbox_agreement4.PreviewTouchDown += new EventHandler<TouchEventArgs>(checkbox_agreement_PreviewTouchDown);
+            this.checkbox_agreement5.PreviewTouchDown += new EventHandler<TouchEventArgs>(checkbox_agreement_PreviewTouchDown);
 
             //ScrollViewer scroll = configurations.GetDescendantByType(this.listbox_avatars, typeof(ScrollViewer)) as ScrollViewer;
-            
+            this.Height = 500;
+            consent_form_1.Visibility = System.Windows.Visibility.Visible;
         }
 
         protected override void OnManipulationBoundaryFeedback(ManipulationBoundaryFeedbackEventArgs e)
@@ -52,7 +60,8 @@ namespace nature_net.user_controls
 
         void checkbox_agreement_PreviewTouchDown(object sender, TouchEventArgs e)
         {
-            this.checkbox_agreement.IsChecked = !this.checkbox_agreement.IsChecked;
+            CheckBox c = (CheckBox)sender;
+            c.IsChecked = !c.IsChecked;
         }
 
         void signup_Unloaded(object sender, RoutedEventArgs e)
@@ -73,6 +82,11 @@ namespace nature_net.user_controls
                     }
                 }
             }
+        }
+
+        public UIElement GetKeyboardFrame()
+        {
+            return keyboard_frame;
         }
 
         void textbox_LostFocus(object sender, RoutedEventArgs e)
@@ -119,6 +133,30 @@ namespace nature_net.user_controls
             get { return this.focused_textbox; }
         }
 
+        private void button_next1_Click(object sender, RoutedEventArgs e)
+        {
+            this.consent_form_1.Visibility = System.Windows.Visibility.Collapsed;
+        }
+
+        private void button_next2_Click(object sender, RoutedEventArgs e)
+        {
+            //if (this.checkbox_agreement1.IsChecked.Value && this.checkbox_agreement2.IsChecked.Value && checkbox_agreement3.IsChecked.Value && checkbox_agreement4.IsChecked.Value)
+            //{
+                this.consent_form_2.Visibility = System.Windows.Visibility.Collapsed;
+                reset();
+            //}
+        }
+
+        private void button_back1_Click(object sender, RoutedEventArgs e)
+        {
+            this.consent_form_1.Visibility = System.Windows.Visibility.Visible;
+        }
+
+        private void button_back2_Click(object sender, RoutedEventArgs e)
+        {
+            this.consent_form_2.Visibility = System.Windows.Visibility.Visible;
+        }
+
         private void button_submit_Click(object sender, RoutedEventArgs e)
         {
             reset();
@@ -144,10 +182,10 @@ namespace nature_net.user_controls
                 desc.Text = "Password is empty.";
                 return;
             }
-            if (!checkbox_agreement.IsChecked.Value)
+            if (!checkbox_agreement5.IsChecked.Value)
             {
-                checkbox_agreement.BorderBrush = Brushes.Red;
-                checkbox_agreement.BorderThickness = new Thickness(5);
+                checkbox_agreement5.BorderBrush = Brushes.Red;
+                checkbox_agreement5.BorderThickness = new Thickness(5);
                 desc.Text = "You should agree to terms and conditions.";
                 return;
             }
@@ -203,11 +241,12 @@ namespace nature_net.user_controls
             textbox_email.BorderThickness = new Thickness(2);
             textbox_password.BorderBrush = Brushes.LightGray;
             textbox_password.BorderThickness = new Thickness(2);
-            checkbox_agreement.BorderBrush = Brushes.LightGray;
-            checkbox_agreement.BorderThickness = new Thickness(0);
+            checkbox_agreement5.BorderBrush = Brushes.LightGray;
+            checkbox_agreement5.BorderThickness = new Thickness(0);
             label_choose_avatar.BorderBrush = Brushes.LightGray;
             label_choose_avatar.BorderThickness = new Thickness(0);
-            desc.Visibility = System.Windows.Visibility.Collapsed;
+            //desc.Visibility = System.Windows.Visibility.Hidden;
+            desc.Text = "Welcome";
         }
     }
 }

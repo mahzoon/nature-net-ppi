@@ -7,8 +7,130 @@
              d:DesignHeight="500" d:DesignWidth="400">
     
     <DockPanel LastChildFill="True" Background="Gainsboro">
-        <TextBlock Name="desc" DockPanel.Dock="Top" HorizontalAlignment="Center" Foreground="Red" ></TextBlock>
-        <StackPanel Orientation="Horizontal" DockPanel.Dock="Top" Height="250">
+        
+        <!-- Page1 -->
+        <DockPanel Name="consent_form_1" DockPanel.Dock="Top" Height="500" Visibility="Visible">
+            <TextBlock Name="consent_form_text1" DockPanel.Dock="Top" TextWrapping="Wrap" FontFamily="Segoe UI" FontSize="15" Margin="5" >
+            You are invited to participate in a research project being conducted by the researchers listed on the bottom of the page in consultation with Jim Kravitz, Director of Naturalist Programs at ACES. In order for us to be allowed to use any data you wish to provide, we must have your consent.
+            </TextBlock>
+            <TextBlock Name="consent_form_text2" DockPanel.Dock="Top" TextWrapping="Wrap" FontFamily="Segoe UI" FontSize="15" Margin="5" >
+                In simplest terms, we hope you will use the mobile phone and tabletop at ACES to
+            </TextBlock>
+            <TextBlock Name="consent_form_text3" DockPanel.Dock="Top" TextWrapping="Wrap" FontFamily="Segoe UI" FontSize="15" Margin="5" >
+                <BulletDecorator Margin="10,0,0,5">
+                    <BulletDecorator.Bullet>
+                        <Ellipse Fill="Black" Stroke="Black" StrokeThickness="1" Width="8" Height="8"/>
+                    </BulletDecorator.Bullet>
+                    <TextBlock Margin="5,0,0,0" Text="Take pictures" />
+                </BulletDecorator>
+                <LineBreak />
+                <BulletDecorator Margin="10,0,0,5">
+                    <BulletDecorator.Bullet>
+                        <Ellipse Fill="Black" Stroke="Black" StrokeThickness="1" Width="8" Height="8"/>
+                    </BulletDecorator.Bullet>
+                    <TextBlock Margin="5,0,0,0" Text="Share observations about the natural world" />
+                </BulletDecorator>
+                <LineBreak />
+                <BulletDecorator Margin="10,0,0,5">
+                    <BulletDecorator.Bullet>
+                        <Ellipse Fill="Black" Stroke="Black" StrokeThickness="1" Width="8" Height="8"/>
+                    </BulletDecorator.Bullet>
+                    <TextBlock TextWrapping="Wrap" Margin="5,0,0,0" Text="Share ideas you have to improve the design of the phone or tabletop application" />
+                </BulletDecorator>
+                <LineBreak />
+                <BulletDecorator Margin="10,0,0,5">
+                    <BulletDecorator.Bullet>
+                        <Ellipse Fill="Black" Stroke="Black" StrokeThickness="1" Width="8" Height="8"/>
+                    </BulletDecorator.Bullet>
+                    <TextBlock TextWrapping="Wrap" Margin="5,0,0,0" Text="Comment on pictures, observations, and design ideas of others" />
+                </BulletDecorator>
+            </TextBlock>
+            <TextBlock Name="consent_form_text4" DockPanel.Dock="Top" TextWrapping="Wrap" FontFamily="Segoe UI" FontSize="15" Margin="5" >
+            The researchers and others visiting the preserve will be able to look at your comments and pictures on the tabletop, and we may ask if you are willing to answer a few more questions (either on paper, by phone, or face to face) about your whole experience. You may stop participating at any time.
+            </TextBlock>
+            <DockPanel>
+            <Button Name="button_next1" DockPanel.Dock="Right" Background="Green" Width="100" Foreground="White"
+                             VerticalContentAlignment="Center" HorizontalContentAlignment="Center"
+                             HorizontalAlignment="Right" Margin="0,5,5,5" Height="32">Next</Button>
+            </DockPanel>
+        </DockPanel>
+
+        <!-- Page2 -->
+        <DockPanel Name="consent_form_2" DockPanel.Dock="Top" Height="500">
+            <TextBlock Name="consent_form_text5" DockPanel.Dock="Top" TextWrapping="Wrap" FontFamily="Segoe UI" FontSize="15" Margin="5" >
+            A long version of this consent form is available for your review and signature, or you may opt to sign this shorter one by
+                <Italic Foreground="Red">
+                checking off all the boxes that reflect your wishes and signing and dating the form below.
+                </Italic>
+            </TextBlock>
+            <CheckBox Name="checkbox_agreement1" DockPanel.Dock="Top" Margin="5,5,5,5" Height="42"
+                                   Background="White" Foreground="Black" BorderBrush="Gray" BorderThickness="2">
+                <TextBlock FontFamily="Segoe UI" FontSize="15" Foreground="Black" TextWrapping="Wrap">
+                        I agree that any nature photos I take using the NatureNet application may be uploaded to the tabletop at ACES and/or a website now under development.
+                </TextBlock>
+            </CheckBox>
+            <CheckBox Name="checkbox_agreement2" DockPanel.Dock="Top" Margin="5,5,5,5" Height="42"
+                                   Background="White" Foreground="Black" BorderBrush="Gray" BorderThickness="2">
+                <TextBlock FontFamily="Segoe UI" FontSize="15" Foreground="Black" TextWrapping="Wrap">
+                        I agree to allow any comments, observations, and profile information that I choose to share with others via the online application to be visible to others who use the application at the same time or after me.
+                </TextBlock>
+            </CheckBox>
+            <CheckBox Name="checkbox_agreement3" DockPanel.Dock="Top" Margin="5,5,5,5" Height="42"
+                                   Background="White" Foreground="Black" BorderBrush="Gray" BorderThickness="2">
+                <TextBlock FontFamily="Segoe UI" FontSize="15" Foreground="Black" TextWrapping="Wrap">
+                        I agree to be videotaped/audiotaped during my participation in this study.
+                </TextBlock>
+            </CheckBox>
+            <CheckBox Name="checkbox_agreement4" DockPanel.Dock="Top" Margin="5,5,5,5" Height="42"
+                                   Background="White" Foreground="Black" BorderBrush="Gray" BorderThickness="2">
+                <TextBlock FontFamily="Segoe UI" FontSize="15" Foreground="Black" TextWrapping="Wrap">
+                        I agree to complete a short questionnaire during or after my participation in this study
+                </TextBlock>
+            </CheckBox>
+            <DockPanel DockPanel.Dock="Top" HorizontalAlignment="Center">
+                <TextBlock Name="researcher1" DockPanel.Dock="Left" TextWrapping="Wrap" FontFamily="Segoe UI" FontSize="10" Margin="5" Width="120" >
+                    Jennifer Preece <LineBreak />
+                    University of Maryland <LineBreak />
+                    College of Information Studies<LineBreak />
+                    4105 Hornbake Bldg, South Wing<LineBreak />
+                    College Park, MD  20742<LineBreak />
+                    (301) 405-2035<LineBreak />
+                    preece@umd.edu
+                </TextBlock>
+                <TextBlock Name="researcher2" DockPanel.Dock="Left" TextWrapping="Wrap" FontFamily="Segoe UI" FontSize="10" Margin="5" Width="120" >
+                    Mary Lou Maher <LineBreak />
+                    University of North Carolina, Charlotte<LineBreak />
+                    Software Information Systems<LineBreak />
+                    Woodward 310A<LineBreak />
+                    9201 University City Blvd. <LineBreak />
+                    Charlotte, NC 28223<LineBreak />
+                    (704) 687-1940 <LineBreak />
+                    m.maher@uncc.edu
+                </TextBlock>
+                <TextBlock Name="researcher3" DockPanel.Dock="Right" TextWrapping="Wrap" FontFamily="Segoe UI" FontSize="10" Margin="5" Width="120" >
+                    Tom Yeh<LineBreak />
+                    University of Colorado<LineBreak />
+                    Department of Computer Science <LineBreak />
+                    DLC 173A<LineBreak />
+                    1045 Regent Drive 430 UCB<LineBreak />
+                    Boulder, CO 80309‐0430<LineBreak />
+                    (303) 492-1762<LineBreak />
+                    tom.yeh@colorado.edu
+                </TextBlock>
+            </DockPanel>
+            <DockPanel DockPanel.Dock="Top">
+                <Button Name="button_back1" Background="Green" Width="100" Foreground="White" DockPanel.Dock="Left"
+                             VerticalContentAlignment="Center" HorizontalContentAlignment="Center"
+                             HorizontalAlignment="Right" Margin="5,5,0,5" Height="32">Back</Button>
+                <Button Name="button_next2" DockPanel.Dock="Right" Background="Green" Width="100" Foreground="White"
+                             VerticalContentAlignment="Center" HorizontalContentAlignment="Center"
+                             HorizontalAlignment="Right" Margin="0,5,5,5" Height="32">Next</Button>
+            </DockPanel>
+        </DockPanel>
+
+        <!-- Page3 -->
+        <TextBlock Name="desc" DockPanel.Dock="Top" HorizontalAlignment="Center" Foreground="Red" Margin="5" >Welcome</TextBlock>
+        <StackPanel Orientation="Horizontal" DockPanel.Dock="Top" Height="260" Margin="0">
             <DockPanel LastChildFill="True" Width="192">
                 <Label Name="label_name" DockPanel.Dock="Top" FontSize="14">Name:</Label>
                 <TextBox Name="textbox_name" DockPanel.Dock="Top" Width="180" FontSize="14" Height="38" VerticalContentAlignment="Center"
@@ -22,7 +144,7 @@
                 <PasswordBox Name="textbox_password" DockPanel.Dock="Top" Width="180" FontFamily="Segoe UI" VerticalContentAlignment="Center"
                                       Height="38" Foreground="Black" FontSize="14" Background="FloralWhite" BorderBrush="LightGray" BorderThickness="2">
                 </PasswordBox>
-                <CheckBox Name="checkbox_agreement" DockPanel.Dock="Top" Margin="5,5,5,5" Height="42"
+                <CheckBox Name="checkbox_agreement5" DockPanel.Dock="Top" Margin="5,5,5,5" Height="42"
                                    Background="White" Foreground="Black" BorderBrush="Gray" BorderThickness="2">
                     <TextBlock FontFamily="Segoe UI" FontSize="12" Foreground="Black" TextWrapping="Wrap" Width="159">
                         I Agree to Terms and Conditions
@@ -75,9 +197,14 @@
                     </DataTemplate>
                 </ListBox.DataContext>
             </ListBox>
-            <Button Name="button_submit" Background="Green" Width="100" Foreground="White"
+            <DockPanel>
+                <Button Name="button_back2" Background="Green" Width="100" Foreground="White" DockPanel.Dock="Left"
+                             VerticalContentAlignment="Center" HorizontalContentAlignment="Center"
+                             HorizontalAlignment="Right" Margin="5,5,0,5" Height="32">Back</Button>
+                <Button Name="button_submit" Background="Green" Width="100" Foreground="White" DockPanel.Dock="Right"
                              VerticalContentAlignment="Center" HorizontalContentAlignment="Center"
                              HorizontalAlignment="Right" Margin="0,5,5,5" Height="32">Submit</Button>
+            </DockPanel>
         </StackPanel>
     </DockPanel>
 

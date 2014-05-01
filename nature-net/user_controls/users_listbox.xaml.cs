@@ -22,6 +22,7 @@ namespace nature_net.user_controls
     public partial class users_listbox : UserControl
     {
         //private readonly BackgroundWorker worker = new BackgroundWorker();
+        item_generic signup;
 
         public users_listbox()
         {
@@ -30,7 +31,8 @@ namespace nature_net.user_controls
             //Static Configuration Values:
             header.title.Content = "Users";
             //this.Width = 270;
-            item_generic signup = new item_generic();
+            signup = new item_generic();
+            signup.Background = Brushes.White;
             signup.user_desc.Visibility = System.Windows.Visibility.Collapsed;
             signup.number.Visibility = System.Windows.Visibility.Collapsed;
             signup.content.Visibility = System.Windows.Visibility.Collapsed;
@@ -55,7 +57,7 @@ namespace nature_net.user_controls
 
         void signup_PreviewTouchDown(object sender, TouchEventArgs e)
         {
-            window_manager.open_signup_window(configurations.RANDOM(0, (int)window_manager.main_canvas.ActualWidth), 0);
+            window_manager.open_signup_window(65, signup.PointToScreen(new Point(0,0)).Y);
         }
 
         public void list_all_users()
@@ -67,9 +69,7 @@ namespace nature_net.user_controls
         bool item_selected(object i)
         {
             item_generic_v2 item = (item_generic_v2)i;
-            window_manager.open_collection_window((string)item.title.Text, (int)item.Tag,
-                    configurations.RANDOM(20, (int)(window_manager.main_canvas.ActualWidth - item.ActualWidth)),
-                    item.PointToScreen(new Point(0, 0)).Y);
+            window_manager.open_collection_window((string)item.title.Text, (int)item.Tag, 0, item.PointToScreen(new Point(0, 0)).Y);
             return true;
         }
 

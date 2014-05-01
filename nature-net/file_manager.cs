@@ -55,17 +55,7 @@ namespace nature_net
             catch (Exception gd_exc)
             {
                 // write log of the exception
-                StreamReader reader = new StreamReader(configurations.GetAbsoluteLogFilePath());
-                string whole = reader.ReadToEnd();
-                reader.Close();
-
-                StreamWriter writer = new StreamWriter(configurations.GetAbsoluteLogFilePath());
-                writer.WriteLine("--START--");
-                writer.WriteLine(gd_exc.Message);
-                writer.WriteLine(whole);
-                writer.WriteLine(gd_exc.StackTrace);
-                writer.WriteLine("--END--");
-                writer.Close();
+                log.WriteErrorLog(gd_exc);
                 return false;
             }
         }

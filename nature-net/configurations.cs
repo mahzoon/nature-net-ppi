@@ -136,6 +136,7 @@ namespace nature_net
 
         public static int frame_width = 300;
         public static int frame_title_bar_height = 40;
+        public static double frame_image_title_bar_height_percentage = 0.05;
         public static int frame_icon_width = 40;
         public static int collection_listbox_height = 170;
 
@@ -576,17 +577,30 @@ namespace nature_net
             //Point p11 = new Point(150, 570); locations.Add(p11);
 
             // Locations (in tabletop)
-            Point p1 = new Point(parser.GetValue("Locations", "P1X", 569 - 240), parser.GetValue("Locations", "P1Y", 699 - 20)); locations.Add(p1);
-            Point p2 = new Point(parser.GetValue("Locations", "P2X", 615 - 240), parser.GetValue("Locations", "P2Y", 783 - 20)); locations.Add(p2);
-            Point p3 = new Point(parser.GetValue("Locations", "P3X", 989 - 240), parser.GetValue("Locations", "P3Y", 439 - 20)); locations.Add(p3);
-            Point p4 = new Point(parser.GetValue("Locations", "P4X", 1264 - 230), parser.GetValue("Locations", "P4Y", 558 - 15)); locations.Add(p4);
-            Point p5 = new Point(parser.GetValue("Locations", "P5X", 1275 - 240), parser.GetValue("Locations", "P5Y", 888 - 20)); locations.Add(p5);
-            Point p6 = new Point(parser.GetValue("Locations", "P6X", 1476 - 230), parser.GetValue("Locations", "P6Y", 1098 - 20)); locations.Add(p6);
-            Point p7 = new Point(parser.GetValue("Locations", "P7X", 1554 - 240), parser.GetValue("Locations", "P7Y", 1253 - 10)); locations.Add(p7);
-            Point p8 = new Point(parser.GetValue("Locations", "P8X", 1438 - 230), parser.GetValue("Locations", "P8Y", 1375 - 10)); locations.Add(p8);
-            Point p9 = new Point(parser.GetValue("Locations", "P9X", 1310 - 230), parser.GetValue("Locations", "P9Y", 1375 - 10)); locations.Add(p9);
-            Point p10 = new Point(parser.GetValue("Locations", "P10X", 724 - 240), parser.GetValue("Locations", "P10Y", 985 - 20)); locations.Add(p10);
-            Point p11 = new Point(parser.GetValue("Locations", "P11X", 630 - 240), parser.GetValue("Locations", "P11Y", 1036 - 20)); locations.Add(p11);
+            Point p1 = new Point(parser.GetValue("Locations", "P1X", 0), parser.GetValue("Locations", "P1Y", 0)); locations.Add(p1);
+            Point p2 = new Point(parser.GetValue("Locations", "P2X", 0), parser.GetValue("Locations", "P2Y", 0)); locations.Add(p2);
+            Point p3 = new Point(parser.GetValue("Locations", "P3X", 0), parser.GetValue("Locations", "P3Y", 0)); locations.Add(p3);
+            Point p4 = new Point(parser.GetValue("Locations", "P4X", 0), parser.GetValue("Locations", "P4Y", 0)); locations.Add(p4);
+            Point p5 = new Point(parser.GetValue("Locations", "P5X", 0), parser.GetValue("Locations", "P5Y", 0)); locations.Add(p5);
+            Point p6 = new Point(parser.GetValue("Locations", "P6X", 0), parser.GetValue("Locations", "P6Y", 0)); locations.Add(p6);
+            Point p7 = new Point(parser.GetValue("Locations", "P7X", 0), parser.GetValue("Locations", "P7Y", 0)); locations.Add(p7);
+            Point p8 = new Point(parser.GetValue("Locations", "P8X", 0), parser.GetValue("Locations", "P8Y", 0)); locations.Add(p8);
+            Point p9 = new Point(parser.GetValue("Locations", "P9X", 0), parser.GetValue("Locations", "P9Y", 0)); locations.Add(p9);
+            Point p10 = new Point(parser.GetValue("Locations", "P10X", 0), parser.GetValue("Locations", "P10Y", 0)); locations.Add(p10);
+            Point p11 = new Point(parser.GetValue("Locations", "P11X", 0), parser.GetValue("Locations", "P11Y", 0)); locations.Add(p11);
+
+            //Point p1 = new Point(parser.GetValue("Locations", "P1X", 800), parser.GetValue("Locations", "P1Y", 1383)); locations.Add(p1);
+            //Point p2 = new Point(parser.GetValue("Locations", "P2X", 925), parser.GetValue("Locations", "P2Y", 1499)); locations.Add(p2);
+            //Point p3 = new Point(parser.GetValue("Locations", "P3X", 1795), parser.GetValue("Locations", "P3Y", 844)); locations.Add(p3);
+            //Point p4 = new Point(parser.GetValue("Locations", "P4X", 2437), parser.GetValue("Locations", "P4Y", 1077)); locations.Add(p4);
+            //Point p5 = new Point(parser.GetValue("Locations", "P5X", 2457), parser.GetValue("Locations", "P5Y", 1711)); locations.Add(p5);
+            //Point p6 = new Point(parser.GetValue("Locations", "P6X", 2921), parser.GetValue("Locations", "P6Y", 2111)); locations.Add(p6);
+            //Point p7 = new Point(parser.GetValue("Locations", "P7X", 3120), parser.GetValue("Locations", "P7Y", 2430)); locations.Add(p7);
+            //Point p8 = new Point(parser.GetValue("Locations", "P8X", 2837), parser.GetValue("Locations", "P8Y", 2670)); locations.Add(p8);
+            //Point p9 = new Point(parser.GetValue("Locations", "P9X", 2533), parser.GetValue("Locations", "P9Y", 2668)); locations.Add(p9);
+            //Point p10 = new Point(parser.GetValue("Locations", "P10X", 1151), parser.GetValue("Locations", "P10Y", 1931)); locations.Add(p10);
+            //Point p11 = new Point(parser.GetValue("Locations", "P11X", 969), parser.GetValue("Locations", "P11Y", 2016)); locations.Add(p11);
+
             location_dot_diameter = parser.GetValue("Locations", "location_dot_diameter", 55);
             location_dot_color = parser.GetValue("Locations", "location_dot_color", Brushes.Crimson);
             location_dot_outline_color = parser.GetValue("Locations", "location_dot_outline_color", Brushes.Crimson);
