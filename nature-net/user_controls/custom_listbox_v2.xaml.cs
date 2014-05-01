@@ -145,17 +145,20 @@ namespace nature_net.user_controls
                     }
                     if (hitResultsList.Count > 1)
                     {
-                        Type t1 = hitResultsList[hitResultsList.Count - 2].GetType();
-                        Type t2 = null;
-                        if (!other)
-                            t2 = Type.GetType("System.Windows.Controls.Border, PresentationFramework, Version=4.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35");
-                        else
-                            t2 = Type.GetType("System.Windows.Controls.Image, PresentationFramework, Version=4.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35");
-                        if (hitResultsList[hitResultsList.Count - 2].GetType() == t2)
+                        for (int counter = 0; counter < hitResultsList.Count - 1; counter++)
                         {
-                            FrameworkElement i2 = (FrameworkElement)hitResultsList[hitResultsList.Count - 2];
-                            if (i2.Name == "right_panel_border" || i2.Name == "drag")
-                                return (UIElement)hitResultsList[hitResultsList.Count - 1];
+                            Type t1 = hitResultsList[counter].GetType();
+                            Type t2 = null;
+                            if (!other)
+                                t2 = Type.GetType("System.Windows.Controls.Border, PresentationFramework, Version=4.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35");
+                            else
+                                t2 = Type.GetType("System.Windows.Controls.Image, PresentationFramework, Version=4.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35");
+                            if (hitResultsList[counter].GetType() == t2)
+                            {
+                                FrameworkElement i2 = (FrameworkElement)hitResultsList[counter];
+                                if (i2.Name == "right_panel_border" || i2.Name == "drag")
+                                    return (UIElement)hitResultsList[hitResultsList.Count - 1];
+                            }
                         }
                     }
                 }
@@ -389,7 +392,13 @@ namespace nature_net.user_controls
             {
                 touch_info t = new touch_info();
                 t.id = e.TouchDevice.Id; t.is_tap = true; t.points.Add(e.GetTouchPoint(this._list as IInputElement));
+                try { t.initial_attended_item = (Control)e.Source; }
+                catch (Exception) { }
                 this.touch_points.Add(e.TouchDevice.Id, t);
+            }
+            else
+            {
+
             }
             ScrollViewer scroll = configurations.GetDescendantByType(this._list, typeof(ScrollViewer)) as ScrollViewer;
             if (is_horizontal)
@@ -418,6 +427,7 @@ namespace nature_net.user_controls
                     touch_points[e.TouchDevice.Id].points.Clear();
                     touch_points[e.TouchDevice.Id].consecutive_drag_points = 0;
                     e.Handled = true;
+                    touch_points.Remove(e.TouchDevice.Id);
                     return;
                 }
             }
@@ -426,8 +436,13 @@ namespace nature_net.user_controls
             {
                 bool r = e.TouchDevice.Capture(this._list as IInputElement, CaptureMode.SubTree);
                 e.Handled = true;
+                touch_points.Remove(e.TouchDevice.Id);
+                return;
             }
+            if (touch_points[e.TouchDevice.Id].initial_attended_item != null)
+                attend_on_item(true, touch_points[e.TouchDevice.Id].initial_attended_item);
         }
+
         private void _list_PreviewTouchMove(object sender, TouchEventArgs e)
         {
             //if (debug_canvas == null)
@@ -437,7 +452,6 @@ namespace nature_net.user_controls
             //    debug_canvas.Height = window_manager.main_canvas.ActualHeight;
             //    window_manager.main_canvas.Children.Add(debug_canvas);
             //}
-
             IInputElement ie = e.TouchDevice.Captured;
             FrameworkElement findSource = e.Source as FrameworkElement;
             ListBoxItem element = null;
@@ -452,7 +466,9 @@ namespace nature_net.user_controls
                 this.touch_points.Add(e.TouchDevice.Id, t);
             }
             else
+            {
                 this.touch_points[e.TouchDevice.Id].points.Add(e.GetTouchPoint(this._list as IInputElement));
+            }
 
             if (touch_points[e.TouchDevice.Id].is_drag == true) return;
             //TextBlock t1 = new TextBlock(); t1.Foreground = Brushes.White;
@@ -475,7 +491,7 @@ namespace nature_net.user_controls
             theta1 = theta1 * 180 / Math.PI;
             theta2 = theta2 * 180 / Math.PI;
             double theta = (theta1 < theta2) ? theta1 : theta2;
-            if (theta < configurations.drag_collection_theta)
+            if (theta < configurations.drag_collection_theta && configurations.whole_item_drag)
             {
                 if (touch_points[e.TouchDevice.Id].consecutive_drag_points < configurations.max_consecutive_drag_points)
                 {
@@ -484,9 +500,11 @@ namespace nature_net.user_controls
                 else
                 {
                     touch_points[e.TouchDevice.Id].is_tap = false;
+                    if (touch_points[e.TouchDevice.Id].initial_attended_item != null)
+                        attend_on_item(false, touch_points[e.TouchDevice.Id].initial_attended_item);
                     //if (element == null) element = last_dragged_element;
-                    if (configurations.whole_item_drag)
-                    {
+                    //if (configurations.whole_item_drag)
+                    //{
                         UIElement dragged_item = HitTestOverItem(e, true, true, false, false);
                         if (dragged_item != null)
                         {
@@ -501,18 +519,27 @@ namespace nature_net.user_controls
                             touch_points[e.TouchDevice.Id].points.Clear();
                             touch_points[e.TouchDevice.Id].consecutive_drag_points = 0;
                             e.Handled = true;
+                            touch_points.Remove(e.TouchDevice.Id);
                             return;
                         }
-                    }
+                    //}
                 }
             }
             
             ScrollViewer scroll = configurations.GetDescendantByType(this._list, typeof(ScrollViewer)) as ScrollViewer;
-            double dv = touch_points[e.TouchDevice.Id].points[touch_points[e.TouchDevice.Id].points.Count - 1].Position.Y - touch_points[e.TouchDevice.Id].points[touch_points[e.TouchDevice.Id].points.Count - 2].Position.Y;
-            double dh = touch_points[e.TouchDevice.Id].points[touch_points[e.TouchDevice.Id].points.Count - 1].Position.X - touch_points[e.TouchDevice.Id].points[touch_points[e.TouchDevice.Id].points.Count - 2].Position.X;
+            //double dv = touch_points[e.TouchDevice.Id].points[touch_points[e.TouchDevice.Id].points.Count - 1].Position.Y - touch_points[e.TouchDevice.Id].points[touch_points[e.TouchDevice.Id].points.Count - 2].Position.Y;
+            //double dh = touch_points[e.TouchDevice.Id].points[touch_points[e.TouchDevice.Id].points.Count - 1].Position.X - touch_points[e.TouchDevice.Id].points[touch_points[e.TouchDevice.Id].points.Count - 2].Position.X;
 
-            if (dv > configurations.tap_error || dh > configurations.tap_error)
+            double dv = touch_points[e.TouchDevice.Id].points[touch_points[e.TouchDevice.Id].points.Count - 1].Position.Y - touch_points[e.TouchDevice.Id].points[0].Position.Y;
+            double dh = touch_points[e.TouchDevice.Id].points[touch_points[e.TouchDevice.Id].points.Count - 1].Position.X - touch_points[e.TouchDevice.Id].points[0].Position.X;
+            //if (touch_points[e.TouchDevice.Id].points.Count > 4)
+            //    dv++;
+            if (Math.Abs(dv) > configurations.tap_error || Math.Abs(dh) > configurations.tap_error)
+            {
                 touch_points[e.TouchDevice.Id].is_tap = false;
+                if (touch_points[e.TouchDevice.Id].initial_attended_item != null)
+                    attend_on_item(false, touch_points[e.TouchDevice.Id].initial_attended_item);
+            }
             if (!selectable) this._list.SelectedIndex = -1;
             if (configurations.manual_scroll)
             {
@@ -527,7 +554,7 @@ namespace nature_net.user_controls
                 {
                     double new_offset = scroll.VerticalOffset + (-1 * dv);
                     try { scroll.ScrollToVerticalOffset(new_offset); }
-                    catch (Exception ex) { }
+                    catch (Exception) { }
                     //last_scroll_offset = scroll.VerticalOffset;
                 }
             }
@@ -547,17 +574,18 @@ namespace nature_net.user_controls
 
             if (touch_points[e.TouchDevice.Id].is_tap)
             {
-                if (touch_points[e.TouchDevice.Id].points.Count < 2) return;
-                double dv = touch_points[e.TouchDevice.Id].points[touch_points[e.TouchDevice.Id].points.Count - 1].Position.Y - touch_points[e.TouchDevice.Id].points[0].Position.Y;
-                double dh = touch_points[e.TouchDevice.Id].points[touch_points[e.TouchDevice.Id].points.Count - 1].Position.X - touch_points[e.TouchDevice.Id].points[0].Position.X;
-                bool should_tap = true;
-                if (is_horizontal && dh > configurations.tap_error)
-                    should_tap = false;
-                if (!is_horizontal && dv > configurations.tap_error)
-                    should_tap = false;
+                
+                //if (touch_points[e.TouchDevice.Id].points.Count < 2) return;
+                //double dv = touch_points[e.TouchDevice.Id].points[touch_points[e.TouchDevice.Id].points.Count - 1].Position.Y - touch_points[e.TouchDevice.Id].points[0].Position.Y;
+                //double dh = touch_points[e.TouchDevice.Id].points[touch_points[e.TouchDevice.Id].points.Count - 1].Position.X - touch_points[e.TouchDevice.Id].points[0].Position.X;
+                //bool should_tap = true;
+                //if (is_horizontal && dh > configurations.tap_error)
+                //    should_tap = false;
+                //if (!is_horizontal && dv > configurations.tap_error)
+                //    should_tap = false;
 
-                if (should_tap)
-                {
+                //if (should_tap)
+                //{
                     //FrameworkElement findSource = e.OriginalSource as FrameworkElement;
                     //ListBoxItem element = null;
                     //while (element == null && findSource != null)
@@ -583,7 +611,7 @@ namespace nature_net.user_controls
                             catch (Exception e2) { log.WriteErrorLog(e2); }
                         }
                     }
-                }
+                //}
             }
             else
                 can_scroll = true;
@@ -600,10 +628,23 @@ namespace nature_net.user_controls
                 //catch (Exception) { }
                 //last_scroll_offset = scroll.VerticalOffset;
             }
+            if (touch_points[e.TouchDevice.Id].initial_attended_item != null)
+                attend_on_item(false, touch_points[e.TouchDevice.Id].initial_attended_item);
             touch_points[e.TouchDevice.Id].points.Clear();
             touch_points.Remove(e.TouchDevice.Id);
             UIElement element2 = sender as UIElement;
             element2.ReleaseTouchCapture(e.TouchDevice);
+        }
+
+        private void attend_on_item(bool select, Control i)
+        {
+            if (i.GetType() != Type.GetType("nature_net.user_controls.collection_listbox_item")
+                && i.GetType() != Type.GetType("nature_net.user_controls.item_generic_v2"))
+                return;
+            if (select)
+                i.Background = Brushes.LightGray;
+            else
+                i.Background = Brushes.White;
         }
 
         private bool test_thumb_feedback(TouchEventArgs e)
@@ -1116,6 +1157,7 @@ namespace nature_net.user_controls
         public bool is_tap = false;
         public bool is_drag = false;
         public int consecutive_drag_points;
+        public Control initial_attended_item;
     }
 
     public delegate bool ItemSelected(object i);
