@@ -44,10 +44,14 @@ namespace nature_net.user_controls
         {
             InitializeComponent();
             contributions.initialize(true, "", new ItemSelected(this.item_selected));
-            Image img = new Image();
-            img.Source = configurations.img_loading_image_pic;
-            img.Tag = null;
-            this.contributions._list.Items.Add(img);
+
+            collection_listbox_item cli = new collection_listbox_item();
+            cli.img.Source = configurations.img_loading_image_pic;
+            cli.img.Tag = null;
+            cli.percentage.Visibility = System.Windows.Visibility.Visible;
+            cli.drag.Visibility = System.Windows.Visibility.Collapsed;
+            this.contributions._list.Items.Add(cli);
+            
             debug_canvas.Width = window_manager.main_canvas.ActualWidth;
             debug_canvas.Height = window_manager.main_canvas.ActualHeight;
             window_manager.main_canvas.Children.Add(debug_canvas);
@@ -274,7 +278,9 @@ namespace nature_net.user_controls
 
         public void list_contributions_in_location(int location)
         {
+            worker.WorkerReportsProgress = true;
             worker.DoWork += new DoWorkEventHandler(get_contributions_in_location);
+            worker.ProgressChanged += new ProgressChangedEventHandler(progress_changed);
             worker.RunWorkerCompleted += new RunWorkerCompletedEventHandler(display_all_contributions);
             if (!worker.IsBusy)
                 worker.RunWorkerAsync((object)location);
@@ -282,7 +288,9 @@ namespace nature_net.user_controls
 
         public void list_contributions_in_activity(int activity_id)
         {
+            worker.WorkerReportsProgress = true;
             worker.DoWork += new DoWorkEventHandler(get_contributions_in_activity);
+            worker.ProgressChanged += new ProgressChangedEventHandler(progress_changed);
             worker.RunWorkerCompleted += new RunWorkerCompletedEventHandler(display_all_contributions);
             if (!worker.IsBusy)
                 worker.RunWorkerAsync((object)activity_id);
@@ -290,7 +298,9 @@ namespace nature_net.user_controls
 
         public void list_all_contributions(string username)
         {
+            worker.WorkerReportsProgress = true;
             worker.DoWork += new DoWorkEventHandler(get_all_contributions);
+            worker.ProgressChanged += new ProgressChangedEventHandler(progress_changed);
             worker.RunWorkerCompleted += new RunWorkerCompletedEventHandler(display_all_contributions);
             if (!worker.IsBusy)
                 worker.RunWorkerAsync((object)username);
@@ -312,16 +322,32 @@ namespace nature_net.user_controls
             //              where contribution_ids.Contains(m.id)
             //              select m;
             List<Contribution> medias = result1.ToList<Contribution>();
-
+            worker.ReportProgress(0, medias.Count);
             // download the image if there is no image
             // create thumbnail if there is no thumbnail
             List<collection_item> items = new List<collection_item>();
-            foreach (Contribution c in medias)
+            for (int counter = 0; counter < medias.Count; counter++)
             {
-                collection_item ci = create_collection_item_from_contribution(c);
+                collection_item ci = create_collection_item_from_contribution(medias[counter]);
                 items.Add(ci);
+                worker.ReportProgress(counter + 1, medias.Count);
             }
             e.Result = (object)items;
+        }
+
+        void progress_changed(object sender, ProgressChangedEventArgs e)
+        {
+            this.contributions._list.Items.Dispatcher.BeginInvoke(DispatcherPriority.Normal,
+               new System.Action(() =>
+               {
+                   try
+                   {
+                       collection_listbox_item cli = (collection_listbox_item)this.contributions._list.Items[0];
+                       cli.percentage.Text = (e.ProgressPercentage).ToString() + " of " + e.UserState.ToString() + " contribution(s) downloaded.";
+                       this.contributions._list.Items.Refresh();
+                   }
+                   catch (Exception) { }
+               }));
         }
 
         public void display_all_contributions(object c_obj, RunWorkerCompletedEventArgs e)
@@ -380,11 +406,13 @@ namespace nature_net.user_controls
                 return;
             }
             List<Contribution> medias = result1.ToList<Contribution>();
+            worker.ReportProgress(0, medias.Count);
             List<collection_item> items = new List<collection_item>();
-            foreach (Contribution c in medias)
+            for (int counter = 0; counter < medias.Count; counter++)
             {
-                collection_item ci = create_collection_item_from_contribution(c);
+                collection_item ci = create_collection_item_from_contribution(medias[counter]);
                 items.Add(ci);
+                worker.ReportProgress(counter + 1, medias.Count);
             }
             e.Result = (object)items;
         }
@@ -402,11 +430,13 @@ namespace nature_net.user_controls
                 return;
             }
             List<Contribution> medias = result0.ToList<Contribution>();
+            worker.ReportProgress(0, medias.Count);
             List<collection_item> items = new List<collection_item>();
-            foreach (Contribution c in medias)
+            for (int counter = 0; counter < medias.Count; counter++)
             {
-                collection_item ci = create_collection_item_from_contribution(c);
+                collection_item ci = create_collection_item_from_contribution(medias[counter]);
                 items.Add(ci);
+                worker.ReportProgress(counter + 1, medias.Count);
             }
             e.Result = (object)items;
         }

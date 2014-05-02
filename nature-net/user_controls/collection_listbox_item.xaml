@@ -16,6 +16,7 @@
         <Image Grid.Row="0" Grid.RowSpan="2" Name="img"></Image>
         <Border Name="drag_panel_border" Grid.Row="1">
             <DockPanel Name="drag_panel">
+                <TextBlock Name="percentage" Visibility="Collapsed" DockPanel.Dock="Bottom" TextWrapping="Wrap" HorizontalAlignment="Center"></TextBlock>
                 <Image Name="drag" Height="13" DockPanel.Dock="Bottom" VerticalAlignment="Bottom"></Image>
             </DockPanel>
         </Border>
