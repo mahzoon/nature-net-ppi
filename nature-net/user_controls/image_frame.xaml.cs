@@ -24,11 +24,13 @@ namespace nature_net.user_controls
         private readonly BackgroundWorker worker = new BackgroundWorker();
         public collection_item item;
 
+        public ImageSource the_image;
         //public window_content win_content;
 
         public image_frame()
         {
             InitializeComponent();
+            //this.title_bar.Background = configurations.contribution_view_title_bar_color;
 
             //Static Configuration Values:
             this.the_item.Width = configurations.frame_width;
@@ -47,6 +49,8 @@ namespace nature_net.user_controls
                 this.close.Click += new RoutedEventHandler(close_Click);
             //this.change_view.Click += new RoutedEventHandler(change_view_Click);
             this.close.PreviewTouchDown += new EventHandler<TouchEventArgs>(close_Click);
+
+            RenderOptions.SetBitmapScalingMode(the_item, configurations.scaling_mode);
         }
 
         public void view_contribution(collection_item i)
@@ -69,20 +73,20 @@ namespace nature_net.user_controls
                     the_media.Play();
                     return;
                 }
-                if (window_manager.contributions.ContainsKey(i._contribution.id))
-                {
-                    double h = window_manager.contributions[i._contribution.id].Height;
-                    double w = window_manager.contributions[i._contribution.id].Width;
-                    the_item.Height = (h / w) * the_item.Width;
-                    the_item.Background = new ImageBrush(window_manager.contributions[i._contribution.id]);
-                    the_item.UpdateLayout();
-                }
-                else
-                {
+                //if (window_manager.contributions.ContainsKey(i._contribution.id))
+                //{
+                //    double h = window_manager.contributions[i._contribution.id].Height;
+                //    double w = window_manager.contributions[i._contribution.id].Width;
+                //    the_item.Height = (h / w) * the_item.Width;
+                //    the_item.Background = new ImageBrush(window_manager.contributions[i._contribution.id]);
+                //    the_item.UpdateLayout();
+                //}
+                //else
+                //{
                     worker.DoWork += new DoWorkEventHandler(load_image);
                     worker.RunWorkerCompleted += new RunWorkerCompletedEventHandler(show_image);
                     worker.RunWorkerAsync((object)i._contribution.id);
-                }
+                //}
 
             }
             if (i.is_video)
@@ -122,7 +126,8 @@ namespace nature_net.user_controls
             {
                 ImageSource src = new BitmapImage(new Uri(configurations.GetAbsoluteContributionPath() + contribution_id.ToString() + ".jpg"));
                 src.Freeze();
-                window_manager.contributions.Add(contribution_id, src);
+                the_image = src;
+                //window_manager.contributions.Add(contribution_id, src);
                 e.Result = (object)contribution_id;
             }
             catch (Exception)
@@ -141,10 +146,10 @@ namespace nature_net.user_controls
                         the_item.Background = new ImageBrush(configurations.img_not_found_image_pic);
                     else
                     {
-                        double h = window_manager.contributions[(int)e.Result].Height;
-                        double w = window_manager.contributions[(int)e.Result].Width;
+                        double h = the_image.Height;//window_manager.contributions[(int)e.Result].Height;
+                        double w = the_image.Width;//window_manager.contributions[(int)e.Result].Width;
                         the_item.Height = (h / w) * the_item.Width;
-                        the_item.Background = new ImageBrush(window_manager.contributions[(int)e.Result]);
+                        the_item.Background = new ImageBrush(the_image);//window_manager.contributions[(int)e.Result]);
                     }
                     the_item.UpdateLayout();
                 }));

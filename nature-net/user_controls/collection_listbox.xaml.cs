@@ -57,9 +57,24 @@ namespace nature_net.user_controls
             window_manager.main_canvas.Children.Add(debug_canvas);
             this.contributions.collection_list = true;
             this.Height = configurations.collection_listbox_height;
+
+            this.Loaded += new RoutedEventHandler(collection_listbox_Loaded);
             //this.contributions.PreviewTouchUp += new EventHandler<System.Windows.Input.TouchEventArgs>(contributions_PreviewTouchUp);
             //this.contributions.PreviewTouchMove += new EventHandler<System.Windows.Input.TouchEventArgs>(contributions_PreviewTouchMove);
             //this.contributions.PreviewTouchDown += new EventHandler<System.Windows.Input.TouchEventArgs>(contributions_TouchDown);
+        }
+
+        void collection_listbox_Loaded(object sender, RoutedEventArgs e)
+        {
+            GradientStopCollection gsc = new GradientStopCollection();
+            gsc.Add(new GradientStop(Colors.LightGray, 0.0));
+            gsc.Add(new GradientStop(Colors.LightGray, (this.Height - 18) / this.Height - 0.01));
+            gsc.Add(new GradientStop(Colors.Transparent, (this.Height - 18) / this.Height + 0.02));
+            gsc.Add(new GradientStop(Colors.Transparent, 1.0));
+
+            LinearGradientBrush myBrush = new LinearGradientBrush(gsc, 90);
+
+            this.contributions.Background = myBrush;
         }
 
         void contributions_PreviewTouchMove(object sender, System.Windows.Input.TouchEventArgs e)

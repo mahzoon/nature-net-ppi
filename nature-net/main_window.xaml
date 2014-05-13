@@ -37,7 +37,7 @@
             </uc:tab_control.LayoutTransform>
         </uc:tab_control>-->
         <Canvas Name="workspace" AllowDrop="True" Margin="-65,0,0,0" Panel.ZIndex="0">
-            <Label Name="label_update" Width="15" Height="15" />
+            <Label Name="label_update" Width="12" Height="12" />
         </Canvas>
         
     </DockPanel>

@@ -79,17 +79,17 @@ namespace nature_net.user_controls
                     the_media.Play();
                     return;
                 }
-                if (window_manager.contributions.ContainsKey(i._contribution.id))
-                {
-                    the_image.Source = window_manager.contributions[i._contribution.id];
-                    the_image.UpdateLayout();
-                }
-                else
-                {
+                //if (window_manager.contributions.ContainsKey(i._contribution.id))
+                //{
+                //    the_image.Source = window_manager.contributions[i._contribution.id];
+                //    the_image.UpdateLayout();
+                //}
+                //else
+                //{
                     worker.DoWork += new DoWorkEventHandler(load_image);
                     worker.RunWorkerCompleted += new RunWorkerCompletedEventHandler(show_image);
                     worker.RunWorkerAsync((object)i._contribution.id);
-                }
+                //}
                 
             }
             if (i.is_video)
@@ -162,7 +162,8 @@ namespace nature_net.user_controls
             {
                 ImageSource src = new BitmapImage(new Uri(configurations.GetAbsoluteContributionPath() + contribution_id.ToString() + ".jpg"));
                 src.Freeze();
-                window_manager.contributions.Add(contribution_id, src);
+                the_image.Source = src;
+                //window_manager.contributions.Add(contribution_id, src);
                 e.Result = (object)contribution_id;
             }
             catch (Exception)
@@ -179,8 +180,8 @@ namespace nature_net.user_controls
                 {
                     if ((int)e.Result == -1)
                         the_image.Source = configurations.img_not_found_image_pic;
-                    else
-                        the_image.Source = window_manager.contributions[(int)e.Result];
+                    //else
+                    //    the_image.Source = window_manager.contributions[(int)e.Result];
                     the_image.UpdateLayout();
 
 

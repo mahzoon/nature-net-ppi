@@ -20,7 +20,7 @@ namespace nature_net
 
         public static List<int> downloaded_contributions = new List<int>();
         public static Dictionary<int, ImageSource> thumbnails = new Dictionary<int, ImageSource>();
-        public static Dictionary<int, ImageSource> contributions = new Dictionary<int, ImageSource>();
+        //public static Dictionary<int, ImageSource> contributions = new Dictionary<int, ImageSource>();
         public static Dictionary<int, MediaPlayer> media = new Dictionary<int, MediaPlayer>();
         public static List<window_frame> collection_frames = new List<window_frame>();
         public static List<window_frame> signup_frames = new List<window_frame>();
@@ -48,7 +48,7 @@ namespace nature_net
             content.list_all_comments();
 
             window_manager.collection_frames.Add(frame);
-            open_window(frame, pos_x, pos_y);
+            open_window(frame, pos_x - (frame.Width / 2), pos_y - (c_listbox.Height));
             frame.set_title("Contributions in " + location_id.ToString() + ": " + location);
         }
 
@@ -97,6 +97,7 @@ namespace nature_net
             window_manager.image_frames.Add(iframe);
 
             double h = iframe.ActualHeight;
+            pos_x = pos_x - (iframe.ActualWidth / 2);
             //try { h = ((window_content)(iframe.window_content.Content)).the_item.ActualHeight; }
             //catch (Exception) { }
             if (pos_y > window_manager.main_canvas.ActualHeight - h)
@@ -104,6 +105,7 @@ namespace nature_net
             TranslateTransform m = new TranslateTransform(pos_x, pos_y);
             Matrix matrix = m.Value;
             iframe.RenderTransform = new MatrixTransform(matrix);
+            UpdateZOrder(iframe, true);
         }
 
         public static void open_design_idea_window(string[] idea_item, double pos_x, double pos_y, string title = "Design Idea")
@@ -141,27 +143,6 @@ namespace nature_net
             frame.hide_change_view();
             frame.set_title(title);
         }
-
-        //public static void open_design_idea_window(item_generic_v2 idea_item, double pos_x, double pos_y, string title = "Design Idea")
-        //{
-        //    if (window_manager.design_ideas_frames.Count + 1 > configurations.max_design_ideas_frame)
-        //        return;
-
-        //    window_frame frame = new window_frame();
-        //    window_content content = new window_content();
-
-        //    item_generic_v2 i = idea_item.get_clone();
-        //    i.Background = new SolidColorBrush(Colors.White);
-        //    i.Width = frame.Width;
-        //    content.initialize_contents(i, Type.GetType("nature_net.Contribution"), Convert.ToInt32(i.Tag), frame);
-
-        //    frame.window_content.Content = content;
-
-        //    window_manager.design_ideas_frames.Add(frame);
-        //    open_window(frame, pos_x, pos_y);
-        //    frame.hide_change_view();
-        //    frame.set_title(title);
-        //}
 
         public static void open_design_idea_window_ext(design_ideas_listbox parent, double pos_x, double pos_y)
         {
@@ -235,6 +216,7 @@ namespace nature_net
             TranslateTransform m = new TranslateTransform(pos_x, pos_y);
             Matrix matrix = m.Value;
             frame.RenderTransform = new MatrixTransform(matrix);
+            UpdateZOrder(frame, true);
         }
 
         public static void close_window(window_frame frame)
@@ -249,6 +231,7 @@ namespace nature_net
         public static void close_window(image_frame frame)
         {
             
+            image_frames.Remove(frame);
             main_canvas.Children.Remove(frame);
         }
 
@@ -317,6 +300,49 @@ namespace nature_net
                 left_tab.load_design_ideas();
             if (right_tab != null)
                 right_tab.load_design_ideas();
+        }
+
+        public static void UpdateZOrder(UIElement element, bool bringToFront)
+        {
+            if (element == null) return;
+            if (!main_canvas.Children.Contains(element)) return;
+
+            // Determine the Z-Index for the target UIElement.
+            int elementNewZIndex = -1;
+            if (bringToFront)
+            {
+                foreach (UIElement elem in main_canvas.Children)
+                    if (elem.Visibility != Visibility.Collapsed)
+                        ++elementNewZIndex;
+            }
+            else
+            {
+                elementNewZIndex = 0;
+            }
+
+            // Determine if the other UIElements' Z-Index 
+            // should be raised or lowered by one. 
+            int offset = (elementNewZIndex == 0) ? +1 : -1;
+            int elementCurrentZIndex = Canvas.GetZIndex(element);
+
+            // Update the Z-Index of every UIElement in the Canvas.
+            foreach (UIElement childElement in main_canvas.Children)
+            {
+                if (childElement == element)
+                    Canvas.SetZIndex(element, elementNewZIndex);
+                else
+                {
+                    int zIndex = Canvas.GetZIndex(childElement);
+
+                    // Only modify the z-index of an element if it is  
+                    // in between the target element's old and new z-index.
+                    if (bringToFront && elementCurrentZIndex < zIndex ||
+                        !bringToFront && zIndex < elementCurrentZIndex)
+                    {
+                        Canvas.SetZIndex(childElement, zIndex + offset);
+                    }
+                }
+            }
         }
 
     }

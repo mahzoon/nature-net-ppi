@@ -25,11 +25,17 @@ namespace nature_net
         public static string users_no_date = "Just Created"; 
         public static string activities_date_desc = "Last Update: ";
         public static string activities_num_desc = "Contributions";
+        public static string users_listbox_header = "Users";
+        public static string signup_item_title = "Sign up";
+        public static string submit_idea_item_title = "Submit Idea";
+        public static string design_idea_listbox_header = "Design Ideas";
+        public static string design_idea_lisbox_top_text = "Popular";
 
         public static bool high_contrast = false;
         public static bool top_most = false;
         public static bool show_update_label = false;
         public static bool response_to_mouse_clicks = true;
+        public static bool enable_single_rotation = true;
 
         public static int max_num_content_update = 12;
 
@@ -52,6 +58,10 @@ namespace nature_net
         public static int max_consecutive_drag_points = 5;
         public static double tap_error = 1;
         public static int tab_width_percentage = 17;
+        public static double manipulation_pivot_radius = 20.0;
+        public static BitmapScalingMode scaling_mode = BitmapScalingMode.Fant;
+        public static double click_opacity_on_collection_item = 0.8;
+        public static double collection_listbox_background_gradient_point = 0.8;
         //public static int tab_header_width = 65;
         public static bool manual_scroll = false;
         public static bool manual_tap = false;
@@ -65,6 +75,7 @@ namespace nature_net
         public static Brush location_dot_color = Brushes.Crimson;
 		public static Brush location_dot_outline_color = Brushes.Crimson;
         public static Brush location_dot_font_color = Brushes.White;
+        //public static Brush contribution_view_title_bar_color = Color.FromArgb(
 
         //static string current_directory = System.IO.Directory.GetCurrentDirectory() + "\\";
         //static string image_directory = System.IO.Directory.GetCurrentDirectory() + "\\images\\";
@@ -83,8 +94,7 @@ namespace nature_net
         public static string googledrive_userfiletitle = "Users";
         public static string googledrive_ideafilename = "Ideas.txt";
         public static string googledrive_ideafiletitle = "Ideas";
-        public static int googledrive_update_min = 2;
-        public static int googledrive_update_sec = 30;
+        public static int update_period_ms = 20000;
 
         // 10KB = 10 * 1024
         public static int download_buffer_size = 10240;
@@ -625,6 +635,7 @@ namespace nature_net
             top_most = parser.GetValue("Parameters", "top_most", false);
             show_update_label = parser.GetValue("Parameters", "show_update_label", false);
             response_to_mouse_clicks = parser.GetValue("Parameters", "response_to_mouse_clicks", true);
+            enable_single_rotation = parser.GetValue("Parameters", "enable_single_rotation", true);
             max_num_content_update = parser.GetValue("Parameters", "max_num_content_update", 12);
             max_signup_frame = parser.GetValue("Parameters", "max_signup_frame", 5);
             max_collection_frame = parser.GetValue("Parameters", "max_collection_frame", 10);
@@ -643,12 +654,16 @@ namespace nature_net
             min_touch_points = parser.GetValue("Parameters", "min_touch_points", 2);
             max_consecutive_drag_points = parser.GetValue("Parameters", "max_consecutive_drag_points", 5);
             tap_error = parser.GetValue("Parameters", "tap_error", 5);
+            manipulation_pivot_radius = parser.GetValue("Parameters", "manipulation_pivot_radius", 20.0);
             use_avatar_drag = parser.GetValue("Parameters", "use_avatar_drag", false);
             tab_width_percentage = parser.GetValue("Parameters", "tab_width_percentage", 17);
             manual_scroll = parser.GetValue("Parameters", "manual_scroll", false);
             manual_tap = parser.GetValue("Parameters", "manual_tap", false);
             right_panel_drag = parser.GetValue("Parameters", "right_panel_drag", true);
             whole_item_drag = parser.GetValue("Parameters", "whole_item_drag", false);
+            update_period_ms = parser.GetValue("Parameters", "update_period_ms", 20000);
+            scaling_mode = parser.GetValue("Parameters", "scaling_mode", BitmapScalingMode.Fant);
+            click_opacity_on_collection_item = parser.GetValue("Parameters", "click_opacity_on_collection_item", 0.8);
 
             // Google Drive
             googledrive_directory_id = parser.GetValue("GoogleDrive", "googledrive_directory_id", "0B9mU-w_CpbztUUxtaXVIeE9SbWM");
@@ -662,8 +677,6 @@ namespace nature_net
             googledrive_userfiletitle = parser.GetValue("GoogleDrive", "googledrive_userfiletitle", "Users");
             googledrive_ideafilename = parser.GetValue("GoogleDrive", "googledrive_ideafilename", "Ideas.txt");
             googledrive_ideafiletitle = parser.GetValue("GoogleDrive", "googledrive_ideafiletitle", "Ideas");
-            googledrive_update_min = parser.GetValue("GoogleDrive", "googledrive_update_min", 2);
-            googledrive_update_sec = parser.GetValue("GoogleDrive", "googledrive_update_sec", 30);
             download_buffer_size = parser.GetValue("GoogleDrive", "download_buffer_size", 10240); // 10KB = 10 * 1024
 
             // Paths
@@ -728,6 +741,7 @@ namespace nature_net
             parser.SetValue("Parameters", "top_most", top_most);
             parser.SetValue("Parameters", "show_update_label", show_update_label);
             parser.SetValue("Parameters", "response_to_mouse_clicks", response_to_mouse_clicks);
+            parser.SetValue("Parameters", "enable_single_rotation", enable_single_rotation);
             parser.SetValue("Parameters", "max_num_content_update", max_num_content_update);
             parser.SetValue("Parameters", "max_signup_frame", max_signup_frame);
             parser.SetValue("Parameters", "max_collection_frame", max_collection_frame);
@@ -746,12 +760,16 @@ namespace nature_net
             parser.SetValue("Parameters", "min_touch_points", min_touch_points);
             parser.SetValue("Parameters", "max_consecutive_drag_points", max_consecutive_drag_points);
             parser.SetValue("Parameters", "tap_error", tap_error);
+            parser.SetValue("Parameters", "manipulation_pivot_radius", manipulation_pivot_radius);
             parser.SetValue("Parameters", "use_avatar_drag", use_avatar_drag);
             parser.SetValue("Parameters", "tab_width_percentage", tab_width_percentage);
             parser.SetValue("Parameters", "manual_scroll", manual_scroll);
             parser.SetValue("Parameters", "manual_tap", manual_tap);
             parser.SetValue("Parameters", "right_panel_drag", right_panel_drag);
             parser.SetValue("Parameters", "whole_item_drag", whole_item_drag);
+            parser.SetValue("Parameters", "update_period_ms", update_period_ms);
+            parser.SetValue("Parameters", "scaling_mode", scaling_mode);
+            parser.SetValue("Parameters", "click_opacity_on_collection_item", click_opacity_on_collection_item);
 
             // Google Drive
             parser.SetValue("GoogleDrive", "googledrive_directory_id", googledrive_directory_id);
@@ -765,8 +783,6 @@ namespace nature_net
             parser.SetValue("GoogleDrive", "googledrive_userfiletitle", googledrive_userfiletitle);
             parser.SetValue("GoogleDrive", "googledrive_ideafilename", googledrive_ideafilename);
             parser.SetValue("GoogleDrive", "googledrive_ideafiletitle", googledrive_ideafiletitle);
-            parser.SetValue("GoogleDrive", "googledrive_update_min", googledrive_update_min);
-            parser.SetValue("GoogleDrive", "googledrive_update_sec", googledrive_update_sec);
             parser.SetValue("GoogleDrive", "download_buffer_size", download_buffer_size); // 10KB = 10 * 1024
 
             // Paths

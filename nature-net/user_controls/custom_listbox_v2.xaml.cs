@@ -80,7 +80,7 @@ namespace nature_net.user_controls
             if (configurations.high_contrast)
                 this._list.Background = Brushes.DarkGreen;
             else
-                this._list.Background = Brushes.White;
+                this._list.Background = Brushes.Transparent;
 
             //if (configurations.response_to_mouse_clicks)
                 this._list.SelectionChanged += new SelectionChangedEventHandler(_list_SelectionChanged);
@@ -642,9 +642,17 @@ namespace nature_net.user_controls
                 && i.GetType() != Type.GetType("nature_net.user_controls.item_generic_v2"))
                 return;
             if (select)
-                i.Background = Brushes.LightGray;
+            {
+                if (i.GetType() != Type.GetType("nature_net.user_controls.collection_listbox_item"))
+                    i.Background = Brushes.LightGray;
+                else
+                    i.Opacity = configurations.click_opacity_on_collection_item;
+            }
             else
-                i.Background = Brushes.White;
+            {
+                i.Background = Brushes.Transparent;
+                i.Opacity = 1;
+            }
         }
 
         private bool test_thumb_feedback(TouchEventArgs e)
@@ -675,7 +683,6 @@ namespace nature_net.user_controls
                 return false;
             }
             catch (Exception) { return false; }
-            return false;
         }
 
         protected override void OnManipulationBoundaryFeedback(ManipulationBoundaryFeedbackEventArgs e)
@@ -763,7 +770,7 @@ namespace nature_net.user_controls
         }
         public void display_all_design_ideas(object di, RunWorkerCompletedEventArgs e)
         {
-            this._list.Items.Dispatcher.BeginInvoke(DispatcherPriority.Normal,
+            this._list.Items.Dispatcher.BeginInvoke(DispatcherPriority.ApplicationIdle,
                 new System.Action(() =>
                 {
                     this._list.Items.Clear();
@@ -887,7 +894,7 @@ namespace nature_net.user_controls
         }
         public void display_all_users(object us, RunWorkerCompletedEventArgs e)
         {
-            this._list.Items.Dispatcher.BeginInvoke(DispatcherPriority.Normal,
+            this._list.Items.Dispatcher.BeginInvoke(DispatcherPriority.ApplicationIdle,
                 new System.Action(() =>
                 {
                     this._list.Items.Clear();
@@ -1078,7 +1085,7 @@ namespace nature_net.user_controls
         }
         public void display_all_activities(object arg, RunWorkerCompletedEventArgs e)
         {
-            this._list.Items.Dispatcher.BeginInvoke(DispatcherPriority.Normal,
+            this._list.Items.Dispatcher.BeginInvoke(DispatcherPriority.ApplicationIdle,
                new System.Action(() =>
                {
                    this._list.Items.Clear();

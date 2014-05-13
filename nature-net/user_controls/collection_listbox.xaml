@@ -7,7 +7,7 @@
              mc:Ignorable="d" 
              d:DesignHeight="150">
 
-    <DockPanel LastChildFill="True">
+    <DockPanel LastChildFill="True" Background="Transparent">
         <uc:custom_listbox_v2 x:Name="contributions" />
     </DockPanel>
 

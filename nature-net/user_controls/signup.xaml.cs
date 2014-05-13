@@ -46,10 +46,9 @@ namespace nature_net.user_controls
             this.checkbox_agreement2.PreviewTouchDown += new EventHandler<TouchEventArgs>(checkbox_agreement_PreviewTouchDown);
             this.checkbox_agreement3.PreviewTouchDown += new EventHandler<TouchEventArgs>(checkbox_agreement_PreviewTouchDown);
             this.checkbox_agreement4.PreviewTouchDown += new EventHandler<TouchEventArgs>(checkbox_agreement_PreviewTouchDown);
-            this.checkbox_agreement5.PreviewTouchDown += new EventHandler<TouchEventArgs>(checkbox_agreement_PreviewTouchDown);
 
             //ScrollViewer scroll = configurations.GetDescendantByType(this.listbox_avatars, typeof(ScrollViewer)) as ScrollViewer;
-            this.Height = 500;
+            this.Height = 580;
             consent_form_1.Visibility = System.Windows.Visibility.Visible;
         }
 
@@ -135,25 +134,47 @@ namespace nature_net.user_controls
 
         private void button_next1_Click(object sender, RoutedEventArgs e)
         {
+            reset();
             this.consent_form_1.Visibility = System.Windows.Visibility.Collapsed;
         }
 
         private void button_next2_Click(object sender, RoutedEventArgs e)
         {
-            //if (this.checkbox_agreement1.IsChecked.Value && this.checkbox_agreement2.IsChecked.Value && checkbox_agreement3.IsChecked.Value && checkbox_agreement4.IsChecked.Value)
-            //{
+            reset();
+            if (this.checkbox_agreement1.IsChecked.Value && this.checkbox_agreement2.IsChecked.Value)// && checkbox_agreement3.IsChecked.Value && checkbox_agreement4.IsChecked.Value)
+            {
                 this.consent_form_2.Visibility = System.Windows.Visibility.Collapsed;
-                reset();
-            //}
+            }
+            else
+            {
+                if (!checkbox_agreement1.IsChecked.Value)
+                {
+                    checkbox_agreement1.BorderBrush = Brushes.Red;
+                    checkbox_agreement1.BorderThickness = new Thickness(5);
+                    required1.Foreground = Brushes.Red;
+                    required1.FontWeight = FontWeights.Bold;
+                    return;
+                }
+                if (!checkbox_agreement2.IsChecked.Value)
+                {
+                    checkbox_agreement2.BorderBrush = Brushes.Red;
+                    checkbox_agreement2.BorderThickness = new Thickness(5);
+                    required2.Foreground = Brushes.Red;
+                    required2.FontWeight = FontWeights.Bold;
+                    return;
+                }
+            }
         }
 
         private void button_back1_Click(object sender, RoutedEventArgs e)
         {
+            reset();
             this.consent_form_1.Visibility = System.Windows.Visibility.Visible;
         }
 
         private void button_back2_Click(object sender, RoutedEventArgs e)
         {
+            reset();
             this.consent_form_2.Visibility = System.Windows.Visibility.Visible;
         }
 
@@ -180,13 +201,6 @@ namespace nature_net.user_controls
                 textbox_password.BorderBrush = Brushes.Red;
                 textbox_password.BorderThickness = new Thickness(5);
                 desc.Text = "Password is empty.";
-                return;
-            }
-            if (!checkbox_agreement5.IsChecked.Value)
-            {
-                checkbox_agreement5.BorderBrush = Brushes.Red;
-                checkbox_agreement5.BorderThickness = new Thickness(5);
-                desc.Text = "You should agree to terms and conditions.";
                 return;
             }
             if (listbox_avatars.SelectedIndex < 0)
@@ -241,12 +255,18 @@ namespace nature_net.user_controls
             textbox_email.BorderThickness = new Thickness(2);
             textbox_password.BorderBrush = Brushes.LightGray;
             textbox_password.BorderThickness = new Thickness(2);
-            checkbox_agreement5.BorderBrush = Brushes.LightGray;
-            checkbox_agreement5.BorderThickness = new Thickness(0);
+            checkbox_agreement1.BorderBrush = Brushes.Gray;
+            checkbox_agreement1.BorderThickness = new Thickness(2);
+            checkbox_agreement2.BorderBrush = Brushes.Gray;
+            checkbox_agreement2.BorderThickness = new Thickness(2);
             label_choose_avatar.BorderBrush = Brushes.LightGray;
             label_choose_avatar.BorderThickness = new Thickness(0);
             //desc.Visibility = System.Windows.Visibility.Hidden;
             desc.Text = "Welcome";
+            required1.Foreground = Brushes.Black;
+            required2.Foreground = Brushes.Black;
+            required1.FontWeight = FontWeights.Normal;
+            required2.FontWeight = FontWeights.Normal;
         }
     }
 }

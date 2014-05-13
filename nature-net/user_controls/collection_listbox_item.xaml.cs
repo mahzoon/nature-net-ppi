@@ -22,6 +22,7 @@ namespace nature_net.user_controls
         public collection_listbox_item()
         {
             InitializeComponent();
+            this.img.Height = configurations.collection_listbox_height - 18;
         }
 
         protected override System.Windows.Media.HitTestResult HitTestCore(System.Windows.Media.PointHitTestParameters hitTestParameters)

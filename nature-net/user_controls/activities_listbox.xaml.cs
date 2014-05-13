@@ -40,8 +40,12 @@ namespace nature_net.user_controls
 
         public void list_all_activities()
         {
-            this.activities_list.populator.item_width = this.Width - 3;
-            this.activities_list.populator.list_all_activities();
+            this.Dispatcher.BeginInvoke(System.Windows.Threading.DispatcherPriority.ApplicationIdle,
+               new System.Action(() =>
+               {
+                   this.activities_list.populator.item_width = this.Width - 3;
+                   this.activities_list.populator.list_all_activities();
+               }));
         }
 
         bool activity_item_selected(object i)

@@ -11,7 +11,7 @@
         <Border DockPanel.Dock="Top" BorderThickness="1" BorderBrush="Gray">
             <uc:list_header x:Name="header"></uc:list_header>
         </Border>
-        <StackPanel Name="signup_panel" DockPanel.Dock="Top"></StackPanel>
+        <StackPanel Name="signup_panel" DockPanel.Dock="Top" Margin="0"></StackPanel>
         <uc:custom_listbox_v2 x:Name="users_list" />
     </DockPanel>
     

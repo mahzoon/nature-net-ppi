@@ -4,12 +4,12 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              mc:Ignorable="d" 
-             d:DesignHeight="500" d:DesignWidth="400">
-    
-    <DockPanel LastChildFill="True" Background="Gainsboro">
-        
+             d:DesignHeight="580" d:DesignWidth="400">
+
+    <DockPanel LastChildFill="True" Background="LightGray">
+
         <!-- Page1 -->
-        <DockPanel Name="consent_form_1" DockPanel.Dock="Top" Height="500" Visibility="Visible">
+        <DockPanel Name="consent_form_1" DockPanel.Dock="Top" Height="580" Visibility="Visible">
             <TextBlock Name="consent_form_text1" DockPanel.Dock="Top" TextWrapping="Wrap" FontFamily="Segoe UI" FontSize="15" Margin="5" >
             You are invited to participate in a research project being conducted by the researchers listed on the bottom of the page in consultation with Jim Kravitz, Director of Naturalist Programs at ACES. In order for us to be allowed to use any data you wish to provide, we must have your consent.
             </TextBlock>
@@ -49,39 +49,45 @@
             The researchers and others visiting the preserve will be able to look at your comments and pictures on the tabletop, and we may ask if you are willing to answer a few more questions (either on paper, by phone, or face to face) about your whole experience. You may stop participating at any time.
             </TextBlock>
             <DockPanel>
-            <Button Name="button_next1" DockPanel.Dock="Right" Background="Green" Width="100" Foreground="White"
+                <Button Name="button_next1" DockPanel.Dock="Right" Background="Green" Width="100" Foreground="White"
                              VerticalContentAlignment="Center" HorizontalContentAlignment="Center"
-                             HorizontalAlignment="Right" Margin="0,5,5,5" Height="32">Next</Button>
+                             HorizontalAlignment="Right" VerticalAlignment="Bottom" Margin="0,5,5,10" Height="32">Next</Button>
             </DockPanel>
         </DockPanel>
 
         <!-- Page2 -->
-        <DockPanel Name="consent_form_2" DockPanel.Dock="Top" Height="500">
+        <DockPanel Name="consent_form_2" DockPanel.Dock="Top" Height="580" Visibility="Visible">
             <TextBlock Name="consent_form_text5" DockPanel.Dock="Top" TextWrapping="Wrap" FontFamily="Segoe UI" FontSize="15" Margin="5" >
             A long version of this consent form is available for your review and signature, or you may opt to sign this shorter one by
                 <Italic Foreground="Red">
                 checking off all the boxes that reflect your wishes and signing and dating the form below.
                 </Italic>
             </TextBlock>
-            <CheckBox Name="checkbox_agreement1" DockPanel.Dock="Top" Margin="5,5,5,5" Height="42"
+            <CheckBox Name="checkbox_agreement1" DockPanel.Dock="Top" Margin="5,5,5,5" Height="80"
                                    Background="White" Foreground="Black" BorderBrush="Gray" BorderThickness="2">
                 <TextBlock FontFamily="Segoe UI" FontSize="15" Foreground="Black" TextWrapping="Wrap">
                         I agree that any nature photos I take using the NatureNet application may be uploaded to the tabletop at ACES and/or a website now under development.
+                    <TextBlock Name="required1">
+                        (Required)
+                    </TextBlock>
                 </TextBlock>
             </CheckBox>
-            <CheckBox Name="checkbox_agreement2" DockPanel.Dock="Top" Margin="5,5,5,5" Height="42"
+            <CheckBox Name="checkbox_agreement2" DockPanel.Dock="Top" Margin="5,5,5,5" Height="100"
                                    Background="White" Foreground="Black" BorderBrush="Gray" BorderThickness="2">
                 <TextBlock FontFamily="Segoe UI" FontSize="15" Foreground="Black" TextWrapping="Wrap">
                         I agree to allow any comments, observations, and profile information that I choose to share with others via the online application to be visible to others who use the application at the same time or after me.
+                    <TextBlock Name="required2">
+                        (Required)
+                    </TextBlock>
                 </TextBlock>
             </CheckBox>
-            <CheckBox Name="checkbox_agreement3" DockPanel.Dock="Top" Margin="5,5,5,5" Height="42"
+            <CheckBox Name="checkbox_agreement3" DockPanel.Dock="Top" Margin="5,5,5,5" Height="40"
                                    Background="White" Foreground="Black" BorderBrush="Gray" BorderThickness="2">
                 <TextBlock FontFamily="Segoe UI" FontSize="15" Foreground="Black" TextWrapping="Wrap">
                         I agree to be videotaped/audiotaped during my participation in this study.
                 </TextBlock>
             </CheckBox>
-            <CheckBox Name="checkbox_agreement4" DockPanel.Dock="Top" Margin="5,5,5,5" Height="42"
+            <CheckBox Name="checkbox_agreement4" DockPanel.Dock="Top" Margin="5,5,5,5" Height="40"
                                    Background="White" Foreground="Black" BorderBrush="Gray" BorderThickness="2">
                 <TextBlock FontFamily="Segoe UI" FontSize="15" Foreground="Black" TextWrapping="Wrap">
                         I agree to complete a short questionnaire during or after my participation in this study
@@ -121,91 +127,87 @@
             <DockPanel DockPanel.Dock="Top">
                 <Button Name="button_back1" Background="Green" Width="100" Foreground="White" DockPanel.Dock="Left"
                              VerticalContentAlignment="Center" HorizontalContentAlignment="Center"
-                             HorizontalAlignment="Right" Margin="5,5,0,5" Height="32">Back</Button>
+                             HorizontalAlignment="Right" VerticalAlignment="Bottom" Margin="5,5,0,10" Height="32">Back</Button>
                 <Button Name="button_next2" DockPanel.Dock="Right" Background="Green" Width="100" Foreground="White"
                              VerticalContentAlignment="Center" HorizontalContentAlignment="Center"
-                             HorizontalAlignment="Right" Margin="0,5,5,5" Height="32">Next</Button>
+                             HorizontalAlignment="Right" Margin="0,5,5,10" VerticalAlignment="Bottom" Height="32">Next</Button>
             </DockPanel>
         </DockPanel>
 
         <!-- Page3 -->
-        <TextBlock Name="desc" DockPanel.Dock="Top" HorizontalAlignment="Center" Foreground="Red" Margin="5" >Welcome</TextBlock>
-        <StackPanel Orientation="Horizontal" DockPanel.Dock="Top" Height="260" Margin="0">
-            <DockPanel LastChildFill="True" Width="192">
-                <Label Name="label_name" DockPanel.Dock="Top" FontSize="14">Name:</Label>
-                <TextBox Name="textbox_name" DockPanel.Dock="Top" Width="180" FontSize="14" Height="38" VerticalContentAlignment="Center"
-                         Background="FloralWhite" BorderBrush="LightGray" BorderThickness="2" Foreground="Black">
-                </TextBox>
-                <Label Name="label_email" DockPanel.Dock="Top" FontSize="14">Email:</Label>
-                <TextBox Name="textbox_email" DockPanel.Dock="Top" Width="180" BorderBrush="LightGray" BorderThickness="2"
-                         FontSize="14" Height="38" Background="FloralWhite" Foreground="Black" VerticalContentAlignment="Center">
-                </TextBox>
-                <Label Name="label_password" DockPanel.Dock="Top" FontSize="14">Password:</Label>
-                <PasswordBox Name="textbox_password" DockPanel.Dock="Top" Width="180" FontFamily="Segoe UI" VerticalContentAlignment="Center"
+        <DockPanel Name="consent_form_3" DockPanel.Dock="Top" Height="580" Visibility="Visible">
+            <TextBlock Name="desc" DockPanel.Dock="Top" HorizontalAlignment="Center" Foreground="Red" Margin="5" >Welcome</TextBlock>
+            <StackPanel Orientation="Horizontal" DockPanel.Dock="Top" Height="260" Margin="0">
+                <DockPanel LastChildFill="False" Width="192">
+                    <Label Name="label_name" DockPanel.Dock="Top" FontSize="14">Name:</Label>
+                    <TextBox Name="textbox_name" DockPanel.Dock="Top" Width="180" FontSize="14" Height="38" VerticalContentAlignment="Center"
+                             Background="FloralWhite" BorderBrush="LightGray" BorderThickness="2" Foreground="Black">
+                    </TextBox>
+                    <Label Name="label_email" DockPanel.Dock="Top" FontSize="14">Email:</Label>
+                    <TextBox Name="textbox_email" DockPanel.Dock="Top" Width="180" BorderBrush="LightGray" BorderThickness="2"
+                             FontSize="14" Height="38" Background="FloralWhite" Foreground="Black" VerticalContentAlignment="Center">
+                    </TextBox>
+                    <Label Name="label_password" DockPanel.Dock="Top" FontSize="14">Password:</Label>
+                    <PasswordBox Name="textbox_password" DockPanel.Dock="Top" Width="180" FontFamily="Segoe UI" VerticalContentAlignment="Center"
                                       Height="38" Foreground="Black" FontSize="14" Background="FloralWhite" BorderBrush="LightGray" BorderThickness="2">
-                </PasswordBox>
-                <CheckBox Name="checkbox_agreement5" DockPanel.Dock="Top" Margin="5,5,5,5" Height="42"
-                                   Background="White" Foreground="Black" BorderBrush="Gray" BorderThickness="2">
-                    <TextBlock FontFamily="Segoe UI" FontSize="12" Foreground="Black" TextWrapping="Wrap" Width="159">
-                        I Agree to Terms and Conditions
-                    </TextBlock>
-                </CheckBox>
-            </DockPanel>
-            <TextBlock Name="why" TextWrapping="Wrap" Width="203" Padding="5,10,10,10" TextAlignment="Justify" Foreground="Black">
-                The NatureNet project is a citizen science project that incorporates crowdsourced interaction design.  Participants can collect and analyse scientific data using their mobile computing devices and a multi-touch tabletop, and they can also participate in the re-design of the interface by which their scientific contributions are made.  The role of the crowd in Naturenet is extended to include interaction design in addition to data collection and analysis.
-            </TextBlock>
-        </StackPanel>
-        <StackPanel Orientation="Vertical" DockPanel.Dock="Top">
-            <Label Name="label_choose_avatar" FontSize="14">Choose an Avatar:</Label>
-            <ListBox Name="listbox_avatars" Margin="5,0,5,0" Height="125"
-                     ScrollViewer.CanContentScroll="True" ScrollViewer.HorizontalScrollBarVisibility="Hidden"
-                     ScrollViewer.VerticalScrollBarVisibility="Hidden">
-                <ListBox.ItemContainerStyle>
-                    <Style TargetType="{x:Type ListBoxItem}">
-                        <Setter Property="Template">
-                            <Setter.Value>
-                                <ControlTemplate TargetType="{x:Type ListBoxItem}">
-                                    <DockPanel Margin="2" Background="White">
-                                        <ContentPresenter />
-                                    </DockPanel>
-                                </ControlTemplate>
-                            </Setter.Value>
-                        </Setter>
-                        <Style.Triggers>
-                            <Trigger Property="IsSelected" Value="True">
-                                <Setter Property="Template">
-                                    <Setter.Value>
-                                        <ControlTemplate TargetType="{x:Type ListBoxItem}">
-                                            <DockPanel Margin="2,0,2,0" Background="Gray">
-                                                <ContentPresenter />
-                                            </DockPanel>
-                                        </ControlTemplate>
-                                    </Setter.Value>
-                                </Setter>
-                            </Trigger>
-                        </Style.Triggers>
-                    </Style>
-                </ListBox.ItemContainerStyle>
-                <ListBox.ItemsPanel>
-                    <ItemsPanelTemplate>
-                        <UniformGrid Columns="{Binding Path=Items.Count,RelativeSource={RelativeSource AncestorType={x:Type ListBox}}}" />
-                    </ItemsPanelTemplate>
-                </ListBox.ItemsPanel>
-                <ListBox.DataContext>
-                    <DataTemplate>
-                        <Image Source="{Binding ImageSource}" HorizontalAlignment="Center" VerticalAlignment="Center" />
-                    </DataTemplate>
-                </ListBox.DataContext>
-            </ListBox>
-            <DockPanel>
+                    </PasswordBox>
+                </DockPanel>
+                <TextBlock Name="why" TextWrapping="Wrap" Width="203" Padding="5,10,10,10" TextAlignment="Justify" Foreground="Black">
+                    The NatureNet project is a citizen science project that incorporates crowdsourced interaction design.  Participants can collect and analyse scientific data using their mobile computing devices and a multi-touch tabletop, and they can also participate in the re-design of the interface by which their scientific contributions are made.  The role of the crowd in Naturenet is extended to include interaction design in addition to data collection and analysis.
+                </TextBlock>
+            </StackPanel>
+            <StackPanel Orientation="Vertical" DockPanel.Dock="Top">
+                <Label Name="label_choose_avatar" FontSize="14">Choose an Avatar:</Label>
+                <ListBox Name="listbox_avatars" Margin="5,0,5,0" Height="125"
+                         ScrollViewer.CanContentScroll="True" ScrollViewer.HorizontalScrollBarVisibility="Hidden"
+                         ScrollViewer.VerticalScrollBarVisibility="Hidden">
+                    <ListBox.ItemContainerStyle>
+                        <Style TargetType="{x:Type ListBoxItem}">
+                            <Setter Property="Template">
+                                <Setter.Value>
+                                    <ControlTemplate TargetType="{x:Type ListBoxItem}">
+                                        <DockPanel Margin="2" Background="White">
+                                            <ContentPresenter />
+                                        </DockPanel>
+                                    </ControlTemplate>
+                                </Setter.Value>
+                            </Setter>
+                            <Style.Triggers>
+                                <Trigger Property="IsSelected" Value="True">
+                                    <Setter Property="Template">
+                                        <Setter.Value>
+                                            <ControlTemplate TargetType="{x:Type ListBoxItem}">
+                                                <DockPanel Margin="2,0,2,0" Background="Gray">
+                                                    <ContentPresenter />
+                                                </DockPanel>
+                                            </ControlTemplate>
+                                        </Setter.Value>
+                                    </Setter>
+                                </Trigger>
+                            </Style.Triggers>
+                        </Style>
+                    </ListBox.ItemContainerStyle>
+                    <ListBox.ItemsPanel>
+                        <ItemsPanelTemplate>
+                            <UniformGrid Columns="{Binding Path=Items.Count,RelativeSource={RelativeSource AncestorType={x:Type ListBox}}}" />
+                        </ItemsPanelTemplate>
+                    </ListBox.ItemsPanel>
+                    <ListBox.DataContext>
+                        <DataTemplate>
+                            <Image Source="{Binding ImageSource}" HorizontalAlignment="Center" VerticalAlignment="Center" />
+                        </DataTemplate>
+                    </ListBox.DataContext>
+                </ListBox>
+            </StackPanel>
+            <DockPanel DockPanel.Dock="Top">
                 <Button Name="button_back2" Background="Green" Width="100" Foreground="White" DockPanel.Dock="Left"
-                             VerticalContentAlignment="Center" HorizontalContentAlignment="Center"
-                             HorizontalAlignment="Right" Margin="5,5,0,5" Height="32">Back</Button>
+                                 VerticalContentAlignment="Center" HorizontalContentAlignment="Center"
+                                 HorizontalAlignment="Right" VerticalAlignment="Bottom" Margin="5,5,0,10" Height="32">Back</Button>
                 <Button Name="button_submit" Background="Green" Width="100" Foreground="White" DockPanel.Dock="Right"
-                             VerticalContentAlignment="Center" HorizontalContentAlignment="Center"
-                             HorizontalAlignment="Right" Margin="0,5,5,5" Height="32">Submit</Button>
+                                 VerticalContentAlignment="Center" HorizontalContentAlignment="Center"
+                                 HorizontalAlignment="Right" VerticalAlignment="Bottom" Margin="0,5,5,10" Height="32">Submit</Button>
             </DockPanel>
-        </StackPanel>
+        </DockPanel>
     </DockPanel>
 
 </UserControl>

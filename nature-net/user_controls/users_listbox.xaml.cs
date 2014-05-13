@@ -22,30 +22,19 @@ namespace nature_net.user_controls
     public partial class users_listbox : UserControl
     {
         //private readonly BackgroundWorker worker = new BackgroundWorker();
-        item_generic signup;
+        public item_generic_v2 signup;
+
+        int init_pos_x = 65;
+        int last_pos_x = 65;
+        int pos_x_increment = 30;
+        int max_pos_x = 250;
 
         public users_listbox()
         {
             InitializeComponent();
 
-            //Static Configuration Values:
-            header.title.Content = "Users";
-            //this.Width = 270;
-            signup = new item_generic();
-            signup.Background = Brushes.White;
-            signup.user_desc.Visibility = System.Windows.Visibility.Collapsed;
-            signup.number.Visibility = System.Windows.Visibility.Collapsed;
-            signup.content.Visibility = System.Windows.Visibility.Collapsed;
-            signup.desc.Visibility = System.Windows.Visibility.Collapsed;
-            signup.username.Text = "Sign up";
-            //signup.Background = new SolidColorBrush(Colors.LightGreen);
-            signup.username.Foreground = new SolidColorBrush(Colors.Black);
-            signup.user_desc.Foreground = new SolidColorBrush(Colors.White);
-            signup.top_panel.Margin = new Thickness(13, 13, 13, 13);
-            signup.avatar.Source = configurations.img_signup_icon;
-            signup.PreviewTouchDown += new EventHandler<TouchEventArgs>(signup_PreviewTouchDown);
-            signup.avatar.Source = configurations.img_signup_icon;
-            signup_panel.Children.Add(signup);
+            header.title.Content = configurations.users_listbox_header;
+            create_signup_item();
 
             this.users_list.initialize(false, "user", new ItemSelected(this.item_selected));
             //this.users_list.populator.initial_item = signup;
@@ -57,19 +46,31 @@ namespace nature_net.user_controls
 
         void signup_PreviewTouchDown(object sender, TouchEventArgs e)
         {
-            window_manager.open_signup_window(65, signup.PointToScreen(new Point(0,0)).Y);
+            signup.Background = Brushes.LightGray;
+        }
+
+        void signup_PreviewTouchUp(object sender, TouchEventArgs e)
+        {
+            signup.Background = Brushes.White;
+            window_manager.open_signup_window(last_pos_x, signup.PointToScreen(new Point(0, 0)).Y);
+            last_pos_x = last_pos_x + pos_x_increment;
+            if (last_pos_x > max_pos_x) last_pos_x = init_pos_x;
         }
 
         public void list_all_users()
         {
-            this.users_list.populator.item_width = this.Width - 3;
-            this.users_list.populator.list_all_users();
+            this.Dispatcher.BeginInvoke(DispatcherPriority.ApplicationIdle,
+               new System.Action(() =>
+               {
+                   this.users_list.populator.item_width = this.Width - 3;
+                   this.users_list.populator.list_all_users();
+               }));
         }
 
         bool item_selected(object i)
         {
             item_generic_v2 item = (item_generic_v2)i;
-            window_manager.open_collection_window((string)item.title.Text, (int)item.Tag, 0, item.PointToScreen(new Point(0, 0)).Y);
+            window_manager.open_collection_window((string)item.title.Text, (int)item.Tag, 65, item.PointToScreen(new Point(0, 0)).Y);
             return true;
         }
 
@@ -92,6 +93,44 @@ namespace nature_net.user_controls
             configurations.SortItemGenericList(this.users_list._list.Items,
                 false, false, true, configurations.users_num_desc.Length, configurations.users_date_desc.Length, true, true);
             //this.users_list._list.Items.Refresh();
+        }
+
+        private void create_signup_item()
+        {
+            signup = new item_generic_v2();
+            signup.Background = Brushes.White;
+            signup.avatar.Source = configurations.img_signup_icon;
+            signup.num_likes.Visibility = System.Windows.Visibility.Collapsed;
+            signup.title.Text = configurations.signup_item_title;
+            signup.description.Visibility = System.Windows.Visibility.Collapsed;
+            signup.user_info.Visibility = System.Windows.Visibility.Collapsed;
+            signup.info_panel.Visibility = System.Windows.Visibility.Collapsed;
+            signup.contribution_panel.Visibility = System.Windows.Visibility.Collapsed;
+            signup.txt_level1.Visibility = System.Windows.Visibility.Collapsed;
+            signup.center_panel.VerticalAlignment = VerticalAlignment.Center;
+            signup.avatar.Width = configurations.user_item_avatar_width;
+            signup.Margin = new Thickness(2, 2, 2, 0);
+            signup.Height = configurations.user_item_avatar_width; //signup.avatar.Height;
+
+            signup.PreviewTouchDown += new EventHandler<TouchEventArgs>(signup_PreviewTouchDown);
+            signup.PreviewTouchUp += new EventHandler<TouchEventArgs>(signup_PreviewTouchUp);
+            signup_panel.Children.Add(signup);
+
+            //signup = new item_generic();
+            //signup.Background = Brushes.White;
+            //signup.user_desc.Visibility = System.Windows.Visibility.Collapsed;
+            //signup.number.Visibility = System.Windows.Visibility.Collapsed;
+            //signup.content.Visibility = System.Windows.Visibility.Collapsed;
+            //signup.desc.Visibility = System.Windows.Visibility.Collapsed;
+            //signup.username.Text = "Sign up";
+            ////signup.Background = new SolidColorBrush(Colors.LightGreen);
+            //signup.username.Foreground = new SolidColorBrush(Colors.Black);
+            //signup.user_desc.Foreground = new SolidColorBrush(Colors.White);
+            //signup.top_panel.Margin = new Thickness(13, 13, 13, 13);
+            //signup.avatar.Source = configurations.img_signup_icon;
+            //signup.PreviewTouchDown += new EventHandler<TouchEventArgs>(signup_PreviewTouchDown);
+            //signup.avatar.Source = configurations.img_signup_icon;
+            //signup_panel.Children.Add(signup);
         }
     }
 }

@@ -18,6 +18,7 @@ using Google.Apis.Drive.v2.Data;
 using System.IO;
 using System.Drawing;
 using nature_net.user_controls;
+using System.Threading;
 
 namespace nature_net
 {
@@ -30,7 +31,7 @@ namespace nature_net
         private Canvas debug_canvas = new Canvas();
         private int num_updates = 0;
         iniparser parser;
-        bool is_updating = false;
+        Timer update_change_timer;
 
         public MainWindow()
         {
@@ -58,23 +59,16 @@ namespace nature_net
                 SurfaceDragDrop.AddDropHandler(this.workspace, new EventHandler<SurfaceDragDropEventArgs>(item_droped_on_workspace));
 
                 application_panel.PreviewTouchDown += new EventHandler<TouchEventArgs>(application_panel_PreviewTouchDown);
+                application_panel.PreviewTouchUp += new EventHandler<TouchEventArgs>(application_panel_PreviewTouchUp);
                 //application_panel.PreviewMouseDown += new MouseButtonEventHandler(application_panel_PreviewMouseDown);
 
-                System.Windows.Threading.DispatcherTimer update_changes_thread = new System.Windows.Threading.DispatcherTimer();
-                update_changes_thread.Tick += new EventHandler(update_changes);
-                update_changes_thread.Interval = new TimeSpan(0, configurations.googledrive_update_min, configurations.googledrive_update_sec);
-                update_changes_thread.Start();
+                update_change_timer = new Timer(new TimerCallback(update_changes));
+                update_change_timer.Change(configurations.update_period_ms, Timeout.Infinite);
 
                 change_update_status(false);
                 this.Topmost = configurations.top_most;
             }
             catch (Exception e) { MessageBox.Show("Exception in starting the application:\r\n" + e.StackTrace, "Error"); }
-
-            //try
-            //{
-            //    update_changes(null, null);
-            //}
-            //catch (Exception e2) { MessageBox.Show("Exception in updating the application from googledrive:\r\n" + e2.Message + "\r\n" + e2.StackTrace, "Error"); }
         }
 
         private void change_update_status(bool red)
@@ -102,12 +96,10 @@ namespace nature_net
             configurations.SaveConfigurations(parser);
         }
 
-        void update_changes(object sender, EventArgs e)
+        void update_changes(Object stateInfo)
         {
             try
             {
-                if (is_updating) return;
-                is_updating = true;
                 change_update_status(true);
                 file_manager.retrieve_and_process_media_changes_from_googledrive();
                 this.left_tab.load_users();
@@ -116,21 +108,11 @@ namespace nature_net
                 //this.right_tab.load_users();
                 //this.right_tab.load_design_ideas();
                 change_update_status(false);
-                is_updating = false;
+                update_change_timer.Change(configurations.update_period_ms, Timeout.Infinite);
             }
             catch (Exception ex)
             {
-                StreamReader reader = new StreamReader(configurations.GetAbsoluteLogFilePath());
-                string whole = reader.ReadToEnd();
-                reader.Close();
-
-                StreamWriter writer = new StreamWriter(configurations.GetAbsoluteLogFilePath());
-                writer.WriteLine("---START---");
-                writer.WriteLine(ex.Message);
-				writer.WriteLine(whole);
-                writer.WriteLine(ex.StackTrace);
-                writer.WriteLine("---END---");
-                writer.Close();
+                log.WriteErrorLog(ex);
             }
         }
 
@@ -166,6 +148,12 @@ namespace nature_net
             //workspace.Children.Add(tb);
             //debug_var = debug_var + 30;
             //if (debug_var > 700) { debug_var = 10; debug_canvas.Children.RemoveRange(0, debug_canvas.Children.Count); }
+        }
+
+        void application_panel_PreviewTouchUp(object sender, TouchEventArgs e)
+        {
+            this.left_tab.users_listbox.signup.Background = System.Windows.Media.Brushes.White;
+            this.left_tab.design_ideas_listbox.submit_idea.Background = System.Windows.Media.Brushes.White;
         }
 
         void item_droped_on_workspace(object sender, SurfaceDragDropEventArgs e)
@@ -219,20 +207,26 @@ namespace nature_net
             FrameworkElement element = (FrameworkElement)e.Source;
             if (element == null) return;
 
-            //if (e.Manipulators.Count() > 0)
-            //{
-            //    TouchDevice td = (TouchDevice)(e.Manipulators.First());
-            //    TouchPoint tp = td.GetTouchPoint(element);
-            //    e.Pivot = new ManipulationPivot(new Point(tp.Position.X, tp.Position.Y), 48);
-            //}
+            if (configurations.enable_single_rotation)
+            {
+                //if (e.Manipulators.Count() > 0)
+                //{
+                //    TouchDevice td = (TouchDevice)(e.Manipulators.First());
+                //    TouchPoint tp = td.GetTouchPoint(element);
+                //    e.Pivot = new ManipulationPivot(new Point(tp.Position.X, tp.Position.Y), 48);
+                //}
+                System.Windows.Point center = new System.Windows.Point(element.ActualWidth / 2, element.ActualHeight / 2);
+                center = element.TranslatePoint(center, this.workspace);
+                e.Pivot = new ManipulationPivot(center, configurations.manipulation_pivot_radius);
+            }
             
-            this.UpdateZOrder(element, true);
+            window_manager.UpdateZOrder(element, true);
             try
             {
                 user_controls.window_frame f = (user_controls.window_frame)element;
-                try { window_content c = (window_content)f.window_content.Content; this.UpdateZOrder(c.GetKeyboardFrame(), true); }
+                try { window_content c = (window_content)f.window_content.Content; window_manager.UpdateZOrder(c.GetKeyboardFrame(), true); }
                 catch (Exception) { }
-                try { signup s = (signup)f.window_content.Content; this.UpdateZOrder(s.GetKeyboardFrame(), true); }
+                try { signup s = (signup)f.window_content.Content; window_manager.UpdateZOrder(s.GetKeyboardFrame(), true); }
                 catch (Exception) { }
             }
             catch (Exception) { }
@@ -251,7 +245,7 @@ namespace nature_net
             try
             {
                 iframe = (image_frame)element;
-                matrix2.ScaleAt(deltaManipulation.Scale.X, deltaManipulation.Scale.Y, center.X, center.Y);
+                matrix2.ScaleAt(deltaManipulation.Scale.X, deltaManipulation.Scale.Y, e.ManipulationOrigin.X, e.ManipulationOrigin.Y);
             }
             catch (Exception) { }
 
@@ -282,14 +276,12 @@ namespace nature_net
             }
         }
 
-        void load_background()
+        void load_locations_on_map(int screen_x)
         {
-            var b = new ImageBrush();
-            b.ImageSource = configurations.img_background_pic;
-            this.workspace.Background = b;
             BitmapImage background = (BitmapImage)configurations.img_background_pic;
             System.Windows.Point pw = this.workspace.PointToScreen(new System.Windows.Point(0, 0));
-            double max_x = this.workspace.PointFromScreen(new System.Windows.Point(this.Width - pw.X, 0)).X;
+            //double max_x = this.workspace.PointFromScreen(new System.Windows.Point(this.Width - pw.X, 0)).X;
+            double max_x = screen_x - (screen_x * configurations.tab_width_percentage / 100) - workspace.Margin.Left;
             int i = 1;
             foreach (System.Windows.Point p in configurations.locations)
             {
@@ -323,6 +315,8 @@ namespace nature_net
                 workspace.Children.Add(tb);
                 i++;
             }
+            Canvas.SetLeft(this.label_update, max_x - this.label_update.Width);
+            Canvas.SetTop(this.label_update, 0);
         }
 
         void tb_PreviewTouchDown(object sender, TouchEventArgs e)
@@ -344,18 +338,21 @@ namespace nature_net
                       where l.id == (int)dot.Tag
                       select l;
             Location location = loc.Single<Location>();
-            window_manager.open_location_collection_window(location.name, location.id, Canvas.GetLeft(dot), Canvas.GetTop(dot));
+            window_manager.open_location_collection_window(location.name, location.id, Canvas.GetLeft(dot) + (dot.Width / 2), Canvas.GetTop(dot) + (dot.Height / 2));
         }
 
         void MainWindow_Loaded(object sender, RoutedEventArgs e)
         {
-            this.load_background();
+            var b = new ImageBrush();
+            b.ImageSource = configurations.img_background_pic;
+            this.workspace.Background = b;
+            int screen_x = System.Windows.Forms.Screen.PrimaryScreen.Bounds.Width;
 
             window_manager.main_canvas = this.workspace;
             window_manager.left_tab = left_tab;
             //window_manager.right_tab = right_tab;
 
-            this.left_tab.load_control(true, 0, this.Width);
+            this.left_tab.load_control(true, 0, screen_x);
             //this.right_tab.load_control(false, 2);
             //this.right_tab.load_control(true, 2);
             
@@ -363,51 +360,7 @@ namespace nature_net
             debug_canvas.Height = window_manager.main_canvas.ActualHeight;
             window_manager.main_canvas.Children.Add(debug_canvas);
 
-            Canvas.SetLeft(this.label_update, this.workspace.ActualWidth - this.label_update.Width);
-            Canvas.SetTop(this.label_update, 0);
-        }
-
-        private void UpdateZOrder(UIElement element, bool bringToFront)
-        {
-            if (element == null)return;
-            if (!this.workspace.Children.Contains(element)) return;
-
-            // Determine the Z-Index for the target UIElement.
-            int elementNewZIndex = -1;
-            if (bringToFront)
-            {
-                foreach (UIElement elem in this.workspace.Children)
-                    if (elem.Visibility != Visibility.Collapsed)
-                        ++elementNewZIndex;
-            }
-            else
-            {
-                elementNewZIndex = 0;
-            }
-
-            // Determine if the other UIElements' Z-Index 
-            // should be raised or lowered by one. 
-            int offset = (elementNewZIndex == 0) ? +1 : -1;
-            int elementCurrentZIndex = Canvas.GetZIndex(element);
-
-            // Update the Z-Index of every UIElement in the Canvas.
-            foreach (UIElement childElement in this.workspace.Children)
-            {
-                if (childElement == element)
-                    Canvas.SetZIndex(element, elementNewZIndex);
-                else
-                {
-                    int zIndex = Canvas.GetZIndex(childElement);
-
-                    // Only modify the z-index of an element if it is  
-                    // in between the target element's old and new z-index.
-                    if (bringToFront && elementCurrentZIndex < zIndex ||
-                        !bringToFront && zIndex < elementCurrentZIndex)
-                    {
-                        Canvas.SetZIndex(childElement, zIndex + offset);
-                    }
-                }
-            }
+            this.load_locations_on_map(screen_x);
         }
     }
     public delegate void UpdateStatus(bool status);
