@@ -10,6 +10,7 @@
         <Border DockPanel.Dock="Top" BorderThickness="1" BorderBrush="Gray">
             <uc:list_header x:Name="header"></uc:list_header>
         </Border>
+        <StackPanel Name="submit_idea_panel" DockPanel.Dock="Top"></StackPanel>
         <uc:custom_listbox_v2 x:Name="activities_list" />
     </DockPanel>
 </UserControl>

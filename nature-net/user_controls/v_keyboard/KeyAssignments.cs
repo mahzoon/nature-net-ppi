@@ -6,6 +6,7 @@ namespace nature_net.user_controls
     public class KeyAssignments
     {
         private KeyAssignment[][] _theKeyAssignmentArray;
+        private KeyAssignment[][] _theNumpadKeyAssignmentArray;
 
         [XmlArrayItem("ListItem", typeof(KeyAssignment))]
         [XmlArray("Assignments")]
@@ -23,6 +24,22 @@ namespace nature_net.user_controls
                     new KeyAssignment[14] {VK_CTRL, null, VK_ALT, null, VK_Space, null, VK_ALT, null, VK_CTRL, null, null, null, null, null}};
                 }
                 return _theKeyAssignmentArray;
+            }
+        }
+
+        public KeyAssignment[][] NumpadAssignments
+        {
+            get
+            {
+                if (_theNumpadKeyAssignmentArray == null)
+                {
+                    _theNumpadKeyAssignmentArray = new KeyAssignment[4][] {
+                        new KeyAssignment[3] {VK_7, VK_8, VK_9},
+                        new KeyAssignment[3] {VK_4, VK_5, VK_6},
+                        new KeyAssignment[3] {VK_1, VK_2, VK_3},
+                        new KeyAssignment[2] {VK_0, VK_BS}};
+                }
+                return _theNumpadKeyAssignmentArray;
             }
         }
 

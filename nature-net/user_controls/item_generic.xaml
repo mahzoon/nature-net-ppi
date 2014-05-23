@@ -10,6 +10,18 @@
         <DockPanel LastChildFill="True">
             <Border Name="second_border" BorderBrush="Gray">
                 <DockPanel LastChildFill="True">
+
+                    <Border Name="right_panel_border" DockPanel.Dock="Right" Visibility="Collapsed" BorderThickness="1">
+                        <DockPanel Name="right_panel" LastChildFill="True" Width="67">
+                            <Button Name="reply_button">
+                                <StackPanel Orientation="Horizontal">
+                                    <Image Name="reply_icon" Margin="0,0,5,0"></Image>
+                                    <TextBlock Name="reply_text">Reply</TextBlock>
+                                </StackPanel>
+                            </Button>
+                        </DockPanel>
+                    </Border>
+
                     <DockPanel DockPanel.Dock="Top" LastChildFill="True" Name="top_panel" Margin="5,10,5,0">
                         <Image Name="avatar" Width="75" Height="75"></Image>
                         <StackPanel Name="topleft_panel" Margin="5,0,5,0" Orientation="Vertical"

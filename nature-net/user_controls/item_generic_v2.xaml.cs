@@ -103,13 +103,11 @@ namespace nature_net.user_controls
         public void like_touched(object sender, TouchEventArgs te)
         {
             this.num_likes.Content = (Convert.ToInt32(this.num_likes.Content) + 1).ToString();
-            naturenet_dataclassDataContext db = new naturenet_dataclassDataContext();
             Feedback f = new Feedback();
             f.note = "true"; f.date = DateTime.Now; f.type_id = 2; f.user_id = 0; f.parent_id = 0;
-            f.object_type = "nature_net.Contribution"; f.object_id = Convert.ToInt32((string)this.Tag);
-            db.Feedbacks.InsertOnSubmit(f);
-            db.SubmitChanges();
-            window_manager.load_design_ideas();
+            f.object_type = "nature_net.Contribution"; f.object_id = Convert.ToInt32(this.Tag);
+            database_manager.InsertFeedback(f);
+            window_manager.load_design_ideas_sync();
             te.Handled = true;
         }
     }

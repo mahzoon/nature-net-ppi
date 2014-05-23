@@ -89,18 +89,7 @@ namespace nature_net
                 catch (Exception e)
                 {
                     // write log of the exception
-                    StreamReader reader = new StreamReader(configurations.GetAbsoluteLogFilePath());
-                    string whole = reader.ReadToEnd();
-                    reader.Close();
-
-                    StreamWriter writer = new StreamWriter(configurations.GetAbsoluteLogFilePath());
-                    writer.WriteLine("--START--");
-                    writer.WriteLine(e.Message);
-                    writer.WriteLine(whole);
-                    writer.WriteLine(e.StackTrace);
-                    writer.WriteLine("--END--");
-                    writer.Close();
-                
+                    log.WriteErrorLog(e);
                     request.PageToken = null;
                 }
             } while (!String.IsNullOrEmpty(request.PageToken));
@@ -258,17 +247,7 @@ namespace nature_net
                 catch (Exception ex_)
                 {
                     // write log of the exception
-                    StreamReader reader = new StreamReader(configurations.GetAbsoluteLogFilePath());
-                    string whole = reader.ReadToEnd();
-                    reader.Close();
-
-                    StreamWriter writer = new StreamWriter(configurations.GetAbsoluteLogFilePath());
-                    writer.WriteLine("--START--");
-                    writer.WriteLine(ex_.Message);
-                    writer.WriteLine(whole);
-                    writer.WriteLine(ex_.StackTrace);
-                    writer.WriteLine("--END--");
-                    writer.Close();
+                    log.WriteErrorLog(ex_);
                     continue;
                 }
             }

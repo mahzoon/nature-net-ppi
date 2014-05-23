@@ -42,6 +42,8 @@ namespace nature_net.user_controls
             header.top_order = new TopOrder(this.top_order);
             header.recent_order = new RecentOrder(this.recent_order);
             this.users_list.populator.header = header;
+
+            this.users_list.Background = Brushes.White;
         }
 
         void signup_PreviewTouchDown(object sender, TouchEventArgs e)
@@ -59,12 +61,59 @@ namespace nature_net.user_controls
 
         public void list_all_users()
         {
-            this.Dispatcher.BeginInvoke(DispatcherPriority.ApplicationIdle,
+            this.Dispatcher.BeginInvoke(DispatcherPriority.Normal,
                new System.Action(() =>
                {
                    this.users_list.populator.item_width = this.Width - 3;
                    this.users_list.populator.list_all_users();
                }));
+        }
+
+        public void list_users_and_highlight(string username, bool highlight, TabControl tb)
+        {
+            this.Dispatcher.BeginInvoke(DispatcherPriority.Normal,
+               new System.Action(() =>
+               {
+                   if (highlight)
+                   {
+                       tb.SelectedIndex = 0;
+                       this.users_list.populator.item_width = this.Width - 3;
+                       this.users_list.populator.list_all_users_sync();
+                       //configurations.SortItemGenericList(this.users_list._list.Items, false, false, true, configurations.users_num_desc.Length, configurations.users_date_desc.Length, true, true);
+                       //this.header.atoz.IsChecked = false;
+                       //this.header.recent.IsChecked = true;
+                       //this.header.top.IsChecked = false;
+                       //this.users_list._list.Items.Refresh();
+                       //this.users_list._list.UpdateLayout();
+                   }
+
+                   item_generic_v2 i = find_item(username);
+                   if (i == null) return;
+                   ListBoxItem lbi = (ListBoxItem)(this.users_list._list.ItemContainerGenerator.ContainerFromItem(i));
+                   if (highlight)
+                   {
+                       this.users_list._list.ScrollToCenterOfView(i);
+                       i.Background = Brushes.Gray;
+                       //double y = lbi.TransformToAncestor(Application.Current.MainWindow).Transform(new Point(0, 0)).Y;
+                       double x = 0;
+                       if (this.users_list._list.Tag != null)
+                           x = (double)this.users_list._list.Tag;
+                       window_manager.open_collection_window((string)i.title.Text, (int)i.Tag, 65, x + 30);//lbi.PointToScreen(new Point(0,0)).Y);
+                   }
+                   else
+                       i.Background = Brushes.White;
+               }));
+        }
+
+        private item_generic_v2 find_item(string title)
+        {
+            for (int counter = 0; counter < this.users_list._list.Items.Count; counter++)
+            {
+                item_generic_v2 i = (item_generic_v2)this.users_list._list.Items[counter];
+                if (i.title.Text == title)
+                    return i;
+            }
+            return null;
         }
 
         bool item_selected(object i)
@@ -98,7 +147,7 @@ namespace nature_net.user_controls
         private void create_signup_item()
         {
             signup = new item_generic_v2();
-            signup.Background = Brushes.White;
+            signup.Background = Brushes.LightGray;
             signup.avatar.Source = configurations.img_signup_icon;
             signup.num_likes.Visibility = System.Windows.Visibility.Collapsed;
             signup.title.Text = configurations.signup_item_title;

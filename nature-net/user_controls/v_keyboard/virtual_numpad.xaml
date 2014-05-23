@@ -1,0 +1,13 @@
+﻿<UserControl x:Class="nature_net.user_controls.v_keyboard.virtual_numpad"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             mc:Ignorable="d" 
+             d:DesignHeight="171" d:DesignWidth="126">
+
+    <Canvas Name="keyboard_canvas" Height="171" Width="126" >
+        <Image Name="keyboard" Height="171" Width="126" >
+        </Image>
+    </Canvas>
+</UserControl>

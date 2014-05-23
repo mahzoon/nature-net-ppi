@@ -3,13 +3,32 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:uc="clr-namespace:nature_net.user_controls"
              mc:Ignorable="d" 
              d:DesignHeight="300" d:DesignWidth="300">
 
+    <!--<UserControl.Resources>
+        <Style x:Key="NewListBox" TargetType="{x:Type ListBox}">
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="{x:Type ListBox}">
+                        <DockPanel>
+                            <Border DockPanel.Dock="Top">
+                                <uc:FadingScrollViewer Margin="1" FadedEdgeThickness="65" FadedEdgeOpacity="0" FadedEdgeFalloffSpeed="0.1" BorderThickness="5" BorderBrush="DarkGray"
+                                                       CanContentScroll="True" VerticalScrollBarVisibility="Hidden" HorizontalScrollBarVisibility="Disabled" Visibility="Visible" PanningMode="VerticalOnly" >
+                                    <ItemsPresenter />
+                                </uc:FadingScrollViewer>
+                            </Border>
+                        </DockPanel>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+    </UserControl.Resources>-->
+    
     <DockPanel>
-        <ListBox Name="_list_vertical"
-                     ScrollViewer.HorizontalScrollBarVisibility="Hidden" ScrollViewer.VerticalScrollBarVisibility="Hidden"
-                     ScrollViewer.CanContentScroll="False" ScrollViewer.PanningMode="VerticalOnly">
+        <ListBox Name="_list_vertical" ScrollViewer.HorizontalScrollBarVisibility="Hidden" ScrollViewer.VerticalScrollBarVisibility="Hidden"
+                 ScrollViewer.CanContentScroll="False" ScrollViewer.PanningMode="VerticalOnly">
             <ListBox.ItemContainerStyle>
                 <Style TargetType="{x:Type ListBoxItem}">
                     <Setter Property="Template">
@@ -60,6 +79,7 @@
                 </ItemsPanelTemplate>
             </ListBox.ItemsPanel>
         </ListBox>
+        
     </DockPanel>
     
 </UserControl>

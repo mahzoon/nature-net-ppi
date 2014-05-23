@@ -48,6 +48,11 @@ namespace nature_net.user_controls
             this.title.Text = t;
         }
 
+        public string get_title()
+        {
+            return this.title.Text;
+        }
+
         public void set_icon(ImageSource ico)
         {
             this.window_icon.Source = ico;

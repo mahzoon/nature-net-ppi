@@ -25,11 +25,19 @@ namespace nature_net
         public static string users_no_date = "Just Created"; 
         public static string activities_date_desc = "Last Update: ";
         public static string activities_num_desc = "Contributions";
-        public static string users_listbox_header = "Users";
+
         public static string signup_item_title = "Sign up";
         public static string submit_idea_item_title = "Submit Idea";
-        public static string design_idea_listbox_header = "Design Ideas";
+        public static string submit_idea_activity_item_title = "Submit Idea";
+
+        public static string design_idea_listbox_header = "Design Ideas sorted by";
+        public static string users_listbox_header = "Users sorted by";
+        public static string activities_listbox_header = "Users sorted by";
+
         public static string design_idea_lisbox_top_text = "Popular";
+
+        public static string comment_init_text = "Add Comment";
+        public static string design_idea_init_text = "Design Idea";
 
         public static bool high_contrast = false;
         public static bool top_most = false;
@@ -67,6 +75,7 @@ namespace nature_net
         public static bool manual_tap = false;
         public static bool right_panel_drag = true;
         public static bool whole_item_drag = false;
+        public static bool center_commentarea_and_keyboard = false;
         
         public static bool use_avatar_drag = false;
 
@@ -111,7 +120,11 @@ namespace nature_net
         static string not_found_image_pic = "not_found_image.png";
         static string sound_image_pic = "sound_image.png";
         static string video_image_pic = "film.png";
-        static string keyboard_pic = "keyboard.png";
+        static string keyboard_pic = "NN_Keyboard_v2.png";
+        static string keyboard_shift_pic = "NN_Keyboard_v2_shift.png";
+        static string keyboard_caps_pic = "NN_Keyboard_v2_caps.png";
+        static string keyboard_numpad_pic = "NN_Numpad.png";
+        static string choose_avatar_pic = "avatar.png";
         static string close_icon = "close.png";
         static string change_view_list_icon = "change_view_list.png";
         static string change_view_stack_icon = "change_view_stack.png";
@@ -122,6 +135,8 @@ namespace nature_net
         static string thumbs_up_icon = "tu.jpg";
         static string thumbs_down_icon = "td.jpg";
         static string drag_icon = "drag.png";
+        static string comment_icon = "comment.png";
+        static string reply_icon = "reply.png";
 
         public static string keyboard_click_wav = "click.wav";
 
@@ -133,6 +148,10 @@ namespace nature_net
         public static ImageSource img_sound_image_pic;
         public static ImageSource img_video_image_pic;
         public static ImageSource img_keyboard_pic;
+        public static ImageSource img_keyboard_shift_pic;
+        public static ImageSource img_keyboard_caps_pic;
+        public static ImageSource img_keyboard_numpad_pic;
+        public static ImageSource img_choose_avatar_pic;
         public static ImageSource img_close_icon;
         public static ImageSource img_change_view_list_icon;
         public static ImageSource img_change_view_stack_icon;
@@ -143,6 +162,8 @@ namespace nature_net
         public static ImageSource img_thumbs_up_icon;
         public static ImageSource img_thumbs_down_icon;
         public static ImageSource img_drag_icon;
+        public static ImageSource img_comment_icon;
+        public static ImageSource img_reply_icon;
 
         public static int frame_width = 300;
         public static int frame_title_bar_height = 40;
@@ -157,6 +178,7 @@ namespace nature_net
         public static Brush right_panel_border_color = Brushes.Gray;
         public static double right_panel_width = 80;
         public static double user_item_avatar_width = 60;
+        public static double comment_item_avatar_width = 20;
         public static double design_idea_item_title_font_size = 17;
         public static double design_idea_item_user_info_font_size = 10;
         public static double design_idea_item_avatar_width = 30;
@@ -235,6 +257,10 @@ namespace nature_net
             img_sound_image_pic = new BitmapImage(new Uri(configurations.GetAbsoluteImagePath() + sound_image_pic));
             img_video_image_pic = new BitmapImage(new Uri(configurations.GetAbsoluteImagePath() + video_image_pic));
             img_keyboard_pic = new BitmapImage(new Uri(configurations.GetAbsoluteImagePath() + keyboard_pic));
+            img_keyboard_shift_pic = new BitmapImage(new Uri(configurations.GetAbsoluteImagePath() + keyboard_shift_pic));
+            img_keyboard_caps_pic = new BitmapImage(new Uri(configurations.GetAbsoluteImagePath() + keyboard_caps_pic));
+            img_keyboard_numpad_pic = new BitmapImage(new Uri(configurations.GetAbsoluteImagePath() + keyboard_numpad_pic));
+            img_choose_avatar_pic = new BitmapImage(new Uri(configurations.GetAbsoluteImagePath() + choose_avatar_pic));
             img_close_icon = new BitmapImage(new Uri(configurations.GetAbsoluteImagePath() + close_icon));
             img_collection_window_icon = new BitmapImage(new Uri(configurations.GetAbsoluteImagePath() + collection_window_icon));
             img_signup_window_icon = new BitmapImage(new Uri(configurations.GetAbsoluteImagePath() + signup_window_icon));
@@ -246,6 +272,8 @@ namespace nature_net
             img_thumbs_down_icon = new BitmapImage(new Uri(configurations.GetAbsoluteImagePath() + thumbs_down_icon));
             img_thumbs_down_icon = new BitmapImage(new Uri(configurations.GetAbsoluteImagePath() + thumbs_down_icon));
             img_drag_icon = new BitmapImage(new Uri(configurations.GetAbsoluteImagePath() + drag_icon));
+            img_comment_icon = new BitmapImage(new Uri(configurations.GetAbsoluteImagePath() + comment_icon));
+            img_reply_icon = new BitmapImage(new Uri(configurations.GetAbsoluteImagePath() + reply_icon));
         }
 
         public static string GetDate_Formatted(DateTime dt)
@@ -501,8 +529,9 @@ namespace nature_net
             return name;
         }
 
-        public static int get_or_create_collection(naturenet_dataclassDataContext db, int user_id, int activity_id, DateTime dt)
+        public static int get_or_create_collection(int user_id, int activity_id, DateTime dt)
         {
+            naturenet_dataclassDataContext db = new naturenet_dataclassDataContext();
             var r = from c in db.Collections
                     where ((c.user_id == user_id) && c.activity_id == activity_id)
                     orderby c.date descending
@@ -522,8 +551,7 @@ namespace nature_net
             cl.date = dt;
             cl.name = configurations.GetDate_Formatted(dt);
             cl.user_id = user_id;
-            db.Collections.InsertOnSubmit(cl);
-            db.SubmitChanges();
+            database_manager.InsertCollection(cl);
             return cl.id;
         }
 
@@ -535,12 +563,7 @@ namespace nature_net
                      select u;
             if (ru.Count() == 0)
             {
-                User u0 = new User();
-                u0.name = user_name; u0.avatar = avatar;
-                u0.password = ""; u0.email = "";
-                db.Users.InsertOnSubmit(u0);
-                db.SubmitChanges();
-                user_id = u0.id;
+                return 0;
             }
             else
             {
@@ -566,8 +589,7 @@ namespace nature_net
             cl.date = dt;
             cl.name = configurations.GetDate_Formatted(dt);
             cl.user_id = user_id;
-            db.Collections.InsertOnSubmit(cl);
-            db.SubmitChanges();
+            database_manager.InsertCollection(cl);
             return cl.id;
         }
 
@@ -661,6 +683,7 @@ namespace nature_net
             manual_tap = parser.GetValue("Parameters", "manual_tap", false);
             right_panel_drag = parser.GetValue("Parameters", "right_panel_drag", true);
             whole_item_drag = parser.GetValue("Parameters", "whole_item_drag", false);
+            center_commentarea_and_keyboard = parser.GetValue("Parameters", "center_commentarea_and_keyboard", false);
             update_period_ms = parser.GetValue("Parameters", "update_period_ms", 20000);
             scaling_mode = parser.GetValue("Parameters", "scaling_mode", BitmapScalingMode.Fant);
             click_opacity_on_collection_item = parser.GetValue("Parameters", "click_opacity_on_collection_item", 0.8);
@@ -693,7 +716,10 @@ namespace nature_net
             not_found_image_pic = parser.GetValue("Files", "not_found_image_pic", "not_found_image.png");
             sound_image_pic = parser.GetValue("Files", "sound_image_pic", "sound_image.png");
             video_image_pic = parser.GetValue("Files", "video_image_pic", "film.png");
-            keyboard_pic = parser.GetValue("Files", "keyboard_pic", "keyboard.png");
+            keyboard_pic = parser.GetValue("Files", "keyboard_pic", "NN_Keyboard_v2.png");
+            keyboard_shift_pic = parser.GetValue("Files", "keyboard_shift_pic", "NN_Keyboard_v2_shift.png");
+            keyboard_caps_pic = parser.GetValue("Files", "keyboard_caps_pic", "NN_Keyboard_v2_caps.png");
+            keyboard_numpad_pic = parser.GetValue("Files", "keyboard_numpad_pic", "NN_Numpad.png");
             close_icon = parser.GetValue("Files", "close_icon", "close.png");
             change_view_list_icon = parser.GetValue("Files", "change_view_list_icon", "change_view_list.png");
             change_view_stack_icon = parser.GetValue("Files", "change_view_stack_icon", "change_view_stack.png");
@@ -704,6 +730,8 @@ namespace nature_net
             thumbs_up_icon = parser.GetValue("Files", "thumbs_up_icon", "tu.jpg");
             thumbs_down_icon = parser.GetValue("Files", "thumbs_down_icon", "td.jpg");
             drag_icon = parser.GetValue("Files", "drag_icon", "drag.png");
+            comment_icon = parser.GetValue("Files", "comment_icon", "comment.png");
+            reply_icon = parser.GetValue("Files", "reply_icon", "reply.png");
             keyboard_click_wav = parser.GetValue("Files", "keyboard_click_wav", "click.wav");
 
             // Frame
@@ -767,6 +795,7 @@ namespace nature_net
             parser.SetValue("Parameters", "manual_tap", manual_tap);
             parser.SetValue("Parameters", "right_panel_drag", right_panel_drag);
             parser.SetValue("Parameters", "whole_item_drag", whole_item_drag);
+            parser.SetValue("Parameters", "center_commentarea_and_keyboard", center_commentarea_and_keyboard);
             parser.SetValue("Parameters", "update_period_ms", update_period_ms);
             parser.SetValue("Parameters", "scaling_mode", scaling_mode);
             parser.SetValue("Parameters", "click_opacity_on_collection_item", click_opacity_on_collection_item);
@@ -800,6 +829,9 @@ namespace nature_net
             parser.SetValue("Files", "sound_image_pic", sound_image_pic);
             parser.SetValue("Files", "video_image_pic", video_image_pic);
             parser.SetValue("Files", "keyboard_pic", keyboard_pic);
+            parser.SetValue("Files", "keyboard_shift_pic", keyboard_shift_pic);
+            parser.SetValue("Files", "keyboard_caps_pic", keyboard_caps_pic);
+            parser.SetValue("Files", "keyboard_numpad_pic", keyboard_numpad_pic);
             parser.SetValue("Files", "close_icon", close_icon);
             parser.SetValue("Files", "change_view_list_icon", change_view_list_icon);
             parser.SetValue("Files", "change_view_stack_icon", change_view_stack_icon);
@@ -811,6 +843,8 @@ namespace nature_net
             parser.SetValue("Files", "thumbs_down_icon", thumbs_down_icon);
             parser.SetValue("Files", "keyboard_click_wav", keyboard_click_wav);
             parser.SetValue("Files", "drag_icon", drag_icon);
+            parser.SetValue("Files", "comment_icon", comment_icon);
+            parser.SetValue("Files", "reply_icon", reply_icon);
 
             // Frame
             parser.SetValue("Frame", "frame_width", frame_width);

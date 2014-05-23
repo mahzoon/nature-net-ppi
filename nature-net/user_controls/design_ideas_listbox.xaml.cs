@@ -50,6 +50,8 @@ namespace nature_net.user_controls
             like_handler = new thumbs_up(this.like_touched);
             this.design_ideas_list.populator.thumbs_up_handler = like_handler;
             //this.design_ideas_list.populator.thumbs_down_handler = new thumbs_down(this.dislike_touched);
+
+            this.design_ideas_list.Background = Brushes.White;
         }
 
         void submit_PreviewTouchDown(object sender, TouchEventArgs e)//RoutedEventArgs e)
@@ -74,14 +76,68 @@ namespace nature_net.user_controls
             return true;
         }
 
+        public void list_all_design_ideas_sync()
+        {
+            this.design_ideas_list.populator.item_width = this.Width - 3;
+            this.design_ideas_list.populator.list_all_design_ideas();
+        }
+
         public void list_all_design_ideas()
         {
-            this.Dispatcher.BeginInvoke(DispatcherPriority.ApplicationIdle,
+            this.Dispatcher.BeginInvoke(DispatcherPriority.Normal,
                new System.Action(() =>
                {
                    this.design_ideas_list.populator.item_width = this.Width - 3;
                    this.design_ideas_list.populator.list_all_design_ideas();
                }));
+        }
+
+        public void list_design_ideas_and_highlight(string title, bool highlight, TabControl tb)
+        {
+            this.Dispatcher.BeginInvoke(DispatcherPriority.Normal,
+               new System.Action(() =>
+               {
+                   if (highlight)
+                   {
+                       tb.SelectedIndex = 2;
+                       this.design_ideas_list.populator.item_width = this.Width - 3;
+                       this.design_ideas_list.populator.list_all_design_ideas_sync();
+                       //configurations.SortItemGenericList(this.users_list._list.Items, false, false, true, configurations.users_num_desc.Length, configurations.users_date_desc.Length, true, true);
+                       //this.header.atoz.IsChecked = false;
+                       //this.header.recent.IsChecked = true;
+                       //this.header.top.IsChecked = false;
+                       //this.design_ideas_list._list.Items.Refresh();
+                       //this.design_ideas_list._list.UpdateLayout();
+                   }
+
+                   item_generic_v2 i = find_item(title);
+                   if (i == null) return;
+                   ListBoxItem lbi = (ListBoxItem)(this.design_ideas_list._list.ItemContainerGenerator.ContainerFromItem(i));
+                   if (highlight)
+                   {
+                       this.design_ideas_list._list.ScrollToCenterOfView(i);
+                       i.Background = Brushes.Gray;
+                       //double y = lbi.TransformToAncestor(Application.Current.MainWindow).Transform(new Point(0, 0)).Y;
+                       double x = 0;
+                       if (this.design_ideas_list._list.Tag != null)
+                           x = (double)this.design_ideas_list._list.Tag;
+                       string[] idea_item = ("design idea;" + i.ToString()).Split(new Char[] { ';' });
+                       window_manager.open_design_idea_window(idea_item, 65, x + 40);//lbi.PointToScreen(new Point(0,0)).Y);
+                   }
+                   else
+                       i.Background = Brushes.White;
+               }));
+        }
+
+        private item_generic_v2 find_item(string title)
+        {
+            for (int counter = 0; counter < this.design_ideas_list._list.Items.Count; counter++)
+            {
+                item_generic_v2 i = (item_generic_v2)this.design_ideas_list._list.Items[counter];
+                if (i.title.Text == title)
+                    return i;
+            }
+            return null;
         }
 
         void atoz_order()
@@ -113,30 +169,17 @@ namespace nature_net.user_controls
             //this.design_ideas_list.populator.list_all_design_ideas();
         }
 
-        //void dislike_touched(object sender, EventArgs te)
-        //{
-        //    item_generic i = (item_generic)sender;
-        //    i.label_dislike.Content = Convert.ToInt32(i.label_dislike.Content) - 1;
-        //    naturenet_dataclassDataContext db = new naturenet_dataclassDataContext();
-        //    Feedback f = new Feedback();
-        //    f.note = "false"; f.date = DateTime.Now; f.type_id = 2; f.user_id = 0; f.parent_id = 0;
-        //    f.object_type = "nature_net.Contribution"; f.object_id = (int)i.Tag;
-        //    db.Feedbacks.InsertOnSubmit(f);
-        //    db.SubmitChanges();
-        //    this.design_ideas_list._list.Items.Refresh();
-        //    this.design_ideas_list.populator.list_all_design_ideas();
-        //}
-
         private void create_submit_design_item()
         {
             submit_idea = new item_generic_v2();
-            submit_idea.Background = Brushes.White;
+            submit_idea.Background = Brushes.LightGray;
             submit_idea.avatar.Source = configurations.img_submit_idea_icon;
             submit_idea.avatar.Width = configurations.design_idea_item_avatar_width;
             submit_idea.avatar.Height = configurations.design_idea_item_avatar_width; submit_idea.avatar.Margin = new Thickness(5);
             submit_idea.num_likes.Visibility = System.Windows.Visibility.Collapsed;
             submit_idea.title.Text = configurations.submit_idea_item_title;
-            TextBlock.SetFontWeight(submit_idea.title, FontWeights.Normal); submit_idea.title.FontSize = configurations.design_idea_item_title_font_size;
+            //TextBlock.SetFontWeight(submit_idea.title, FontWeights.Normal);
+            //submit_idea.title.FontSize = configurations.design_idea_item_title_font_size;
             submit_idea.description.Visibility = System.Windows.Visibility.Collapsed;
             submit_idea.user_info.Visibility = System.Windows.Visibility.Collapsed;
             submit_idea.info_panel.Visibility = System.Windows.Visibility.Collapsed;

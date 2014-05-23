@@ -39,7 +39,9 @@ namespace nature_net.user_controls
         private int consecutive_drag_points = 0;
         ListBoxItem last_dragged_element = null;
         double last_scroll_offset = 0;
-        
+
+        string collection_username;
+
         public collection_listbox()
         {
             InitializeComponent();
@@ -48,7 +50,7 @@ namespace nature_net.user_controls
             collection_listbox_item cli = new collection_listbox_item();
             cli.img.Source = configurations.img_loading_image_pic;
             cli.img.Tag = null;
-            cli.percentage.Visibility = System.Windows.Visibility.Visible;
+            //cli.percentage.Visibility = System.Windows.Visibility.Visible;
             cli.drag.Visibility = System.Windows.Visibility.Collapsed;
             this.contributions._list.Items.Add(cli);
             
@@ -66,15 +68,16 @@ namespace nature_net.user_controls
 
         void collection_listbox_Loaded(object sender, RoutedEventArgs e)
         {
-            GradientStopCollection gsc = new GradientStopCollection();
-            gsc.Add(new GradientStop(Colors.LightGray, 0.0));
-            gsc.Add(new GradientStop(Colors.LightGray, (this.Height - 18) / this.Height - 0.01));
-            gsc.Add(new GradientStop(Colors.Transparent, (this.Height - 18) / this.Height + 0.02));
-            gsc.Add(new GradientStop(Colors.Transparent, 1.0));
+            //GradientStopCollection gsc = new GradientStopCollection();
+            //gsc.Add(new GradientStop(Colors.LightGray, 0.0));
+            //gsc.Add(new GradientStop(Colors.LightGray, (this.Height - 18) / this.Height - 0.01));
+            //gsc.Add(new GradientStop(Colors.Transparent, (this.Height - 18) / this.Height + 0.02));
+            //gsc.Add(new GradientStop(Colors.Transparent, 1.0));
 
-            LinearGradientBrush myBrush = new LinearGradientBrush(gsc, 90);
+            //LinearGradientBrush myBrush = new LinearGradientBrush(gsc, 90);
 
-            this.contributions.Background = myBrush;
+            //this.contributions.Background = myBrush;
+            this.contributions.Background = Brushes.LightGray;
         }
 
         void contributions_PreviewTouchMove(object sender, System.Windows.Input.TouchEventArgs e)
@@ -313,6 +316,7 @@ namespace nature_net.user_controls
 
         public void list_all_contributions(string username)
         {
+            this.collection_username = username;
             worker.WorkerReportsProgress = true;
             worker.DoWork += new DoWorkEventHandler(get_all_contributions);
             worker.ProgressChanged += new ProgressChangedEventHandler(progress_changed);
@@ -337,15 +341,25 @@ namespace nature_net.user_controls
             //              where contribution_ids.Contains(m.id)
             //              select m;
             List<Contribution> medias = result1.ToList<Contribution>();
-            worker.ReportProgress(0, medias.Count);
+            List<collection_item> loaded_items = new List<collection_item>();
+            loading_progress lp0 = new loading_progress();
+            lp0.current_progress = 0; lp0.total = medias.Count;
+            lp0.loaded_items = loaded_items;
+            worker.ReportProgress(0, lp0);
             // download the image if there is no image
             // create thumbnail if there is no thumbnail
             List<collection_item> items = new List<collection_item>();
+            
             for (int counter = 0; counter < medias.Count; counter++)
             {
                 collection_item ci = create_collection_item_from_contribution(medias[counter]);
                 items.Add(ci);
-                worker.ReportProgress(counter + 1, medias.Count);
+                loaded_items.Add(ci);
+                loading_progress lp = new loading_progress();
+                lp.current_progress = counter + 1;
+                lp.total = medias.Count;
+                lp.loaded_items = loaded_items; 
+                worker.ReportProgress(counter + 1, lp);
             }
             e.Result = (object)items;
         }
@@ -357,8 +371,49 @@ namespace nature_net.user_controls
                {
                    try
                    {
-                       collection_listbox_item cli = (collection_listbox_item)this.contributions._list.Items[0];
-                       cli.percentage.Text = (e.ProgressPercentage).ToString() + " of " + e.UserState.ToString() + " contribution(s) downloaded.";
+                       loading_progress progress = (loading_progress)e.UserState;
+                       //collection_listbox_item cli = (collection_listbox_item)this.contributions._list.Items[this.contributions._list.Items.Count - 1];
+                       string progress_text = " (loading " + (e.ProgressPercentage).ToString() + " of " + progress.total + ")";
+                       string[] title = this.parent.get_title().Split(new string[] { " (" }, StringSplitOptions.RemoveEmptyEntries);
+                       this.parent.set_title(title[0] + progress_text);
+
+                       if (progress.current_progress == 0)
+                       {
+                           this.contributions._list.Items.Clear();
+                           for (int counter = 0; counter < progress.total; counter++)
+                           {
+                               collection_listbox_item c = new collection_listbox_item();
+                               c.img.Source = configurations.img_loading_image_pic;
+                               //c.img.GifSource = configurations.GetAbsoluteImagePath() + "loading1.gif";
+                               c.img.Tag = null;
+                               //c.percentage.Visibility = System.Windows.Visibility.Collapsed;
+                               //c.percentage.Text = (e.ProgressPercentage).ToString() + " of " + progress.total + " contribution(s) downloaded.";
+                               c.drag.Visibility = System.Windows.Visibility.Collapsed;
+                               this.contributions._list.Items.Add(c);
+                           }
+                       }
+                       else
+                       {
+                           ////load the item
+                           collection_item i = progress.loaded_items[progress.current_progress - 1];
+                           collection_listbox_item cli2 = new collection_listbox_item();
+
+                           //Image img = new Image();
+                           if (window_manager.thumbnails.ContainsKey(i._contribution.id))
+                           {
+                               cli2.img.Source = window_manager.thumbnails[i._contribution.id];
+                               cli2.img.Tag = i;
+                               cli2.drag.Source = configurations.img_drag_icon;
+                           }
+                           else
+                           {
+                               cli2.img.Source = configurations.img_not_found_image_pic;
+                               cli2.img.Tag = null;
+                           }
+                           this.contributions._list.Items.RemoveAt(progress.current_progress - 1);
+                           this.contributions._list.Items.Insert(progress.current_progress - 1, cli2);
+                       }
+
                        this.contributions._list.Items.Refresh();
                    }
                    catch (Exception) { }
@@ -370,39 +425,31 @@ namespace nature_net.user_controls
             this.contributions._list.Items.Dispatcher.BeginInvoke(DispatcherPriority.Normal,
                new System.Action(() =>
                {
-                   this.contributions._list.Items.Clear();
+                   //this.contributions._list.Items.Clear();
                    List<collection_item> items;
                    if (e.Result == null)
                        items = new List<collection_item>();
                    else
                        items = (List<collection_item>)e.Result;
                    
-                   foreach (collection_item i in items)
-                   {
-                       collection_listbox_item cli = new collection_listbox_item();
-                       
-                       //Image img = new Image();
-                       if (window_manager.thumbnails.ContainsKey(i._contribution.id))
-                       {
-                           cli.img.Source = window_manager.thumbnails[i._contribution.id];
-                           cli.img.Tag = i;
-                           cli.drag.Source = configurations.img_drag_icon;
-                       }
-                       else
-                       {
-                           cli.img.Source = configurations.img_not_found_image_pic;
-                           cli.img.Tag = null;
-                       }
-                       this.contributions._list.Items.Add(cli);
-                   }
                    if (items.Count == 0)
                    {
+                       this.contributions._list.Items.Clear();
                        Image img = new Image();
                        img.Source = configurations.img_empty_image_pic;
                        img.Tag = null;
                        this.contributions._list.Items.Add(img);
+
+                       string[] title = this.parent.get_title().Split(new string[] { " (" }, StringSplitOptions.RemoveEmptyEntries);
+                       this.parent.set_title(title[0]);
+                   }
+                   else
+                   {
+                       string[] title = this.parent.get_title().Split(new string[] { " (" }, StringSplitOptions.RemoveEmptyEntries);
+                       this.parent.set_title(title[0] + " (" + items.Count + ")");
                    }
                    this.contributions._list.Items.Refresh();
+                   window_manager.contribution_collection_opened(this.collection_username);
                }));
         }
 
@@ -421,13 +468,23 @@ namespace nature_net.user_controls
                 return;
             }
             List<Contribution> medias = result1.ToList<Contribution>();
-            worker.ReportProgress(0, medias.Count);
+            List<collection_item> loaded_items = new List<collection_item>();
+            loading_progress lp0 = new loading_progress();
+            lp0.current_progress = 0; lp0.total = medias.Count;
+            lp0.loaded_items = loaded_items;
+            worker.ReportProgress(0, lp0);
+
             List<collection_item> items = new List<collection_item>();
             for (int counter = 0; counter < medias.Count; counter++)
             {
                 collection_item ci = create_collection_item_from_contribution(medias[counter]);
                 items.Add(ci);
-                worker.ReportProgress(counter + 1, medias.Count);
+                loaded_items.Add(ci);
+                loading_progress lp = new loading_progress();
+                lp.current_progress = counter + 1;
+                lp.total = medias.Count;
+                lp.loaded_items = loaded_items;
+                worker.ReportProgress(counter + 1, lp);
             }
             e.Result = (object)items;
         }
@@ -445,13 +502,23 @@ namespace nature_net.user_controls
                 return;
             }
             List<Contribution> medias = result0.ToList<Contribution>();
-            worker.ReportProgress(0, medias.Count);
+            List<collection_item> loaded_items = new List<collection_item>();
+            loading_progress lp0 = new loading_progress();
+            lp0.current_progress = 0; lp0.total = medias.Count;
+            lp0.loaded_items = loaded_items;
+            worker.ReportProgress(0, lp0);
+
             List<collection_item> items = new List<collection_item>();
             for (int counter = 0; counter < medias.Count; counter++)
             {
                 collection_item ci = create_collection_item_from_contribution(medias[counter]);
                 items.Add(ci);
-                worker.ReportProgress(counter + 1, medias.Count);
+                loaded_items.Add(ci);
+                loading_progress lp = new loading_progress();
+                lp.current_progress = counter + 1;
+                lp.total = medias.Count;
+                lp.loaded_items = loaded_items;
+                worker.ReportProgress(counter + 1, lp);
             }
             e.Result = (object)items;
         }
@@ -572,4 +639,12 @@ namespace nature_net.user_controls
             return "Media";
         }
     }
+
+    public class loading_progress
+    {
+        public int current_progress;
+        public int total;
+        public List<collection_item> loaded_items;
+    }
+
 }

@@ -13,27 +13,25 @@ using System.Windows.Navigation;
 using System.Windows.Shapes;
 using System.Media;
 
-namespace nature_net.user_controls
+namespace nature_net.user_controls.v_keyboard
 {
     /// <summary>
-    /// Interaction logic for virtual_keyboard.xaml
+    /// Interaction logic for virtual_numpad.xaml
     /// </summary>
-    public partial class virtual_keyboard : UserControl
+    public partial class virtual_numpad : UserControl
     {
         private int button_height = 40;
-        //private int button_width_default = 40;
+        //private int button_width_default = 52;
         private int margin_w = 2;
         private int margin_h = 1;
 
         bool is_shifted = false;
-        bool is_first_shift = false;
 
-        private int[][] rows = new int[5][]{
-        new int[14] { 45, 40, 40, 40, 40, 40, 40, 40, 40, 40, 40, 40, 40, 60 },
-        new int[14] { 65, 40, 40, 40, 40, 40, 40, 40, 40, 40, 40, 40, 40, 40 },
-        new int[14] { 75, 40, 40, 40, 40, 40, 40, 40, 40, 40, 40, 40, 75, 0 },
-        new int[14] { 95, 40, 40, 40, 40, 40, 40, 40, 40, 40, 40, 90, 0, 0 },
-        new int[14] { 130, 0, 0, 0, 350, 0, 0, 0, 0, 0, 0, 0, 0, 0}};
+        private int[][] rows = new int[4][]{
+        new int[3] { 40, 40, 40 },
+        new int[3] { 40, 40, 40 },
+        new int[3] { 40, 40, 40 },
+        new int[2] { 80, 40 }};
 
         KeyAssignments ka = new KeyAssignments();
         KeyAssignment[][] keys;
@@ -42,43 +40,27 @@ namespace nature_net.user_controls
         private CommandBinding _backspaceCommandBinding;
         private SoundPlayer click_sound;
 
-        private Rectangle capslock_rectangle;
-        private Rectangle shift_rectangle;
-
         private Dictionary<TouchDevice, Rectangle> rectangles = new Dictionary<TouchDevice, Rectangle>();
 
-        public InitialTextCheck init_text_checker;
-        public CharacterValidation validation_checker;
+        public number_hit number_hit_handler;
+        public backspace_hit backspace_hit_handler;
+        public submit_hit submit_hit_handler;
 
-        public virtual_keyboard()
+        public virtual_numpad()
         {
             InitializeComponent();
             click_sound = new SoundPlayer();
             click_sound.SoundLocation = configurations.GetAbsolutePath() + configurations.keyboard_click_wav;
             click_sound.Load();
             click_sound.Play();
-            keys = ka.Assignments;
+            keys = ka.NumpadAssignments;
             keyboard_canvas.TouchDown += new EventHandler<TouchEventArgs>(keyboard_TouchDown);
             keyboard_canvas.TouchUp += new EventHandler<TouchEventArgs>(keyboard_TouchUp);
-            //this.keyboard.Background = new ImageBrush(configurations.img_keyboard_pic);
-            this.keyboard.Source = configurations.img_keyboard_pic;
-            this.Loaded += new RoutedEventHandler(virtual_keyboard_Loaded);
-
-            capslock_rectangle = new Rectangle();
-            SolidColorBrush s = new SolidColorBrush();
-            s.Color = Colors.LightBlue; s.Opacity = 0.5;
-            capslock_rectangle.Fill = s;
-            capslock_rectangle.Height = button_height;
-            capslock_rectangle.Width = rows[2][0];
-            Canvas.SetLeft(capslock_rectangle, 0);
-            Canvas.SetTop(capslock_rectangle, 2 * (button_height + margin_h) + margin_h);
-
-            shift_rectangle = new Rectangle();
-            shift_rectangle.Fill = s;
-            shift_rectangle.Height = button_height;
+            this.keyboard.Source = configurations.img_keyboard_numpad_pic;
+            this.Loaded += new RoutedEventHandler(virtual_numpad_Loaded);
         }
 
-        void virtual_keyboard_Loaded(object sender, RoutedEventArgs e)
+        void virtual_numpad_Loaded(object sender, RoutedEventArgs e)
         {
             this.UpdateLayout();
         }
@@ -101,49 +83,12 @@ namespace nature_net.user_controls
             if (key_code == null) return;
 
             click_sound.Play();
-            if (key_code.IsALTKey || key_code.IsControlKey) return;
-            if (key_code.IsCAPSLOCK)
-            {
-                if (!is_shifted)
-                    this.keyboard.Source = configurations.img_keyboard_caps_pic;
-                else
-                    this.keyboard.Source = configurations.img_keyboard_pic;
-                is_shifted = !is_shifted;
-                return;
-            }
-            if (key_code.IsSHIFTKey && is_shifted)
-            { 
-                is_shifted = false; is_first_shift = false;
-                this.keyboard.Source = configurations.img_keyboard_pic;
-                return;
-            }
-            if (key_code.IsSHIFTKey && is_first_shift)
-            {
-                is_shifted = true;
-                is_first_shift = false;
-                this.keyboard.Source = configurations.img_keyboard_caps_pic;
-                return;
-            }
-            if (key_code.IsSHIFTKey && !is_first_shift)
-            {
-                is_first_shift = true;
-                this.keyboard.Source = configurations.img_keyboard_shift_pic;
-                return;
-            }
             if (key_code.UnshiftedCodePoint == 0x0008) { this.DoBackspace(); return; }
+            if (key_code.UnshiftedCodePoint == 0x000A && this.submit_hit_handler != null) { submit_hit_handler(); return; }
             if (is_shifted)
                 this.Inject(((char)key_code.ShiftedCodePoint).ToString());
             else
-            {
-                if (is_first_shift)
-                {
-                    this.Inject(((char)key_code.ShiftedCodePoint).ToString());
-                    is_first_shift = false;
-                    this.keyboard.Source = configurations.img_keyboard_pic;
-                }
-                else
-                    this.Inject(((char)key_code.UnshiftedCodePoint).ToString());
-            }
+                this.Inject(((char)key_code.UnshiftedCodePoint).ToString());
         }
 
         private KeyAssignment get_key(double x, double y, TouchDevice td)
@@ -169,12 +114,21 @@ namespace nature_net.user_controls
             this.keyboard_canvas.Children.Add(r);
             if (!this.rectangles.ContainsKey(td))
                 this.rectangles.Add(td, r);
-
+            else
+            {
+                this.keyboard_canvas.Children.Remove(this.rectangles[td]);
+                this.rectangles.Remove(td);
+            }
             return keys[row][col];
         }
 
         protected void Inject(string sWhat)
         {
+            if (number_hit_handler != null)
+            {
+                number_hit_handler(Convert.ToInt32(sWhat));
+                return;
+            }
             if (target_window != null)
             {
                 //target_window.ControlToInjectInto.Focus();
@@ -183,12 +137,6 @@ namespace nature_net.user_controls
                 if (txtTarget != null)
                 {
                     //txtTarget.Text.Insert(txtTarget.SelectionStart, sWhat);
-                    if (validation_checker != null)
-                        if (!validation_checker(sWhat))
-                            return;
-                    if (init_text_checker != null)
-                        if (init_text_checker())
-                            txtTarget.Text = "";
                     txtTarget.InsertText(sWhat);
                 }
                 else
@@ -226,7 +174,7 @@ namespace nature_net.user_controls
             }
         }
 
-        public static void ShowKeyboard(IVirtualKeyboardInjectable targetWindow, ref virtual_keyboard myPointerToIt)
+        public static void ShowKeyboard(IVirtualKeyboardInjectable targetWindow, ref virtual_numpad myPointerToIt)
         {
             if (myPointerToIt != null)
             {
@@ -234,7 +182,7 @@ namespace nature_net.user_controls
             }
             else
             {
-                myPointerToIt = new virtual_keyboard();
+                myPointerToIt = new virtual_numpad();
                 myPointerToIt.ShowIt(targetWindow);
             }
         }
@@ -248,6 +196,11 @@ namespace nature_net.user_controls
 
         public void DoBackspace()
         {
+            if (backspace_hit_handler != null)
+            {
+                backspace_hit_handler();
+                return;
+            }
             if (target_window != null)
             {
                 target_window.ControlToInjectInto.Focus();
@@ -314,7 +267,7 @@ namespace nature_net.user_controls
             //textbox.Text = sOriginalContent.Insert(iCaretIndex, sStuffToInsert);
         }
 
-        public void MoveAlongWith(UserControl parent, bool center)
+        public void MoveAlongWith(UserControl parent)
         {
             if (parent == null) return;
             MatrixTransform parent_matrix = (MatrixTransform)parent.RenderTransform;
@@ -322,14 +275,13 @@ namespace nature_net.user_controls
             matrix.M11 = parent_matrix.Matrix.M11; matrix.M12 = parent_matrix.Matrix.M12;
             matrix.M21 = parent_matrix.Matrix.M21; matrix.M22 = parent_matrix.Matrix.M22;
             matrix.OffsetX = parent_matrix.Matrix.OffsetX; matrix.OffsetY = parent_matrix.Matrix.OffsetY;
-            double dx =0;
-            if (center)
-                dx = (parent.ActualWidth / 2) - (this.Width / 2);
+            double dx = (parent.ActualWidth / 2) - (this.ActualWidth / 2);
             matrix.TranslatePrepend(dx, parent.ActualHeight);
             this.RenderTransform = new MatrixTransform(matrix);
         }
     }
 
-    public delegate bool InitialTextCheck();
-    public delegate bool CharacterValidation(string c);
+    public delegate void backspace_hit();
+    public delegate void number_hit(int number);
+    public delegate void submit_hit();
 }

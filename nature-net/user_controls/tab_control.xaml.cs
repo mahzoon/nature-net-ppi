@@ -52,6 +52,16 @@ namespace nature_net.user_controls
             this.design_ideas_listbox.list_all_design_ideas();
         }
 
+        public void highlight_user_and_open_collection(string username, bool highlight)
+        {
+            this.users_listbox.list_users_and_highlight(username, highlight, this.tab);
+        }
+
+        public void highlight_design_idea_and_open_it(string title, bool highlight)
+        {
+            this.design_ideas_listbox.list_design_ideas_and_highlight(title, highlight, this.tab);
+        }
+
         public void load_users()
         {
             this.users_listbox.list_all_users();
@@ -65,6 +75,11 @@ namespace nature_net.user_controls
         public void load_activities()
         {
             this.activities_listbox.list_all_activities();
+        }
+
+        public void load_design_ideas_sync()
+        {
+            this.design_ideas_listbox.list_all_design_ideas_sync();
         }
 
         private void TabItem_TouchDown(object sender, TouchEventArgs e)

@@ -152,8 +152,9 @@ namespace nature_net
 
         void application_panel_PreviewTouchUp(object sender, TouchEventArgs e)
         {
-            this.left_tab.users_listbox.signup.Background = System.Windows.Media.Brushes.White;
-            this.left_tab.design_ideas_listbox.submit_idea.Background = System.Windows.Media.Brushes.White;
+            this.left_tab.users_listbox.signup.Background = System.Windows.Media.Brushes.LightGray;
+            this.left_tab.design_ideas_listbox.submit_idea.Background = System.Windows.Media.Brushes.LightGray;
+            this.left_tab.activities_listbox.submit_idea.Background = System.Windows.Media.Brushes.LightGray;
         }
 
         void item_droped_on_workspace(object sender, SurfaceDragDropEventArgs e)
@@ -226,7 +227,7 @@ namespace nature_net
                 user_controls.window_frame f = (user_controls.window_frame)element;
                 try { window_content c = (window_content)f.window_content.Content; window_manager.UpdateZOrder(c.GetKeyboardFrame(), true); }
                 catch (Exception) { }
-                try { signup s = (signup)f.window_content.Content; window_manager.UpdateZOrder(s.GetKeyboardFrame(), true); }
+                try { signup s = (signup)f.window_content.Content; window_manager.UpdateZOrder(s.GetKeyboardFrame(), true); window_manager.UpdateZOrder(s.GetAvatarFrame(), true); window_manager.UpdateZOrder(s.GetNumpadFrame(), true); }
                 catch (Exception) { }
             }
             catch (Exception) { }
@@ -250,7 +251,8 @@ namespace nature_net
             catch (Exception) { }
 
             matrix.RotateAt(e.DeltaManipulation.Rotation, e.ManipulationOrigin.X, e.ManipulationOrigin.Y);// center.X, center.Y);
-            matrix.Translate(e.DeltaManipulation.Translation.X, e.DeltaManipulation.Translation.Y);
+            //if (element.PointToScreen(new System.Windows.Point(0, 0)).X > 300 && e.DeltaManipulation.Translation.X > 0)
+                matrix.Translate(e.DeltaManipulation.Translation.X, e.DeltaManipulation.Translation.Y);
             element.RenderTransform = new MatrixTransform(matrix);
             if (iframe != null)
             {

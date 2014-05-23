@@ -9,28 +9,77 @@
              d:DesignWidth="300">
     <DockPanel LastChildFill="False">
         <ContentControl Name="the_item" DockPanel.Dock="Top"></ContentControl>
-        <Button Name="expander" DockPanel.Dock="Top" HorizontalAlignment="Center" Width="38" Height="38"
-                         VerticalContentAlignment="Center" HorizontalContentAlignment="Center"
-                         Background="#FF3E9D3E" Foreground="White">v</Button>
-        <uc:custom_listbox_v2 x:Name="comments_listbox" Height="250" DockPanel.Dock="Top" />
-        <StackPanel DockPanel.Dock="Top" Orientation="Vertical" AllowDrop="True" Name="leave_comment_area">
-            <DockPanel Name="leave_comment_panel" LastChildFill="True">
-                <Image DockPanel.Dock="Left" Name="avatar" Height="75"></Image>
-                <Button DockPanel.Dock="Right" Name="submit_comment" Width="65" HorizontalContentAlignment="Center"
-                                 VerticalContentAlignment="Center" FontFamily="Segoe UI" FontSize="14" Background="Green"
-                                 Foreground="White">
-                    Submit
-                </Button>
-                <TextBox DockPanel.Dock="Left" Name="comment_textbox" TextWrapping="Wrap" AcceptsReturn="True"
-                         FontSize="15" FontFamily="Segoe UI" Background="White" Foreground="Black"></TextBox>
-            </DockPanel>
-            <Image Name="add_comment_img" Height="75" Stretch="Fill" ></Image>
-            <!--<InkCanvas Name="leave_comment_canvas" Height="95" IsManipulationEnabled="False" Background="Gray">
-                <InkCanvas.DefaultDrawingAttributes>
-                    <DrawingAttributes Color="White" Width="1" IgnorePressure="False" FitToCurve="True" />
-                </InkCanvas.DefaultDrawingAttributes>
-            </InkCanvas>-->
-        </StackPanel>
-        
+        <Button Name="expander" DockPanel.Dock="Top" HorizontalAlignment="Left" Width="140" Height="40"
+                         VerticalContentAlignment="Center" HorizontalContentAlignment="Left"
+                         Background="#FF3E9D3E" Foreground="White" >
+            <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                <Image Name="comment_icon" Margin="5,0,0,0"></Image>
+                <TextBlock Name="comment_text1" Margin="10,0,0,0" VerticalAlignment="Center">Comments (</TextBlock>
+                <TextBlock Name="number_comments" VerticalAlignment="Center"></TextBlock>
+                <TextBlock Name="comment_text2" VerticalAlignment="Center">)</TextBlock>
+            </StackPanel>
+        </Button>
+
+        <DockPanel Name="comments_section" DockPanel.Dock="Top">
+
+            <StackPanel DockPanel.Dock="Top" Orientation="Vertical" AllowDrop="True" Name="leave_comment_area_default" Background="White">
+                <uc:custom_listbox_v2 x:Name="comments_listbox" MaxHeight="250" />
+                <DockPanel Name="leave_comment_panel_default" LastChildFill="True">
+                    <Button DockPanel.Dock="Right" Name="submit_comment_default" Width="70" HorizontalContentAlignment="Center"
+                                     VerticalContentAlignment="Center" FontFamily="Segoe UI" FontSize="14" Background="Green"
+                                     Foreground="White">
+                        Submit
+                    </Button>
+                    <TextBox DockPanel.Dock="Left" Name="comment_textbox_default" TextWrapping="Wrap" AcceptsReturn="True" Height="60"
+                             FontSize="15" FontFamily="Segoe UI" Background="White" Foreground="Gray" Padding="4">
+                        Comment Textbox</TextBox>
+                </DockPanel>
+                <!--"<Image Name="add_comment_img" Height="75" Stretch="Fill" ></Image>-->
+            </StackPanel>
+
+            <StackPanel DockPanel.Dock="Top" Orientation="Vertical" AllowDrop="True" Name="leave_comment_area_reply" Background="White">
+                <TextBlock Background="White" FontSize="15" Margin="5">Reply to:</TextBlock>
+                <uc:item_generic x:Name="reply_item" Margin="20,0,0,5"></uc:item_generic>
+                <DockPanel Name="leave_comment_panel_reply" LastChildFill="True">
+                    <DockPanel Name="buttons_reply" DockPanel.Dock="Bottom" Height="35">
+                        <Button DockPanel.Dock="Right" Name="submit_comment_reply" Width="150" HorizontalContentAlignment="Center"
+                                     VerticalContentAlignment="Center" FontFamily="Segoe UI" FontSize="14" Background="Green"
+                                     Foreground="White">
+                            Submit
+                        </Button>
+                        <Button DockPanel.Dock="Left" Name="cancel_comment_reply" Width="150" HorizontalContentAlignment="Center"
+                                     VerticalContentAlignment="Center" FontFamily="Segoe UI" FontSize="14" Background="Green"
+                                     Foreground="White">
+                            Cancel
+                        </Button>
+                    </DockPanel>
+                    <TextBox DockPanel.Dock="Top" Name="comment_textbox_reply" TextWrapping="Wrap" AcceptsReturn="True" Height="60"
+                             FontSize="15" FontFamily="Segoe UI" Background="White" Foreground="Gray" Padding="4">
+                        Comment Textbox</TextBox>
+                </DockPanel>
+            </StackPanel>
+
+            <StackPanel DockPanel.Dock="Top" Orientation="Vertical" AllowDrop="True" Name="leave_comment_area_auth" Background="White">
+                <uc:item_generic_v2 x:Name="selected_user"></uc:item_generic_v2>
+                <StackPanel Name="pin_area" Orientation="Horizontal" Visibility="Collapsed" Margin="0,5,0,5" HorizontalAlignment="Center">
+                    <Label Name="pin_label" Margin="5,0,10,0">Enter your PIN:</Label>
+                    <uc:pin_box x:Name="pin" Height="30"></uc:pin_box>
+                </StackPanel>
+                <Label Name="error_desc" HorizontalAlignment="Center" Foreground="Red" Visibility="Collapsed">Error</Label>
+                <DockPanel Name="buttons_auth" Height="35">
+                    <Button DockPanel.Dock="Right" Name="submit_comment_auth" Width="150" HorizontalContentAlignment="Center"
+                                     VerticalContentAlignment="Center" FontFamily="Segoe UI" FontSize="14" Background="Green"
+                                     Foreground="White">
+                        Submit
+                    </Button>
+                    <Button DockPanel.Dock="Left" Name="cancel_comment_auth" Width="150" HorizontalContentAlignment="Center"
+                                     VerticalContentAlignment="Center" FontFamily="Segoe UI" FontSize="14" Background="Green"
+                                     Foreground="White">
+                        Cancel
+                    </Button>
+                </DockPanel>
+            </StackPanel>
+        </DockPanel>
+
     </DockPanel>
 </UserControl>

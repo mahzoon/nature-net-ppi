@@ -100,6 +100,9 @@ namespace nature_net.user_controls
         [XmlAttribute("htmlEntityName")]
         public string HtmlEntityName { get; set; }
 
+        [XmlAttribute("htmlEntityName")]
+        public object Tag { get; set; }
+
         /// <summary>
         /// Get/set the flag that indicates when both the CodePoint, and the ShiftedCodePoint, glyphs
         /// are to be shown together, one below the other, on the key-cap.

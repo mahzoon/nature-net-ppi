@@ -31,10 +31,10 @@
         </Style>
     </UserControl.Resources>
     
-    <StackPanel Background="LightGreen">
+    <StackPanel Name="whole" Background="LightGreen">
         <Label Name="title" HorizontalAlignment="Center" VerticalAlignment="Center"
                FontSize="20">Title</Label>
-        <Grid Margin="7,5,8,15">
+        <Grid Name="the_grid" Margin="7,5,8,15">
             <Grid.RowDefinitions>
                 <RowDefinition Height="30" />
             </Grid.RowDefinitions>

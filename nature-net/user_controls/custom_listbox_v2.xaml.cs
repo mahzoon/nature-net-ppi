@@ -388,6 +388,8 @@ namespace nature_net.user_controls
 
         private void _list_PreviewTouchDown(object sender, TouchEventArgs e)
         {
+            if (e.Handled)
+                return;
             if (!touch_points.ContainsKey(e.TouchDevice.Id))
             {
                 touch_info t = new touch_info();
@@ -525,7 +527,7 @@ namespace nature_net.user_controls
                     //}
                 }
             }
-            
+
             ScrollViewer scroll = configurations.GetDescendantByType(this._list, typeof(ScrollViewer)) as ScrollViewer;
             //double dv = touch_points[e.TouchDevice.Id].points[touch_points[e.TouchDevice.Id].points.Count - 1].Position.Y - touch_points[e.TouchDevice.Id].points[touch_points[e.TouchDevice.Id].points.Count - 2].Position.Y;
             //double dh = touch_points[e.TouchDevice.Id].points[touch_points[e.TouchDevice.Id].points.Count - 1].Position.X - touch_points[e.TouchDevice.Id].points[touch_points[e.TouchDevice.Id].points.Count - 2].Position.X;
@@ -658,10 +660,12 @@ namespace nature_net.user_controls
         private bool test_thumb_feedback(TouchEventArgs e)
         {
             TouchPoint pt = e.GetTouchPoint(this._list as IInputElement);
-            HitTestResult hr = VisualTreeHelper.HitTest(this._list, new Point(pt.Position.X, pt.Position.Y));
+            hitResultsList.Clear();
+            //HitTestResult hr = VisualTreeHelper.HitTest(this._list, new Point(pt.Position.X, pt.Position.Y));
+            VisualTreeHelper.HitTest(this._list, null, new HitTestResultCallback(HitTestResult_Tap_v2), new PointHitTestParameters(new Point(pt.Position.X, pt.Position.Y)));
             try
             {
-                Image i = (Image)hr.VisualHit;
+                Image i = (Image)hitResultsList[0];
                 if (i.Name == "avatar")
                 {
                     item_generic_v2 i2 =null;
@@ -682,7 +686,7 @@ namespace nature_net.user_controls
                 //}
                 return false;
             }
-            catch (Exception) { return false; }
+            catch (Exception e2) { return false; }
         }
 
         protected override void OnManipulationBoundaryFeedback(ManipulationBoundaryFeedbackEventArgs e)
@@ -702,6 +706,9 @@ namespace nature_net.user_controls
         public list_header header;
         public thumbs_up thumbs_up_handler;
         public thumbs_down thumbs_down_handler;
+        //
+        public TextBlock total_number;
+        public reply_clicked reply_clicked_handler;
 
         // for design ideas
         public void list_all_design_ideas()
@@ -714,6 +721,23 @@ namespace nature_net.user_controls
         public void get_all_design_ideas(object arg, DoWorkEventArgs e)
         {
             e.Result = (object)(new List<design_idea_item>());
+            e.Result = get_all_design_ideas();
+        }
+        public void display_all_design_ideas(object di, RunWorkerCompletedEventArgs e)
+        {
+            this._list.Items.Dispatcher.BeginInvoke(DispatcherPriority.Normal,
+                new System.Action(() =>
+                {
+                    display_all_design_ideas((List<design_idea_item>)e.Result);
+                }));
+        }
+        public void list_all_design_ideas_sync()
+        {
+            List<design_idea_item> idea_items = get_all_design_ideas();
+            display_all_design_ideas(idea_items);
+        }
+        public List<design_idea_item> get_all_design_ideas()
+        {
             try
             {
                 naturenet_dataclassDataContext db = new naturenet_dataclassDataContext();
@@ -722,8 +746,7 @@ namespace nature_net.user_controls
                         select d;
                 if (r == null)
                 {
-                    e.Result = (object)(new List<design_idea_item>());
-                    return;
+                    return new List<design_idea_item>();
                 }
                 List<design_idea_item> ideas = new List<design_idea_item>();
                 foreach (Design_Idea d in r)
@@ -761,54 +784,51 @@ namespace nature_net.user_controls
                     i.num_like = num_like;
                     ideas.Add(i);
                 }
-                e.Result = (object)ideas;
+                return ideas;
             }
             catch (Exception ex)
             {
                 log.WriteErrorLog(ex);
+                return new List<design_idea_item>();
             }
         }
-        public void display_all_design_ideas(object di, RunWorkerCompletedEventArgs e)
+        public void display_all_design_ideas(List<design_idea_item> ideas)
         {
-            this._list.Items.Dispatcher.BeginInvoke(DispatcherPriority.ApplicationIdle,
-                new System.Action(() =>
-                {
-                    this._list.Items.Clear();
-                    if (initial_item != null)
-                        this._list.Items.Add(initial_item);
+            this._list.Items.Clear();
+            if (initial_item != null)
+                this._list.Items.Add(initial_item);
 
-                    List<design_idea_item> ideas = (List<design_idea_item>)e.Result;
-                    foreach (design_idea_item idea in ideas)
-                    {
-                        item_generic_v2 i = new item_generic_v2();
-                        i.title.Text = idea.design_idea.note; i.description.Visibility = Visibility.Collapsed;
-                        TextBlock.SetFontWeight(i.title, FontWeights.Normal); 
-                        i.title.FontSize = configurations.design_idea_item_title_font_size;
-                        i.user_info.Margin = new Thickness(5);
-                        i.user_info_name.Text = idea.design_idea.name; i.user_info_date.Text = configurations.GetDate_Formatted(idea.last_date);
-                        i.user_info_name.Margin = new Thickness(2, 0, 0, 0); i.user_info_date.Margin = new Thickness(2, 0, 2, 0);
-                        i.user_info_name.FontSize = configurations.design_idea_item_user_info_font_size; i.user_info_date.FontSize = configurations.design_idea_item_user_info_font_size;
-                        i.user_info_icon.Source = idea.img; i.number.Text = idea.count.ToString(); i.number_icon.Visibility = Visibility.Collapsed;
-                        i.txt_level1.Text = configurations.designidea_num_desc;
-                        i.txt_level2.Visibility = Visibility.Collapsed; i.txt_level3.Visibility = Visibility.Collapsed;
-                        i.avatar.Source = configurations.img_thumbs_up_icon; i.num_likes.Content = idea.num_like.ToString();
-                        i.avatar.Width = configurations.design_idea_item_avatar_width; i.avatar.Height = configurations.design_idea_item_avatar_width; i.avatar.Margin = new Thickness(5); i.avatar.Tag = i;
-                        i.Tag = idea.design_idea.id;
-                        i.Margin = items_margins;
-                        if (item_width != 0) i.Width = item_width;
-                        i.right_panel.Width = configurations.design_idea_right_panel_width;
-                        //i.left_panel.VerticalAlignment = VerticalAlignment.Center; DockPanel.SetDock(i.number, Dock.Left); DockPanel.SetDock(i.txt_level1, Dock.Left);
-                        i.top_value = idea.num_like;
-                        if (thumbs_up_handler != null)
-                            i.avatar.Tag = i;
-                        this._list.Items.Add(i);
-                    }
-                    if (header.atoz.IsChecked.Value && header.atoz_order != null) header.atoz_order();
-                    if (header.top.IsChecked.Value && header.top_order != null) header.top_order();
-                    if (header.recent.IsChecked.Value && header.recent_order != null) header.recent_order();
-                    this._list.Items.Refresh();
-                    this._list.UpdateLayout();
-                }));
+            foreach (design_idea_item idea in ideas)
+            {
+                item_generic_v2 i = new item_generic_v2();
+                i.Background = Brushes.White;
+                i.title.Text = idea.design_idea.note; i.description.Visibility = Visibility.Collapsed;
+                TextBlock.SetFontWeight(i.title, FontWeights.Normal);
+                i.title.FontSize = configurations.design_idea_item_title_font_size;
+                i.user_info.Margin = new Thickness(5);
+                i.user_info_name.Text = idea.design_idea.name; i.user_info_date.Text = configurations.GetDate_Formatted(idea.last_date);
+                i.user_info_name.Margin = new Thickness(2, 0, 0, 0); i.user_info_date.Margin = new Thickness(2, 0, 2, 0);
+                i.user_info_name.FontSize = configurations.design_idea_item_user_info_font_size; i.user_info_date.FontSize = configurations.design_idea_item_user_info_font_size;
+                i.user_info_icon.Source = idea.img; i.number.Text = idea.count.ToString(); i.number_icon.Visibility = Visibility.Collapsed;
+                i.txt_level1.Text = configurations.designidea_num_desc;
+                i.txt_level2.Visibility = Visibility.Collapsed; i.txt_level3.Visibility = Visibility.Collapsed;
+                i.avatar.Source = configurations.img_thumbs_up_icon; i.num_likes.Content = idea.num_like.ToString();
+                i.avatar.Width = configurations.design_idea_item_avatar_width; i.avatar.Height = configurations.design_idea_item_avatar_width; i.avatar.Margin = new Thickness(5); i.avatar.Tag = i;
+                i.Tag = idea.design_idea.id;
+                i.Margin = items_margins;
+                if (item_width != 0) i.Width = item_width;
+                i.right_panel.Width = configurations.design_idea_right_panel_width;
+                //i.left_panel.VerticalAlignment = VerticalAlignment.Center; DockPanel.SetDock(i.number, Dock.Left); DockPanel.SetDock(i.txt_level1, Dock.Left);
+                i.top_value = idea.num_like;
+                if (thumbs_up_handler != null)
+                    i.avatar.Tag = i;
+                this._list.Items.Add(i);
+            }
+            if (header.atoz.IsChecked.Value && header.atoz_order != null) header.atoz_order();
+            if (header.top.IsChecked.Value && header.top_order != null) header.top_order();
+            if (header.recent.IsChecked.Value && header.recent_order != null) header.recent_order();
+            this._list.Items.Refresh();
+            this._list.UpdateLayout();
         }
 
         // for users
@@ -821,8 +841,24 @@ namespace nature_net.user_controls
         }
         public void get_all_users(object arg, DoWorkEventArgs e)
         {
-
             e.Result = (object)(new List<user_item>());
+            e.Result = get_all_users();
+        }
+        public void display_all_users(object us, RunWorkerCompletedEventArgs e)
+        {
+            this._list.Items.Dispatcher.BeginInvoke(DispatcherPriority.Normal,
+                new System.Action(() =>
+                {
+                    display_all_users((List<user_item>)e.Result);
+                }));
+        }
+        public void list_all_users_sync()
+        {
+            List<user_item> user_items = get_all_users();
+            display_all_users(user_items);
+        }
+        public List<user_item> get_all_users()
+        {
             try
             {
                 naturenet_dataclassDataContext db = new naturenet_dataclassDataContext();
@@ -832,8 +868,7 @@ namespace nature_net.user_controls
                         select u;
                 if (r == null)
                 {
-                    e.Result = (object)(new List<user_item>());
-                    return;
+                    return new List<user_item>();
                 }
                 List<user_item> users = new List<user_item>();
                 foreach (User u in r)
@@ -885,48 +920,44 @@ namespace nature_net.user_controls
                     }
                     users.Add(i);
                 }
-                e.Result = (object)users;
+                return users;
             }
             catch (Exception ex)
             {
                 log.WriteErrorLog(ex);
+                return new List<user_item>();
             }
         }
-        public void display_all_users(object us, RunWorkerCompletedEventArgs e)
+        public void display_all_users(List<user_item> users)
         {
-            this._list.Items.Dispatcher.BeginInvoke(DispatcherPriority.ApplicationIdle,
-                new System.Action(() =>
-                {
-                    this._list.Items.Clear();
-                    if (initial_item != null)
-                        this._list.Items.Add(initial_item);
+            this._list.Items.Clear();
+            if (initial_item != null)
+                this._list.Items.Add(initial_item);
 
-                    List<user_item> users = (List<user_item>)e.Result;
-                    foreach (user_item u in users)
-                    {
-                        item_generic_v2 i = new item_generic_v2();
-                        if (u.has_date)
-                            i.txt_level2.Text = configurations.GetDate_Formatted(u.last_date);
-                        else
-                            i.txt_level2.Text = configurations.users_no_date;
-                        i.title.Text = u.user.name; i.avatar.Source = u.img; i.Tag = u.user.id;
-                        i.number.Text = u.count.ToString();
-                        if (item_width != 0) i.Width = item_width;
-                        i.Margin = items_margins; i.txt_level2.Margin = new Thickness(0, 0, 0, 10);
-                        i.num_likes.Visibility = Visibility.Collapsed; i.txt_level1.Visibility = Visibility.Collapsed;
-                        i.txt_level3.Visibility = Visibility.Collapsed; i.description.Visibility = Visibility.Collapsed;
-                        i.center_panel.VerticalAlignment = VerticalAlignment.Center;
-                        i.avatar.Width = configurations.user_item_avatar_width; i.avatar.Height = configurations.user_item_avatar_width;
-                        i.user_info.Visibility = Visibility.Collapsed; i.user_info_date.Text = i.txt_level2.Text;
-                        i.top_value = u.count;
-                        this._list.Items.Add(i);
-                    }
-                    if (header.atoz.IsChecked.Value && header.atoz_order != null) header.atoz_order();
-                    if (header.top.IsChecked.Value && header.top_order != null) header.top_order();
-                    if (header.recent.IsChecked.Value && header.recent_order != null) header.recent_order();
-                    this._list.Items.Refresh();
-                    this._list.UpdateLayout();
-                }));
+            foreach (user_item u in users)
+            {
+                item_generic_v2 i = new item_generic_v2();
+                if (u.has_date)
+                    i.txt_level2.Text = configurations.GetDate_Formatted(u.last_date);
+                else
+                    i.txt_level2.Text = configurations.users_no_date;
+                i.title.Text = u.user.name; i.avatar.Source = u.img; i.Tag = u.user.id;
+                i.number.Text = u.count.ToString();
+                if (item_width != 0) i.Width = item_width;
+                i.Margin = items_margins; i.txt_level2.Margin = new Thickness(0, 0, 0, 10);
+                i.num_likes.Visibility = Visibility.Collapsed; i.txt_level1.Visibility = Visibility.Collapsed;
+                i.txt_level3.Visibility = Visibility.Collapsed; i.description.Visibility = Visibility.Collapsed;
+                i.center_panel.VerticalAlignment = VerticalAlignment.Center;
+                i.avatar.Width = configurations.user_item_avatar_width; i.avatar.Height = configurations.user_item_avatar_width;
+                i.user_info.Visibility = Visibility.Collapsed; i.user_info_date.Text = i.txt_level2.Text;
+                i.top_value = u.count;
+                this._list.Items.Add(i);
+            }
+            if (header.atoz.IsChecked.Value && header.atoz_order != null) header.atoz_order();
+            if (header.top.IsChecked.Value && header.top_order != null) header.top_order();
+            if (header.recent.IsChecked.Value && header.recent_order != null) header.recent_order();
+            this._list.Items.Refresh();
+            this._list.UpdateLayout();
         }
 
         // for comments
@@ -1006,13 +1037,17 @@ namespace nature_net.user_controls
                        this._list.Items.Add(initial_item);
 
                    List<comment_item_generic> comments = (List<comment_item_generic>)e.Result;
+                   if (this.total_number != null)
+                       this.total_number.Text = comments.Count.ToString();
                    foreach (comment_item_generic cig in comments)
                    {
                        item_generic i = new item_generic();
                        i.username.Text = cig.comment.User.name;
-                       i.user_desc.Content = configurations.GetDate_Formatted(cig.comment.date);
-                       i.number.Visibility = System.Windows.Visibility.Collapsed;
-                       i.desc.Content = "Commented:";
+                       i.user_desc.Visibility = Visibility.Collapsed; //i.user_desc.Content = configurations.GetDate_Formatted(cig.comment.date);
+                       i.number.Text = configurations.GetDate_Formatted(cig.comment.date); //i.number.Visibility = System.Windows.Visibility.Collapsed;
+                       i.desc.Visibility = Visibility.Collapsed;// i.desc.Content = "Commented:";
+                       i.topleft_panel.VerticalAlignment = VerticalAlignment.Top;
+                       i.top_panel.Margin = new Thickness(5, 10, 5, 10);
                        i.content.Text = cig.comment.note;
                        if (item_width != 0) i.Width = item_width + 2;
                        i.avatar.Source = new BitmapImage(new Uri(configurations.GetAbsoluteAvatarPath() + cig.comment.User.avatar));
@@ -1022,8 +1057,12 @@ namespace nature_net.user_controls
                        i.second_border.Margin = new Thickness(cig.level * 25, 0, 0, 0);
                        i.first_border.BorderBrush = Brushes.Gray; i.first_border.BorderThickness = new Thickness(0, 0, 0, 1);
                        i.second_border.BorderBrush = Brushes.DarkGray; i.second_border.BorderThickness = new Thickness(1, 0, 0, 0);
+                       if (this.reply_clicked_handler != null) i.set_replybutton(this.reply_clicked_handler);
                        this._list.Items.Add(i);
                    }
+
+                   if (this._list.Items.Count == 0)
+                       this._list.Height = 0;
                    this._list.Items.Refresh();
                    this._list.Padding = new Thickness(0);
                    this._list.UpdateLayout();
@@ -1085,7 +1124,7 @@ namespace nature_net.user_controls
         }
         public void display_all_activities(object arg, RunWorkerCompletedEventArgs e)
         {
-            this._list.Items.Dispatcher.BeginInvoke(DispatcherPriority.ApplicationIdle,
+            this._list.Items.Dispatcher.BeginInvoke(DispatcherPriority.Normal,
                new System.Action(() =>
                {
                    this._list.Items.Clear();

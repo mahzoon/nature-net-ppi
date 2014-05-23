@@ -3,98 +3,104 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:uc="clr-namespace:nature_net.user_controls"
              mc:Ignorable="d" 
-             d:DesignHeight="580" d:DesignWidth="400">
+             d:DesignHeight="490" d:DesignWidth="400">
+    
+    <DockPanel Name="whole_panel" LastChildFill="True" Background="LightGray">
 
-    <DockPanel LastChildFill="True" Background="LightGray">
-
+        <Border DockPanel.Dock="Top" BorderBrush="DarkGray" BorderThickness="0,0,0,2">
+            <StackPanel Name="header">
+                <Grid Name="the_grid" Margin="7,5,8,0">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="30" />
+                    </Grid.RowDefinitions>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="20" />
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="20" />
+                        <ColumnDefinition Width="*" />
+                    </Grid.ColumnDefinitions>
+                    <Label Grid.Column="0" Name="step1" DockPanel.Dock="Left" BorderThickness="0" Height="30" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" FontWeight="ExtraBold">Step 1. Read</Label>
+                    <Label Grid.Column="1" Name="step1sign" DockPanel.Dock="Left" BorderThickness="0" Height="30" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" >></Label>
+                    <Label Grid.Column="2" Name="step2" DockPanel.Dock="Right" BorderThickness="0" Height="30" HorizontalContentAlignment="Center" VerticalContentAlignment="Center">Step 2. Sign</Label>
+                    <Label Grid.Column="3" Name="step2sign" DockPanel.Dock="Left" BorderThickness="0" Height="30" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" >></Label>
+                    <Label Grid.Column="4" Name="step3" BorderThickness="0" Height="30" HorizontalContentAlignment="Center" VerticalContentAlignment="Center">Step 3. Create</Label>
+                </Grid>
+            </StackPanel>
+        </Border>
         <!-- Page1 -->
-        <DockPanel Name="consent_form_1" DockPanel.Dock="Top" Height="580" Visibility="Visible">
-            <TextBlock Name="consent_form_text1" DockPanel.Dock="Top" TextWrapping="Wrap" FontFamily="Segoe UI" FontSize="15" Margin="5" >
-            You are invited to participate in a research project being conducted by the researchers listed on the bottom of the page in consultation with Jim Kravitz, Director of Naturalist Programs at ACES. In order for us to be allowed to use any data you wish to provide, we must have your consent.
-            </TextBlock>
-            <TextBlock Name="consent_form_text2" DockPanel.Dock="Top" TextWrapping="Wrap" FontFamily="Segoe UI" FontSize="15" Margin="5" >
-                In simplest terms, we hope you will use the mobile phone and tabletop at ACES to
-            </TextBlock>
-            <TextBlock Name="consent_form_text3" DockPanel.Dock="Top" TextWrapping="Wrap" FontFamily="Segoe UI" FontSize="15" Margin="5" >
-                <BulletDecorator Margin="10,0,0,5">
-                    <BulletDecorator.Bullet>
-                        <Ellipse Fill="Black" Stroke="Black" StrokeThickness="1" Width="8" Height="8"/>
-                    </BulletDecorator.Bullet>
-                    <TextBlock Margin="5,0,0,0" Text="Take pictures" />
-                </BulletDecorator>
-                <LineBreak />
-                <BulletDecorator Margin="10,0,0,5">
-                    <BulletDecorator.Bullet>
-                        <Ellipse Fill="Black" Stroke="Black" StrokeThickness="1" Width="8" Height="8"/>
-                    </BulletDecorator.Bullet>
-                    <TextBlock Margin="5,0,0,0" Text="Share observations about the natural world" />
-                </BulletDecorator>
-                <LineBreak />
-                <BulletDecorator Margin="10,0,0,5">
-                    <BulletDecorator.Bullet>
-                        <Ellipse Fill="Black" Stroke="Black" StrokeThickness="1" Width="8" Height="8"/>
-                    </BulletDecorator.Bullet>
-                    <TextBlock TextWrapping="Wrap" Margin="5,0,0,0" Text="Share ideas you have to improve the design of the phone or tabletop application" />
-                </BulletDecorator>
-                <LineBreak />
-                <BulletDecorator Margin="10,0,0,5">
-                    <BulletDecorator.Bullet>
-                        <Ellipse Fill="Black" Stroke="Black" StrokeThickness="1" Width="8" Height="8"/>
-                    </BulletDecorator.Bullet>
-                    <TextBlock TextWrapping="Wrap" Margin="5,0,0,0" Text="Comment on pictures, observations, and design ideas of others" />
-                </BulletDecorator>
-            </TextBlock>
-            <TextBlock Name="consent_form_text4" DockPanel.Dock="Top" TextWrapping="Wrap" FontFamily="Segoe UI" FontSize="15" Margin="5" >
-            The researchers and others visiting the preserve will be able to look at your comments and pictures on the tabletop, and we may ask if you are willing to answer a few more questions (either on paper, by phone, or face to face) about your whole experience. You may stop participating at any time.
-            </TextBlock>
-            <DockPanel>
-                <Button Name="button_next1" DockPanel.Dock="Right" Background="Green" Width="100" Foreground="White"
-                             VerticalContentAlignment="Center" HorizontalContentAlignment="Center"
-                             HorizontalAlignment="Right" VerticalAlignment="Bottom" Margin="0,5,5,10" Height="32">Next</Button>
-            </DockPanel>
-        </DockPanel>
+        <DockPanel Name="consent_form_1" DockPanel.Dock="Top" Height="450" Visibility="Visible">
+            <uc:FadingScrollViewer x:Name="form1" CanContentScroll="True" VerticalScrollBarVisibility="Hidden" HorizontalScrollBarVisibility="Disabled" Visibility="Visible" PanningMode="VerticalOnly" Width="400" Height="450"
+                                   FadedEdgeThickness="65" FadedEdgeOpacity="0" FadedEdgeFalloffSpeed="0.1">
 
-        <!-- Page2 -->
-        <DockPanel Name="consent_form_2" DockPanel.Dock="Top" Height="580" Visibility="Visible">
-            <TextBlock Name="consent_form_text5" DockPanel.Dock="Top" TextWrapping="Wrap" FontFamily="Segoe UI" FontSize="15" Margin="5" >
-            A long version of this consent form is available for your review and signature, or you may opt to sign this shorter one by
-                <Italic Foreground="Red">
-                checking off all the boxes that reflect your wishes and signing and dating the form below.
-                </Italic>
+                <uc:FadingScrollViewer.Template>
+                    <ControlTemplate TargetType="{x:Type ScrollViewer}">
+                        <Grid x:Name="Grid" Background="{TemplateBinding Background}">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="Auto"/>
+                            </Grid.ColumnDefinitions>
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="*"/>
+                                <RowDefinition Height="Auto"/>
+                            </Grid.RowDefinitions>
+
+                            <Border x:Name="PART_ScrollContentPresenterContainer">
+                                <ScrollContentPresenter x:Name="PART_ScrollContentPresenter" CanContentScroll="{TemplateBinding CanContentScroll}" CanHorizontallyScroll="False" CanVerticallyScroll="False" ContentTemplate="{TemplateBinding ContentTemplate}" Content="{TemplateBinding Content}" Grid.Column="0" Margin="{TemplateBinding Padding}" Grid.Row="0"/>
+                            </Border>
+
+                            <ScrollBar x:Name="PART_VerticalScrollBar" AutomationProperties.AutomationId="VerticalScrollBar" Cursor="Arrow" Grid.Column="1" Maximum="{TemplateBinding ScrollableHeight}" Minimum="0" Grid.Row="0" Visibility="{TemplateBinding ComputedVerticalScrollBarVisibility}" Value="{Binding VerticalOffset, Mode=OneWay, RelativeSource={RelativeSource TemplatedParent}}" ViewportSize="{TemplateBinding ViewportHeight}"/>
+                            <ScrollBar x:Name="PART_HorizontalScrollBar" AutomationProperties.AutomationId="HorizontalScrollBar" Cursor="Arrow" Grid.Column="0" Maximum="{TemplateBinding ScrollableWidth}" Minimum="0" Orientation="Horizontal" Grid.Row="1" Visibility="{TemplateBinding ComputedHorizontalScrollBarVisibility}" Value="{Binding HorizontalOffset, Mode=OneWay, RelativeSource={RelativeSource TemplatedParent}}" ViewportSize="{TemplateBinding ViewportWidth}"/>
+                        </Grid>
+                    </ControlTemplate>
+                </uc:FadingScrollViewer.Template>
+                
+                <DockPanel Name="the_form" DockPanel.Dock="Top" Height="780" Visibility="Visible" ScrollViewer.PanningMode="Both"  Width="370">
+                    <TextBlock Name="consent_form_text1" DockPanel.Dock="Top" TextWrapping="Wrap" FontFamily="Segoe UI" FontSize="15" Margin="5" >
+            You are invited to participate in NatureNet, a research project being conducted by the researchers listed on the bottom of the page [in consultation with Jim Kravitz, Director of Naturalist Programs at ACES]. In order for us to collect and study the way people are using technology like NatureNet, we must have your consent.
+                    </TextBlock>
+                    <TextBlock Name="consent_form_text2" DockPanel.Dock="Top" TextWrapping="Wrap" FontFamily="Segoe UI" FontSize="15" Margin="5" >
+                In simplest terms, we hope you will use a mobile device, multi-touch display, and website to:
+                    </TextBlock>
+                    <TextBlock Name="consent_form_text3" DockPanel.Dock="Top" TextWrapping="Wrap" FontFamily="Segoe UI" FontSize="15" Margin="5" >
+                <BulletDecorator Margin="10,0,0,5">
+                    <BulletDecorator.Bullet>
+                        <Ellipse Fill="Black" Stroke="Black" StrokeThickness="1" Width="8" Height="8"/>
+                    </BulletDecorator.Bullet>
+                    <TextBlock Margin="5,0,0,0" Text="Take pictures and make observations about the natural world" TextWrapping="Wrap" />
+                </BulletDecorator>
+                <LineBreak />
+                <BulletDecorator Margin="10,0,0,5">
+                    <BulletDecorator.Bullet>
+                        <Ellipse Fill="Black" Stroke="Black" StrokeThickness="1" Width="8" Height="8"/>
+                    </BulletDecorator.Bullet>
+                    <TextBlock Margin="5,0,0,0" Text="Share those observations with other visitors" />
+                </BulletDecorator>
+                <LineBreak />
+                <BulletDecorator Margin="10,0,0,5">
+                    <BulletDecorator.Bullet>
+                        <Ellipse Fill="Black" Stroke="Black" StrokeThickness="1" Width="8" Height="8"/>
+                    </BulletDecorator.Bullet>
+                    <TextBlock TextWrapping="Wrap" Margin="5,0,0,0" Text="Share ideas you have about improving the design of our application" />
+                </BulletDecorator>
+                <LineBreak />
+                <BulletDecorator Margin="10,0,0,5">
+                    <BulletDecorator.Bullet>
+                        <Ellipse Fill="Black" Stroke="Black" StrokeThickness="1" Width="8" Height="8"/>
+                    </BulletDecorator.Bullet>
+                    <TextBlock TextWrapping="Wrap" Margin="5,0,0,0" Text="Comment on the observations and ideas of others." />
+                </BulletDecorator>
             </TextBlock>
-            <CheckBox Name="checkbox_agreement1" DockPanel.Dock="Top" Margin="5,5,5,5" Height="80"
-                                   Background="White" Foreground="Black" BorderBrush="Gray" BorderThickness="2">
-                <TextBlock FontFamily="Segoe UI" FontSize="15" Foreground="Black" TextWrapping="Wrap">
-                        I agree that any nature photos I take using the NatureNet application may be uploaded to the tabletop at ACES and/or a website now under development.
-                    <TextBlock Name="required1">
-                        (Required)
+                    <TextBlock Name="consent_form_text4" DockPanel.Dock="Top" TextWrapping="Wrap" FontFamily="Segoe UI" FontSize="15" Margin="5" >
+            The researchers and other visitors will be able to look at your contributions and comments via the tabletop or website, and we may ask you if you are willing to answer a few questions (either on paper, by phone, or face to face) about your whole experience.  You may stop participating at any time.
                     </TextBlock>
-                </TextBlock>
-            </CheckBox>
-            <CheckBox Name="checkbox_agreement2" DockPanel.Dock="Top" Margin="5,5,5,5" Height="100"
-                                   Background="White" Foreground="Black" BorderBrush="Gray" BorderThickness="2">
-                <TextBlock FontFamily="Segoe UI" FontSize="15" Foreground="Black" TextWrapping="Wrap">
-                        I agree to allow any comments, observations, and profile information that I choose to share with others via the online application to be visible to others who use the application at the same time or after me.
-                    <TextBlock Name="required2">
-                        (Required)
+                    <TextBlock Name="consent_form_text5" DockPanel.Dock="Top" TextWrapping="Wrap" FontFamily="Segoe UI" FontSize="15" Margin="5" >
+            A longer version of this consent form is available [at the ACES front desk/from Prof Yeh/Maher/Preece], or you can indicate your understanding and willingness to participate in our study by checking off the boxes on the next screen.
                     </TextBlock>
-                </TextBlock>
-            </CheckBox>
-            <CheckBox Name="checkbox_agreement3" DockPanel.Dock="Top" Margin="5,5,5,5" Height="40"
-                                   Background="White" Foreground="Black" BorderBrush="Gray" BorderThickness="2">
-                <TextBlock FontFamily="Segoe UI" FontSize="15" Foreground="Black" TextWrapping="Wrap">
-                        I agree to be videotaped/audiotaped during my participation in this study.
-                </TextBlock>
-            </CheckBox>
-            <CheckBox Name="checkbox_agreement4" DockPanel.Dock="Top" Margin="5,5,5,5" Height="40"
-                                   Background="White" Foreground="Black" BorderBrush="Gray" BorderThickness="2">
-                <TextBlock FontFamily="Segoe UI" FontSize="15" Foreground="Black" TextWrapping="Wrap">
-                        I agree to complete a short questionnaire during or after my participation in this study
-                </TextBlock>
-            </CheckBox>
-            <DockPanel DockPanel.Dock="Top" HorizontalAlignment="Center">
-                <TextBlock Name="researcher1" DockPanel.Dock="Left" TextWrapping="Wrap" FontFamily="Segoe UI" FontSize="10" Margin="5" Width="120" >
+                    <DockPanel DockPanel.Dock="Top" HorizontalAlignment="Center">
+                        <TextBlock Name="researcher1" DockPanel.Dock="Left" TextWrapping="Wrap" FontFamily="Segoe UI" FontSize="10" Margin="5" Width="120" >
                     Jennifer Preece <LineBreak />
                     University of Maryland <LineBreak />
                     College of Information Studies<LineBreak />
@@ -102,8 +108,8 @@
                     College Park, MD  20742<LineBreak />
                     (301) 405-2035<LineBreak />
                     preece@umd.edu
-                </TextBlock>
-                <TextBlock Name="researcher2" DockPanel.Dock="Left" TextWrapping="Wrap" FontFamily="Segoe UI" FontSize="10" Margin="5" Width="120" >
+                        </TextBlock>
+                        <TextBlock Name="researcher2" DockPanel.Dock="Left" TextWrapping="Wrap" FontFamily="Segoe UI" FontSize="10" Margin="5" Width="120" >
                     Mary Lou Maher <LineBreak />
                     University of North Carolina, Charlotte<LineBreak />
                     Software Information Systems<LineBreak />
@@ -112,8 +118,8 @@
                     Charlotte, NC 28223<LineBreak />
                     (704) 687-1940 <LineBreak />
                     m.maher@uncc.edu
-                </TextBlock>
-                <TextBlock Name="researcher3" DockPanel.Dock="Right" TextWrapping="Wrap" FontFamily="Segoe UI" FontSize="10" Margin="5" Width="120" >
+                        </TextBlock>
+                        <TextBlock Name="researcher3" DockPanel.Dock="Right" TextWrapping="Wrap" FontFamily="Segoe UI" FontSize="10" Margin="5" Width="120" >
                     Tom Yeh<LineBreak />
                     University of Colorado<LineBreak />
                     Department of Computer Science <LineBreak />
@@ -122,90 +128,111 @@
                     Boulder, CO 80309‐0430<LineBreak />
                     (303) 492-1762<LineBreak />
                     tom.yeh@colorado.edu
+                        </TextBlock>
+                    </DockPanel>
+                    <DockPanel>
+                        <Button Name="button_next1" DockPanel.Dock="Right" Background="Green" Width="100" Foreground="White"
+                             VerticalContentAlignment="Center" HorizontalContentAlignment="Center" FontSize="15" FontFamily="Segoe UI"
+                             HorizontalAlignment="Right" VerticalAlignment="Bottom" Margin="0,5,5,10" Height="35">Next</Button>
+                    </DockPanel>
+                </DockPanel>
+            </uc:FadingScrollViewer>
+        </DockPanel>
+
+        <!-- Page2 -->
+        <DockPanel Name="consent_form_2" DockPanel.Dock="Top" Height="450" Visibility="Visible">
+            <TextBlock Name="consent_form_text6" DockPanel.Dock="Top" TextWrapping="Wrap" FontFamily="Segoe UI" FontSize="15" Margin="5" >
+            To participate in NatureNet we will need you to agree to a few things:
+            </TextBlock>
+            <CheckBox Name="checkbox_agreement1" DockPanel.Dock="Top" Margin="5,5,5,5" Height="80"
+                                   Background="White" Foreground="Black" BorderBrush="Gray" BorderThickness="2">
+                <TextBlock Name="checkbox_agreement1_text"  FontFamily="Segoe UI" FontSize="15" Foreground="Black" TextWrapping="Wrap">
+                    <TextBlock Name="required1" Foreground="Red">
+                        (Required)
+                    </TextBlock>
+                         I agree that any nature photos I take using the NatureNet application may be uploaded to the tabletop at ACES and/or a website now under development.
                 </TextBlock>
-            </DockPanel>
+            </CheckBox>
+            <CheckBox Name="checkbox_agreement2" DockPanel.Dock="Top" Margin="5,5,5,5" Height="100"
+                                   Background="White" Foreground="Black" BorderBrush="Gray" BorderThickness="2">
+                <TextBlock FontFamily="Segoe UI" FontSize="15" Foreground="Black" TextWrapping="Wrap">
+                    <TextBlock Name="required2" Foreground="Red">
+                        (Required)
+                    </TextBlock>
+                        I agree to allow any comments, observations, and profile information that I choose to share with others via the online application to be visible to others who use the application at the same time or after me.
+                </TextBlock>
+            </CheckBox>
+            <CheckBox Name="checkbox_agreement3" DockPanel.Dock="Top" Margin="5,5,5,5" Height="40"
+                                   Background="White" Foreground="Black" BorderBrush="Gray" BorderThickness="2">
+                <TextBlock FontFamily="Segoe UI" FontSize="15" Foreground="Black" TextWrapping="Wrap">
+                    <TextBlock Name="optional1">
+                        (Optional)
+                    </TextBlock>
+                        I agree to be videotaped/audiotaped during my participation in this study.
+                </TextBlock>
+            </CheckBox>
+            <CheckBox Name="checkbox_agreement4" DockPanel.Dock="Top" Margin="5,5,5,5" Height="40"
+                                   Background="White" Foreground="Black" BorderBrush="Gray" BorderThickness="2">
+                <TextBlock FontFamily="Segoe UI" FontSize="15" Foreground="Black" TextWrapping="Wrap">
+                    <TextBlock Name="optional2">
+                        (Optional)
+                    </TextBlock>
+                         I agree to complete a short questionnaire during or after my participation in this study.
+                </TextBlock>
+            </CheckBox>
+            
             <DockPanel DockPanel.Dock="Top">
                 <Button Name="button_back1" Background="Green" Width="100" Foreground="White" DockPanel.Dock="Left"
-                             VerticalContentAlignment="Center" HorizontalContentAlignment="Center"
-                             HorizontalAlignment="Right" VerticalAlignment="Bottom" Margin="5,5,0,10" Height="32">Back</Button>
+                             VerticalContentAlignment="Center" HorizontalContentAlignment="Center"  FontSize="15" FontFamily="Segoe UI"
+                             HorizontalAlignment="Right" VerticalAlignment="Bottom" Margin="5,5,0,10" Height="35">Back</Button>
                 <Button Name="button_next2" DockPanel.Dock="Right" Background="Green" Width="100" Foreground="White"
-                             VerticalContentAlignment="Center" HorizontalContentAlignment="Center"
-                             HorizontalAlignment="Right" Margin="0,5,5,10" VerticalAlignment="Bottom" Height="32">Next</Button>
+                             VerticalContentAlignment="Center" HorizontalContentAlignment="Center"  FontSize="15" FontFamily="Segoe UI"
+                             HorizontalAlignment="Right" Margin="0,5,5,10" VerticalAlignment="Bottom" Height="35">Next</Button>
             </DockPanel>
         </DockPanel>
 
         <!-- Page3 -->
-        <DockPanel Name="consent_form_3" DockPanel.Dock="Top" Height="580" Visibility="Visible">
-            <TextBlock Name="desc" DockPanel.Dock="Top" HorizontalAlignment="Center" Foreground="Red" Margin="5" >Welcome</TextBlock>
-            <StackPanel Orientation="Horizontal" DockPanel.Dock="Top" Height="260" Margin="0">
-                <DockPanel LastChildFill="False" Width="192">
-                    <Label Name="label_name" DockPanel.Dock="Top" FontSize="14">Name:</Label>
-                    <TextBox Name="textbox_name" DockPanel.Dock="Top" Width="180" FontSize="14" Height="38" VerticalContentAlignment="Center"
+        <DockPanel Name="consent_form_3" DockPanel.Dock="Top" Height="450" Visibility="Visible" VerticalAlignment="Top">
+            <TextBlock Name="desc" DockPanel.Dock="Top" HorizontalAlignment="Center" Foreground="Red" Margin="0,0,0,5" ></TextBlock>
+            <StackPanel Orientation="Horizontal" DockPanel.Dock="Top" Margin="0">
+                <Border Name="avatar_border" BorderThickness="2" BorderBrush="DarkGray" Width="120" Height="120" Margin="10" VerticalAlignment="Top" >
+                    <Image Name="avatar_image" Width="120" Height="120" Focusable="True" IsManipulationEnabled="False" Stylus.IsPressAndHoldEnabled="False" ></Image>
+                </Border>
+                <DockPanel LastChildFill="False" Margin="0,0,5,0" Width="250">
+                    <DockPanel DockPanel.Dock="Top" Margin="0,0,0,10">
+                        <Label Name="label_name" FontSize="15" DockPanel.Dock="Top" >Name:</Label>
+                        <TextBox Name="textbox_name" DockPanel.Dock="Top" FontSize="15" Height="35" VerticalContentAlignment="Center" HorizontalAlignment="Left" Width="230"
+                                 Background="FloralWhite" BorderBrush="LightGray" BorderThickness="2" Foreground="Black">
+                        </TextBox>
+                    </DockPanel>
+                    <DockPanel DockPanel.Dock="Top" Margin="0,0,0,10">
+                        <Label Name="label_email" FontSize="15" DockPanel.Dock="Top">Email:</Label>
+                        <TextBox Name="textbox_email" DockPanel.Dock="Top" FontSize="15" Height="35"  VerticalContentAlignment="Center" HorizontalAlignment="Left" Width="230"
                              Background="FloralWhite" BorderBrush="LightGray" BorderThickness="2" Foreground="Black">
-                    </TextBox>
-                    <Label Name="label_email" DockPanel.Dock="Top" FontSize="14">Email:</Label>
-                    <TextBox Name="textbox_email" DockPanel.Dock="Top" Width="180" BorderBrush="LightGray" BorderThickness="2"
-                             FontSize="14" Height="38" Background="FloralWhite" Foreground="Black" VerticalContentAlignment="Center">
-                    </TextBox>
-                    <Label Name="label_password" DockPanel.Dock="Top" FontSize="14">Password:</Label>
-                    <PasswordBox Name="textbox_password" DockPanel.Dock="Top" Width="180" FontFamily="Segoe UI" VerticalContentAlignment="Center"
-                                      Height="38" Foreground="Black" FontSize="14" Background="FloralWhite" BorderBrush="LightGray" BorderThickness="2">
-                    </PasswordBox>
+                        </TextBox>
+                        <TextBlock Name="consent_form_text7" DockPanel.Dock="Top" TextWrapping="Wrap" FontFamily="Segoe UI" FontSize="10" Margin="5" Width="225" HorizontalAlignment="Left">
+                Your email will not be visible to any other participants unless you so choose, and we will not provide it to any third party.
+                        </TextBlock>
+                    </DockPanel>
+                    <DockPanel DockPanel.Dock="Top" Margin="0,0,0,10">
+                        <Label Name="label_password" DockPanel.Dock="Top" FontSize="15">PIN:</Label>
+                        <!--<PasswordBox Name="textbox_password" DockPanel.Dock="Top" FontFamily="Segoe UI" VerticalContentAlignment="Center" HorizontalAlignment="Left" Width="230"
+                                      Height="38" Foreground="Black" FontSize="15" Background="FloralWhite" BorderBrush="LightGray" BorderThickness="2">
+                        </PasswordBox>-->
+                        <uc:pin_box x:Name="user_pin" Height="35"></uc:pin_box>
+                    </DockPanel>
                 </DockPanel>
-                <TextBlock Name="why" TextWrapping="Wrap" Width="203" Padding="5,10,10,10" TextAlignment="Justify" Foreground="Black">
-                    The NatureNet project is a citizen science project that incorporates crowdsourced interaction design.  Participants can collect and analyse scientific data using their mobile computing devices and a multi-touch tabletop, and they can also participate in the re-design of the interface by which their scientific contributions are made.  The role of the crowd in Naturenet is extended to include interaction design in addition to data collection and analysis.
-                </TextBlock>
             </StackPanel>
-            <StackPanel Orientation="Vertical" DockPanel.Dock="Top">
-                <Label Name="label_choose_avatar" FontSize="14">Choose an Avatar:</Label>
-                <ListBox Name="listbox_avatars" Margin="5,0,5,0" Height="125"
-                         ScrollViewer.CanContentScroll="True" ScrollViewer.HorizontalScrollBarVisibility="Hidden"
-                         ScrollViewer.VerticalScrollBarVisibility="Hidden">
-                    <ListBox.ItemContainerStyle>
-                        <Style TargetType="{x:Type ListBoxItem}">
-                            <Setter Property="Template">
-                                <Setter.Value>
-                                    <ControlTemplate TargetType="{x:Type ListBoxItem}">
-                                        <DockPanel Margin="2" Background="White">
-                                            <ContentPresenter />
-                                        </DockPanel>
-                                    </ControlTemplate>
-                                </Setter.Value>
-                            </Setter>
-                            <Style.Triggers>
-                                <Trigger Property="IsSelected" Value="True">
-                                    <Setter Property="Template">
-                                        <Setter.Value>
-                                            <ControlTemplate TargetType="{x:Type ListBoxItem}">
-                                                <DockPanel Margin="2,0,2,0" Background="Gray">
-                                                    <ContentPresenter />
-                                                </DockPanel>
-                                            </ControlTemplate>
-                                        </Setter.Value>
-                                    </Setter>
-                                </Trigger>
-                            </Style.Triggers>
-                        </Style>
-                    </ListBox.ItemContainerStyle>
-                    <ListBox.ItemsPanel>
-                        <ItemsPanelTemplate>
-                            <UniformGrid Columns="{Binding Path=Items.Count,RelativeSource={RelativeSource AncestorType={x:Type ListBox}}}" />
-                        </ItemsPanelTemplate>
-                    </ListBox.ItemsPanel>
-                    <ListBox.DataContext>
-                        <DataTemplate>
-                            <Image Source="{Binding ImageSource}" HorizontalAlignment="Center" VerticalAlignment="Center" />
-                        </DataTemplate>
-                    </ListBox.DataContext>
-                </ListBox>
-            </StackPanel>
+            <TextBlock Name="consent_form_text8" DockPanel.Dock="Top" TextWrapping="Wrap" FontFamily="Segoe UI" FontSize="15" Margin="10,10,5,10" Width="360" HorizontalAlignment="Left">
+                Please note that by creating an account on this service you are digitally signing your consent.
+            </TextBlock>
             <DockPanel DockPanel.Dock="Top">
                 <Button Name="button_back2" Background="Green" Width="100" Foreground="White" DockPanel.Dock="Left"
-                                 VerticalContentAlignment="Center" HorizontalContentAlignment="Center"
-                                 HorizontalAlignment="Right" VerticalAlignment="Bottom" Margin="5,5,0,10" Height="32">Back</Button>
+                                 VerticalContentAlignment="Center" HorizontalContentAlignment="Center" FontSize="15" FontFamily="Segoe UI"
+                                 HorizontalAlignment="Right" VerticalAlignment="Bottom" Margin="5,5,0,10" Height="35">Back</Button>
                 <Button Name="button_submit" Background="Green" Width="100" Foreground="White" DockPanel.Dock="Right"
-                                 VerticalContentAlignment="Center" HorizontalContentAlignment="Center"
-                                 HorizontalAlignment="Right" VerticalAlignment="Bottom" Margin="0,5,5,10" Height="32">Submit</Button>
+                                 VerticalContentAlignment="Center" HorizontalContentAlignment="Center" FontSize="15" FontFamily="Segoe UI"
+                                 HorizontalAlignment="Right" VerticalAlignment="Bottom" Margin="0,5,5,10" Height="35">Submit</Button>
             </DockPanel>
         </DockPanel>
     </DockPanel>

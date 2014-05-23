@@ -31,6 +31,8 @@ namespace nature_net
 
         public static Dictionary<string, ImageSource> avatars = new Dictionary<string, ImageSource>();
 
+        static System.Threading.Timer highlight_timer;
+
         public static void open_location_collection_window(string location, int location_id, double pos_x, double pos_y)
         {
             if (window_manager.collection_frames.Count + 1 > configurations.max_collection_frame)
@@ -84,6 +86,11 @@ namespace nature_net
             iframe.view_contribution(citem);
             content.initialize_comments(citem._contribution);
             iframe.window_content.Content = content;
+            if (!configurations.center_commentarea_and_keyboard)
+            {
+                iframe.the_content.HorizontalAlignment = System.Windows.HorizontalAlignment.Left;
+                content.center_keyboard = false;
+            }
             iframe.UpdateLayout();
             content.initialize_contents(null, Type.GetType("nature_net.Contribution"), citem._contribution.id, iframe, iframe.the_content.Width);
             //frame.window_content.Content = content;
@@ -170,6 +177,7 @@ namespace nature_net
             window_frame frame = new window_frame();
             signup s = new signup();
             s.parent = frame;
+            s.user_pin.parent = frame;
             s.load_window();
             frame.window_content.Content = s;
             
@@ -219,25 +227,51 @@ namespace nature_net
             UpdateZOrder(frame, true);
         }
 
+        public static void contribution_collection_opened(string username)
+        {
+            //left_tab.highlight_user_and_open_collection(username, false);
+        }
+
+        public static void highlight_callback_f(Object stateInfo)
+        {
+            left_tab.highlight_user_and_open_collection((string)stateInfo, false);
+        }
+
+        public static void highlight_callback_t(Object stateInfo)
+        {
+            left_tab.highlight_user_and_open_collection((string)stateInfo, false);
+        }
+
         public static void close_window(window_frame frame)
         {
             collection_frames.Remove(frame);
             image_display_frames.Remove(frame);
-            signup_frames.Remove(frame);
             design_ideas_frames.Remove(frame);
             main_canvas.Children.Remove(frame);
         }
 
         public static void close_window(image_frame frame)
         {
-            
             image_frames.Remove(frame);
             main_canvas.Children.Remove(frame);
         }
 
+        public static void close_signup_window(window_frame frame, string username)
+        {
+            signup_frames.Remove(frame);
+            main_canvas.Children.Remove(frame);
+            highlight_timer = new System.Threading.Timer(new System.Threading.TimerCallback(highlight_callback_users_t), username, 100, System.Threading.Timeout.Infinite);
+        }
+
+        public static void close_submit_design_idea_window(window_frame frame, string title)
+        {
+            design_ideas_frames.Remove(frame);
+            main_canvas.Children.Remove(frame);
+            highlight_timer = new System.Threading.Timer(new System.Threading.TimerCallback(highlight_callback_design_ideas_t), title, 100, System.Threading.Timeout.Infinite);
+        }
+
         public static void refresh_downloaded_contributions()
         {
-
             DirectoryInfo d = new DirectoryInfo(configurations.GetAbsoluteContributionPath());
             FileInfo[] files = d.GetFiles();
             window_manager.downloaded_contributions.Clear();
@@ -302,6 +336,14 @@ namespace nature_net
                 right_tab.load_design_ideas();
         }
 
+        public static void load_design_ideas_sync()
+        {
+            if (left_tab != null)
+                left_tab.load_design_ideas_sync();
+            if (right_tab != null)
+                right_tab.load_design_ideas_sync();
+        }
+
         public static void UpdateZOrder(UIElement element, bool bringToFront)
         {
             if (element == null) return;
@@ -345,6 +387,27 @@ namespace nature_net
             }
         }
 
+        public static void highlight_callback_users_f(Object stateInfo)
+        {
+            left_tab.highlight_user_and_open_collection((string)stateInfo, false);
+        }
+
+        public static void highlight_callback_users_t(Object stateInfo)
+        {
+            left_tab.highlight_user_and_open_collection((string)stateInfo, true);
+            highlight_timer = new System.Threading.Timer(new System.Threading.TimerCallback(highlight_callback_users_f), stateInfo, 5000, System.Threading.Timeout.Infinite);
+        }
+
+        public static void highlight_callback_design_ideas_f(Object stateInfo)
+        {
+            left_tab.highlight_design_idea_and_open_it((string)stateInfo, false);
+        }
+
+        public static void highlight_callback_design_ideas_t(Object stateInfo)
+        {
+            left_tab.highlight_design_idea_and_open_it((string)stateInfo, true);
+            highlight_timer = new System.Threading.Timer(new System.Threading.TimerCallback(highlight_callback_design_ideas_f), stateInfo, 5000, System.Threading.Timeout.Infinite);
+        }
     }
 
     public partial class Collection : INotifyPropertyChanging, INotifyPropertyChanged

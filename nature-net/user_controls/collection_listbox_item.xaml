@@ -3,13 +3,29 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:uc="clr-namespace:nature_net.user_controls"
              mc:Ignorable="d" 
              d:DesignHeight="300" d:DesignWidth="300">
-    <DockPanel LastChildFill="False" Background="Transparent">
+    <!--<DockPanel LastChildFill="False" Background="Transparent">
         <Image Name="img" DockPanel.Dock="Top" Margin="0,0,7,0"></Image>
         <DockPanel Name="drag_panel" DockPanel.Dock="Top" Background="Transparent">
             <TextBlock Name="percentage" Visibility="Collapsed" DockPanel.Dock="Bottom" TextWrapping="Wrap" HorizontalAlignment="Center"></TextBlock>
             <Image Name="drag" Height="13" DockPanel.Dock="Top"></Image>
         </DockPanel>
-    </DockPanel>
+    </DockPanel>-->
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="*" />
+            <RowDefinition Height="30" />
+        </Grid.RowDefinitions>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="*" />
+        </Grid.ColumnDefinitions>
+        <Image Grid.Row="0" Grid.RowSpan="2" x:Name="img" Margin="0,0,7,0"></Image>
+        <Border Name="drag_panel_border" Grid.Row="1">
+            <DockPanel Name="drag_panel">
+                <Image x:Name="drag" Height="13" DockPanel.Dock="Bottom" VerticalAlignment="Bottom"></Image>
+            </DockPanel>
+        </Border>
+    </Grid>
 </UserControl>

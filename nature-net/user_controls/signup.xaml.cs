@@ -24,6 +24,11 @@ namespace nature_net.user_controls
         ContentControl keyboard_frame;
         Control focused_textbox;
         public UserControl parent;
+        ContentControl avatar_frame;
+        avatar_list avatar_list_control;
+
+        private string valid_email_string = "qwertyuiopasdfghjklmnbvcxz1234567890@_-.+!#$%&'*/=?^`{|}~";
+        private string valid_name_string = "qwertyuiopasdfghjklmnbvcxz1234567890";
 
         public signup()
         {
@@ -31,10 +36,15 @@ namespace nature_net.user_controls
 
             textbox_name.GotFocus += new RoutedEventHandler(textbox_GotFocus);
             textbox_email.GotFocus += new RoutedEventHandler(textbox_GotFocus);
-            textbox_password.GotFocus += new RoutedEventHandler(textbox_GotFocus);
-            //textbox_name.LostFocus += new RoutedEventHandler(textbox_LostFocus);
-            //textbox_email.LostFocus += new RoutedEventHandler(textbox_LostFocus);
+            //textbox_password.GotFocus += new RoutedEventHandler(textbox_GotFocus);
+            user_pin.GotFocus += new RoutedEventHandler(user_pin_GotFocus);
+            textbox_name.LostFocus += new RoutedEventHandler(textbox_LostFocus);
+            textbox_email.LostFocus += new RoutedEventHandler(textbox_LostFocus);
             //textbox_password.LostFocus += new RoutedEventHandler(textbox_LostFocus);
+            user_pin.LostFocus += new RoutedEventHandler(user_pin_LostFocus);
+            avatar_image.GotFocus += new RoutedEventHandler(avatar_image_GotFocus);
+            avatar_image.LostFocus += new RoutedEventHandler(avatar_image_LostFocus);
+
             this.button_submit.PreviewTouchDown += new EventHandler<TouchEventArgs>(button_submit_Click);
             this.button_next1.PreviewTouchDown += new EventHandler<TouchEventArgs>(button_next1_Click);
             this.button_next2.PreviewTouchDown += new EventHandler<TouchEventArgs>(button_next2_Click);
@@ -47,13 +57,59 @@ namespace nature_net.user_controls
             this.checkbox_agreement3.PreviewTouchDown += new EventHandler<TouchEventArgs>(checkbox_agreement_PreviewTouchDown);
             this.checkbox_agreement4.PreviewTouchDown += new EventHandler<TouchEventArgs>(checkbox_agreement_PreviewTouchDown);
 
+            this.avatar_image.PreviewTouchDown += new EventHandler<TouchEventArgs>(avatar_image_PreviewTouchDown);
+            
             //ScrollViewer scroll = configurations.GetDescendantByType(this.listbox_avatars, typeof(ScrollViewer)) as ScrollViewer;
-            this.Height = 580;
+            this.Height = 490;
             consent_form_1.Visibility = System.Windows.Visibility.Visible;
+            //this.form1.Visibility = System.Windows.Visibility.Visible;
+            avatar_list_control = new avatar_list();
+            avatar_list_control.return_value = this.avatar_image;
+            avatar_frame = new ContentControl();
+            this.avatar_frame.Content = avatar_list_control;
+            window_manager.main_canvas.Children.Add(avatar_frame);
+            avatar_frame.Visibility = System.Windows.Visibility.Hidden;
+            avatar_image.Source = configurations.img_choose_avatar_pic;
+        }
+
+        void user_pin_LostFocus(object sender, RoutedEventArgs e)
+        {
+            if (user_pin.numpad_frame != null)
+                user_pin.numpad_frame.Visibility = System.Windows.Visibility.Collapsed;
+        }
+
+        void user_pin_GotFocus(object sender, RoutedEventArgs e)
+        {
+            if (user_pin.numpad_frame != null)
+                user_pin.numpad_frame.Visibility = System.Windows.Visibility.Visible;
+            else
+                user_pin.Reset(true);
+            user_pin.numpad.MoveAlongWith(parent);
+        }
+
+        void avatar_image_LostFocus(object sender, RoutedEventArgs e)
+        {
+            if (!avatar_frame.IsFocused)
+                avatar_frame.Visibility = System.Windows.Visibility.Collapsed;
+        }
+
+        void avatar_image_GotFocus(object sender, RoutedEventArgs e)
+        {
+            avatar_frame.Visibility = System.Windows.Visibility.Visible;
+            avatar_list_control.MoveAlongWith(parent);
+        }
+
+        void avatar_image_PreviewTouchDown(object sender, TouchEventArgs e)
+        {
+            avatar_frame.Visibility = System.Windows.Visibility.Visible;
+            avatar_list_control.MoveAlongWith(parent);
+            avatar_image.Focus();
         }
 
         protected override void OnManipulationBoundaryFeedback(ManipulationBoundaryFeedbackEventArgs e)
         {
+            double y = e.BoundaryFeedback.Translation.Y;
+
             e.Handled = true;
         }
 
@@ -67,6 +123,8 @@ namespace nature_net.user_controls
         {
             if (keyboard_frame != null)
                 window_manager.main_canvas.Children.Remove(keyboard_frame);
+            if (avatar_frame != null)
+                window_manager.main_canvas.Children.Remove(avatar_frame);
         }
 
         public void UpdateKeyboardLayout()
@@ -74,13 +132,16 @@ namespace nature_net.user_controls
             if (keyboard_frame != null)
             {
                 if (keyboard != null)
-                {
                     if (keyboard_frame.Visibility == System.Windows.Visibility.Visible)
-                    {
-                        keyboard.MoveAlongWith(parent);
-                    }
-                }
+                        keyboard.MoveAlongWith(parent, true);
             }
+            if (avatar_frame != null)
+            {
+                if (avatar_list_control != null)
+                    if (avatar_frame.Visibility == System.Windows.Visibility.Visible)
+                        avatar_list_control.MoveAlongWith(parent);
+            }
+            user_pin.UpdateKeyboardPosition();
         }
 
         public UIElement GetKeyboardFrame()
@@ -88,9 +149,20 @@ namespace nature_net.user_controls
             return keyboard_frame;
         }
 
+        public UIElement GetNumpadFrame()
+        {
+            return user_pin.numpad_frame;
+        }
+
+        public UIElement GetAvatarFrame()
+        {
+            return avatar_frame;
+        }
+
         void textbox_LostFocus(object sender, RoutedEventArgs e)
         {
-            keyboard_frame.Visibility = System.Windows.Visibility.Collapsed;
+            if (!textbox_email.IsFocused && !textbox_name.IsFocused)// && !textbox_password.IsFocused)
+                keyboard_frame.Visibility = System.Windows.Visibility.Collapsed;
         }
 
         void textbox_GotFocus(object sender, RoutedEventArgs e)
@@ -99,6 +171,7 @@ namespace nature_net.user_controls
             if (keyboard_frame == null)
                 keyboard_frame = new ContentControl();
             virtual_keyboard.ShowKeyboard(this, ref keyboard);
+            if (keyboard.validation_checker == null) keyboard.validation_checker = new CharacterValidation(this.ValidateString);
             keyboard_frame.Visibility = System.Windows.Visibility.Visible;
             if (keyboard != null)
             {
@@ -109,21 +182,22 @@ namespace nature_net.user_controls
                     this.keyboard_frame.Background = new SolidColorBrush(Colors.White);
                     window_manager.main_canvas.Children.Add(keyboard_frame);
                 }
-                keyboard.MoveAlongWith(parent);
+                keyboard.MoveAlongWith(parent, true);
             }
         }
 
         public void load_window()
         {
             // load avtar listbox
-            listbox_avatars.Items.Clear();
-            foreach (KeyValuePair<string, ImageSource> kvp in window_manager.avatars)
-            {
-                Image i = new Image();
-                i.Source = kvp.Value;
-                i.Tag = kvp.Key;
-                listbox_avatars.Items.Add(i);
-            }
+            
+            //listbox_avatars.Items.Clear();
+            //foreach (KeyValuePair<string, ImageSource> kvp in window_manager.avatars)
+            //{
+            //    Image i = new Image();
+            //    i.Source = kvp.Value;
+            //    i.Tag = kvp.Key;
+            //    listbox_avatars.Items.Add(i);
+            //}
             reset();
         }
 
@@ -136,14 +210,22 @@ namespace nature_net.user_controls
         {
             reset();
             this.consent_form_1.Visibility = System.Windows.Visibility.Collapsed;
+            //this.form1.Visibility = System.Windows.Visibility.Collapsed;
+            this.step1.FontWeight = FontWeights.Normal;
+            this.step2.FontWeight = FontWeights.ExtraBold;
+            this.step3.FontWeight = FontWeights.Normal;
         }
 
         private void button_next2_Click(object sender, RoutedEventArgs e)
         {
             reset();
+            this.user_pin.Reset(false);
             if (this.checkbox_agreement1.IsChecked.Value && this.checkbox_agreement2.IsChecked.Value)// && checkbox_agreement3.IsChecked.Value && checkbox_agreement4.IsChecked.Value)
             {
                 this.consent_form_2.Visibility = System.Windows.Visibility.Collapsed;
+                this.step1.FontWeight = FontWeights.Normal;
+                this.step2.FontWeight = FontWeights.Normal;
+                this.step3.FontWeight = FontWeights.ExtraBold;
             }
             else
             {
@@ -170,12 +252,20 @@ namespace nature_net.user_controls
         {
             reset();
             this.consent_form_1.Visibility = System.Windows.Visibility.Visible;
+            //this.form1.Visibility = System.Windows.Visibility.Visible;
+            this.step1.FontWeight = FontWeights.ExtraBold;
+            this.step2.FontWeight = FontWeights.Normal;
+            this.step3.FontWeight = FontWeights.Normal;
         }
 
         private void button_back2_Click(object sender, RoutedEventArgs e)
         {
             reset();
+            this.user_pin.Reset(false);
             this.consent_form_2.Visibility = System.Windows.Visibility.Visible;
+            this.step1.FontWeight = FontWeights.Normal;
+            this.step2.FontWeight = FontWeights.ExtraBold;
+            this.step3.FontWeight = FontWeights.Normal;
         }
 
         private void button_submit_Click(object sender, RoutedEventArgs e)
@@ -187,6 +277,7 @@ namespace nature_net.user_controls
                 textbox_name.BorderBrush = Brushes.Red;
                 textbox_name.BorderThickness = new Thickness(5);
                 desc.Text = "Name is empty.";
+                textbox_name.Focus();
                 return;
             }
             if (textbox_email.Text == "")
@@ -194,20 +285,31 @@ namespace nature_net.user_controls
                 textbox_email.BorderBrush = Brushes.Red;
                 textbox_email.BorderThickness = new Thickness(5);
                 desc.Text = "Email is empty.";
+                textbox_email.Focus();
                 return;
             }
-            if (textbox_password.Password == "")
+            if (!IsValid(textbox_email.Text))
             {
-                textbox_password.BorderBrush = Brushes.Red;
-                textbox_password.BorderThickness = new Thickness(5);
-                desc.Text = "Password is empty.";
+                textbox_email.BorderBrush = Brushes.Red;
+                textbox_email.BorderThickness = new Thickness(5);
+                desc.Text = "Enter a valid email address.";
+                textbox_email.Focus();
                 return;
             }
-            if (listbox_avatars.SelectedIndex < 0)
+            if (user_pin.IsEmpty())
             {
-                label_choose_avatar.BorderBrush = Brushes.Red;
-                label_choose_avatar.BorderThickness = new Thickness(5);
+                user_pin.BorderBrush = Brushes.Red;
+                user_pin.BorderThickness = new Thickness(5);
+                desc.Text = "Choose a PIN.";
+                user_pin.Focus();
+                return;
+            }
+            if (avatar_list_control.Tag == null)
+            {
+                avatar_border.BorderBrush = Brushes.Red;
+                avatar_border.BorderThickness = new Thickness(5);
                 desc.Text = "Please select an avatar.";
+                avatar_image.Focus();
                 return;
             }
             naturenet_dataclassDataContext db = new naturenet_dataclassDataContext();
@@ -216,7 +318,7 @@ namespace nature_net.user_controls
                     select us.name;
             if (r != null)
                 usernames = r.ToList<string>();
-            if (usernames.Contains(textbox_name.Text))
+            if (UserExists(usernames, textbox_name.Text))
             {
                 textbox_name.BorderBrush = Brushes.Red;
                 textbox_name.BorderThickness = new Thickness(5);
@@ -227,22 +329,32 @@ namespace nature_net.user_controls
             User u = new User();
             u.name = textbox_name.Text;
             u.email = textbox_email.Text;
-            //u.password = textbox_password.SecurePassword.ToString();
+            u.avatar = (string)(avatar_list_control.Tag);
+            u.password = user_pin.pin_string;
 
             //UnicodeEncoding encode = new UnicodeEncoding();
             //byte[] pass_byte = encode.GetBytes(textbox_password.Password);
             //SHA1CryptoServiceProvider sha1 = new SHA1CryptoServiceProvider();
             //byte[] pass_hash = sha1.ComputeHash(pass_byte);
-            //u.technical_info = "";
-            u.avatar = (string)(((Image)listbox_avatars.SelectedItem).Tag);
-            u.technical_info = textbox_name.Text + " signed the consent form on " + DateTime.Now.ToString();
+
+            string consent_checkboxes = "";
+            if (checkbox_agreement1.IsChecked.Value)
+                consent_checkboxes = consent_checkboxes + GetTextBlockText((TextBlock)(checkbox_agreement1.Content)) + ";" ;
+            if (checkbox_agreement2.IsChecked.Value)
+                consent_checkboxes = consent_checkboxes + GetTextBlockText((TextBlock)(checkbox_agreement2.Content)) + ";";
+            if (checkbox_agreement3.IsChecked.Value)
+                consent_checkboxes = consent_checkboxes + GetTextBlockText((TextBlock)(checkbox_agreement3.Content)) + ";";
+            if (checkbox_agreement4.IsChecked.Value)
+                consent_checkboxes = consent_checkboxes + GetTextBlockText((TextBlock)(checkbox_agreement4.Content));
+
+            u.technical_info = textbox_name.Text + " signed the consent form on " + DateTime.Now.ToString() + "; " + consent_checkboxes;
+
             try
             {
-                db.Users.InsertOnSubmit(u);
-                db.SubmitChanges();
+                database_manager.InsertUser(u);
                 desc.Text = "Congratulations!";
-                file_manager.add_user_to_googledrive(u.id, u.name, u.avatar);
-                window_manager.load_users();
+                //file_manager.add_user_to_googledrive(u.id, u.name, u.avatar);
+                window_manager.close_signup_window((window_frame)parent, u.name);
             }
             catch (Exception) { desc.Text = "Could not complete the operation."; }
         }
@@ -253,20 +365,78 @@ namespace nature_net.user_controls
             textbox_name.BorderThickness = new Thickness(2);
             textbox_email.BorderBrush = Brushes.LightGray;
             textbox_email.BorderThickness = new Thickness(2);
-            textbox_password.BorderBrush = Brushes.LightGray;
-            textbox_password.BorderThickness = new Thickness(2);
+            user_pin.BorderBrush = Brushes.LightGray;
+            user_pin.BorderThickness = new Thickness(2);
             checkbox_agreement1.BorderBrush = Brushes.Gray;
             checkbox_agreement1.BorderThickness = new Thickness(2);
             checkbox_agreement2.BorderBrush = Brushes.Gray;
             checkbox_agreement2.BorderThickness = new Thickness(2);
-            label_choose_avatar.BorderBrush = Brushes.LightGray;
-            label_choose_avatar.BorderThickness = new Thickness(0);
-            //desc.Visibility = System.Windows.Visibility.Hidden;
+            avatar_border.BorderBrush = Brushes.LightGray;
+            avatar_border.BorderThickness = new Thickness(0);
+            desc.Visibility = System.Windows.Visibility.Hidden;
             desc.Text = "Welcome";
-            required1.Foreground = Brushes.Black;
-            required2.Foreground = Brushes.Black;
+            required1.Foreground = Brushes.Red;
+            required2.Foreground = Brushes.Red;
             required1.FontWeight = FontWeights.Normal;
             required2.FontWeight = FontWeights.Normal;
+            if (avatar_frame.Visibility == System.Windows.Visibility.Visible)
+                avatar_frame.Visibility = System.Windows.Visibility.Hidden;
+        }
+
+        private string GetTextBlockText(TextBlock tb)
+        {
+            StringBuilder s = new StringBuilder();
+            foreach (var line in tb.Inlines)
+            {
+                if (line is LineBreak)
+                {
+                    s.Append("\r\n");
+                }
+                else if (line is Run)
+                {
+                    Run text = (Run)line;
+                    s.Append(text.Text);
+                }
+            }
+            return s.ToString();
+        }
+
+        private bool IsValid(string emailaddress)
+        {
+            try
+            {
+                System.Net.Mail.MailAddress m = new System.Net.Mail.MailAddress(emailaddress);
+                return true;
+            }
+            catch (FormatException)
+            {
+                return false;
+            }
+        }
+
+        public bool ValidateString(string s)
+        {
+            if (focused_textbox.Name == "textbox_name")
+            {
+                if (valid_name_string.Contains(s.ToLower()))
+                    return true;
+                return false;
+            }
+            if (focused_textbox.Name == "textbox_email")
+            {
+                if (valid_email_string.Contains(s.ToLower()))
+                    return true;
+                return false;
+            }
+            return false;
+        }
+
+        public bool UserExists(List<string> current_users, string new_user)
+        {
+            for (int counter = 0; counter < current_users.Count; counter++)
+                if (current_users[counter].ToLower() == new_user.ToLower())
+                    return true;
+            return false;
         }
     }
 }

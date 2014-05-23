@@ -52,7 +52,7 @@
         <elementListCompartment Id="3671b01b-9a65-403a-8ac4-7e4e923c17b5" absoluteBounds="3.2649999999999997, 3.335, 1.9700000000000002, 1.5954996744791665" name="DataPropertiesCompartment" titleTextColor="Black" itemTextColor="Black" />
       </nestedChildShapes>
     </classShape>
-    <associationConnector edgePoints="[(5.25 : 3.26044840494792); (5.51041916666667 : 3.26044840494792 : JumpStart); (5.67708583333333 : 3.26044840494792 : JumpEnd); (6.25 : 3.26044840494792)]" fixedFrom="Algorithm" fixedTo="Algorithm">
+    <associationConnector edgePoints="[(5.25 : 3.26044840494792); (5.51041916666667 : 3.26044840494792 : JumpStart); (5.67708583333333 : 3.26044840494792 : JumpEnd); (6.25 : 3.26044840494792)]" fixedFrom="NotFixed" fixedTo="NotFixed">
       <AssociationMoniker Name="/naturenet_dataclassDataContext/Collection/Collection_Collection_Contribution_Mapping" />
       <nodes>
         <classShapeMoniker Id="175b4c29-c5a7-471f-8f8b-5b8739d24128" />
@@ -65,7 +65,7 @@
         <elementListCompartment Id="fd2a76d4-77d1-4d89-a2ee-29bc48f947ed" absoluteBounds="3.89, 0.96, 1.9700000000000002, 1.4031982421875" name="DataPropertiesCompartment" titleTextColor="Black" itemTextColor="Black" />
       </nestedChildShapes>
     </classShape>
-    <associationConnector edgePoints="[(4.5625 : 2.4631982421875); (4.5625 : 2.875)]" fixedFrom="Algorithm" fixedTo="Algorithm">
+    <associationConnector edgePoints="[(4.5625 : 2.4631982421875); (4.5625 : 2.875)]" fixedFrom="NotFixed" fixedTo="NotFixed">
       <AssociationMoniker Name="/naturenet_dataclassDataContext/User/User_Collection" />
       <nodes>
         <classShapeMoniker Id="38774c41-ed78-420f-ab7f-cef2e4c7ebfc" />
@@ -78,26 +78,6 @@
         <elementListCompartment Id="4cad8172-c112-4c22-8892-ccc63e0b049b" absoluteBounds="9.265, 2.585, 1.9700000000000002, 1.9801025390625" name="DataPropertiesCompartment" titleTextColor="Black" itemTextColor="Black" />
       </nestedChildShapes>
     </classShape>
-    <classShape Id="b4b0a710-c131-43a6-bb84-f3e9ee9dd047" absoluteBounds="8.75, 5.5, 2, 2.1554996744791666">
-      <DataClassMoniker Name="/naturenet_dataclassDataContext/Action" />
-      <nestedChildShapes>
-        <elementListCompartment Id="5fa0740b-b3ff-43ee-a34f-a1e7ef44e7da" absoluteBounds="8.765, 5.96, 1.9700000000000002, 1.5954996744791665" name="DataPropertiesCompartment" titleTextColor="Black" itemTextColor="Black" />
-      </nestedChildShapes>
-    </classShape>
-    <associationConnector edgePoints="[(8 : 7.20274983723958); (8.75 : 7.20274983723958)]" fixedFrom="NotFixed" fixedTo="NotFixed">
-      <AssociationMoniker Name="/naturenet_dataclassDataContext/Action_Type/Action_Type_Action" />
-      <nodes>
-        <classShapeMoniker Id="3c0abb12-d9da-4343-9055-862b3fd6de85" />
-        <classShapeMoniker Id="b4b0a710-c131-43a6-bb84-f3e9ee9dd047" />
-      </nodes>
-    </associationConnector>
-    <associationConnector edgePoints="[(5.875 : 1.15625); (8.96875 : 1.15625); (8.96875 : 5.5)]" fixedFrom="Algorithm" fixedTo="Algorithm">
-      <AssociationMoniker Name="/naturenet_dataclassDataContext/User/User_Action" />
-      <nodes>
-        <classShapeMoniker Id="38774c41-ed78-420f-ab7f-cef2e4c7ebfc" />
-        <classShapeMoniker Id="b4b0a710-c131-43a6-bb84-f3e9ee9dd047" />
-      </nodes>
-    </associationConnector>
     <classShape Id="4c25efbf-35de-498c-aaa6-e0c49afc93ba" absoluteBounds="3.25, 6, 2, 2.7324039713541666">
       <DataClassMoniker Name="/naturenet_dataclassDataContext/Feedback" />
       <nestedChildShapes>
@@ -118,7 +98,7 @@
         <classShapeMoniker Id="4c25efbf-35de-498c-aaa6-e0c49afc93ba" />
       </nodes>
     </associationConnector>
-    <associationConnector edgePoints="[(5.5937525 : 2.4631982421875); (5.5937525 : 7.36620198567708); (5.25 : 7.36620198567708)]" fixedFrom="Algorithm" fixedTo="Algorithm">
+    <associationConnector edgePoints="[(5.5937525 : 2.4631982421875); (5.5937525 : 7.36620198567708); (5.25 : 7.36620198567708)]" fixedFrom="NotFixed" fixedTo="NotFixed">
       <AssociationMoniker Name="/naturenet_dataclassDataContext/User/User_Feedback" />
       <nodes>
         <classShapeMoniker Id="38774c41-ed78-420f-ab7f-cef2e4c7ebfc" />
@@ -138,11 +118,31 @@
         <classShapeMoniker Id="175b4c29-c5a7-471f-8f8b-5b8739d24128" />
       </nodes>
     </associationConnector>
-    <associationConnector edgePoints="[(1.5625 : 4.625); (1.5625 : 3.47280110677083)]" fixedFrom="Algorithm" fixedTo="Algorithm">
+    <associationConnector edgePoints="[(1.5625 : 4.625); (1.5625 : 3.47280110677083)]" fixedFrom="NotFixed" fixedTo="NotFixed">
       <AssociationMoniker Name="/naturenet_dataclassDataContext/Location/Location_Activity" />
       <nodes>
         <classShapeMoniker Id="7ae80aee-0ba1-431a-bcb1-fa3dc0a2d2ad" />
         <classShapeMoniker Id="f9cc5eaa-4b3c-4093-ae4c-5b121169c2c9" />
+      </nodes>
+    </associationConnector>
+    <classShape Id="2c47078f-6372-488c-81c1-66fc4b9456f4" absoluteBounds="9.25, 6.625, 2, 2.1554996744791666">
+      <DataClassMoniker Name="/naturenet_dataclassDataContext/Action" />
+      <nestedChildShapes>
+        <elementListCompartment Id="454fa69b-cf60-43b5-a742-a8edcd57c00b" absoluteBounds="9.265, 7.085, 1.9700000000000002, 1.5954996744791665" name="DataPropertiesCompartment" titleTextColor="Black" itemTextColor="Black" />
+      </nestedChildShapes>
+    </classShape>
+    <associationConnector edgePoints="[(8 : 7.44314697265625); (9.25 : 7.44314697265625)]" fixedFrom="Algorithm" fixedTo="Algorithm">
+      <AssociationMoniker Name="/naturenet_dataclassDataContext/Action_Type/Action_Type_Action" />
+      <nodes>
+        <classShapeMoniker Id="3c0abb12-d9da-4343-9055-862b3fd6de85" />
+        <classShapeMoniker Id="2c47078f-6372-488c-81c1-66fc4b9456f4" />
+      </nodes>
+    </associationConnector>
+    <associationConnector edgePoints="[(5.875 : 1.1562505); (9 : 1.1562505); (9 : 6.25); (10.25 : 6.25); (10.25 : 6.625)]" fixedFrom="Algorithm" fixedTo="Algorithm">
+      <AssociationMoniker Name="/naturenet_dataclassDataContext/User/User_Action" />
+      <nodes>
+        <classShapeMoniker Id="38774c41-ed78-420f-ab7f-cef2e4c7ebfc" />
+        <classShapeMoniker Id="2c47078f-6372-488c-81c1-66fc4b9456f4" />
       </nodes>
     </associationConnector>
   </nestedChildShapes>

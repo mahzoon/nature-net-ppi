@@ -27,7 +27,7 @@ namespace nature_net.user_controls
         private Type _object_type;
 
         private int comment_user_id;
-        bool expand_state = false;
+        bool expand_state = true;
 
         bool hide_expander = false;
 
@@ -35,63 +35,51 @@ namespace nature_net.user_controls
         ContentControl keyboard_frame;
         UserControl parent;
 
+        bool is_reply = false;
+        int reply_id = 0;
+        
+        public bool center_keyboard = true;
+
         public window_content()
         {
             InitializeComponent();
 
-            this.submit_comment.Content = "Submit";
-            //this.submit_comment.Click += new RoutedEventHandler(submit_comment_Click);
-            this.submit_comment.PreviewTouchDown += new EventHandler<TouchEventArgs>(submit_comment_Click);
-            this.leave_comment_panel.Visibility = System.Windows.Visibility.Collapsed;
+            this.comment_icon.Source = configurations.img_comment_icon;
+            this.leave_comment_area_default.Visibility = System.Windows.Visibility.Visible;
+            this.leave_comment_area_reply.Visibility = System.Windows.Visibility.Collapsed;
+            this.leave_comment_area_auth.Visibility = System.Windows.Visibility.Collapsed;
+            this.submit_comment_default.PreviewTouchDown += new EventHandler<TouchEventArgs>(submit_comment_default_clicked);
+            this.submit_comment_reply.PreviewTouchDown += new EventHandler<TouchEventArgs>(submit_comment_reply_clicked);
+            this.cancel_comment_reply.PreviewTouchDown += new EventHandler<TouchEventArgs>(cancel_comment_reply_clicked);
+            this.submit_comment_auth.PreviewTouchDown += new EventHandler<TouchEventArgs>(submit_comment_auth_clicked);
+            this.cancel_comment_auth.PreviewTouchDown += new EventHandler<TouchEventArgs>(cancel_comment_auth_clicked);
 
-            this.leave_comment_area.AllowDrop = true;
-            SurfaceDragDrop.AddPreviewDropHandler(this.leave_comment_area, new EventHandler<SurfaceDragDropEventArgs>(item_droped_on_leave_comment_area));
+            this.selected_user.AllowDrop = true;
+            SurfaceDragDrop.AddPreviewDropHandler(this.selected_user, new EventHandler<SurfaceDragDropEventArgs>(item_dropped_on_leave_comment_area_auth));
             if (configurations.response_to_mouse_clicks)
                 this.expander.Click += new RoutedEventHandler(expander_Click);
             this.expander.PreviewTouchDown += new EventHandler<TouchEventArgs>(expander_Click);
             
-            this.comment_textbox.GotFocus += new RoutedEventHandler(comment_textbox_GotKeyboardFocus);
-            //this.comment_textbox.LostFocus += new RoutedEventHandler(comment_textbox_LostKeyboardFocus);
+            this.comment_textbox_default.GotFocus += new RoutedEventHandler(comment_textbox_GotKeyboardFocus);
+            this.comment_textbox_reply.GotFocus += new RoutedEventHandler(comment_textbox_GotKeyboardFocus);
+
             this.Unloaded += new RoutedEventHandler(window_content_Unloaded);
             this.Loaded += new RoutedEventHandler(window_content_Loaded);
 
-			this.add_comment_img.Source = configurations.img_drop_avatar_pic;
-            //this.leave_comment_canvas.PreviewTouchUp += new EventHandler<TouchEventArgs>(leave_comment_canvas_PreviewTouchUp);
+			//this.add_comment_img.Source = configurations.img_drop_avatar_pic;
+            
             this.comments_listbox.initialize(false, "comment", new ItemSelected(this.item_selected));
             this.comments_listbox.Background = Brushes.White;
-            this.comments_listbox.selectable = true;
-            this.comments_listbox.comment_list = true;
-        }
 
-        void leave_comment_canvas_PreviewTouchUp(object sender, TouchEventArgs e)
-        {
-            //do stuff with the image of strokes
-            //this.leave_comment_canvas.Strokes.Clear();
+            this.comments_listbox.selectable = false;
+            this.comments_listbox.comment_list = true;
+
+            keyboard_frame = new ContentControl();
         }
 
         void window_content_Loaded(object sender, RoutedEventArgs e)
         {
-            if (hide_expander)
-                this.expander.Visibility = System.Windows.Visibility.Collapsed;
-
-            if (expand_state)
-            {
-                if (!hide_expander)
-                    this.comments_listbox.Visibility = System.Windows.Visibility.Visible;
-                else
-                    this.comments_listbox.Visibility = System.Windows.Visibility.Collapsed;
-                this.leave_comment_area.Visibility = System.Windows.Visibility.Visible;
-                this.comments_listbox.UpdateLayout();
-                this.expander.Content = "^";
-                //this.leave_comment_canvas.Strokes.Clear();
-            }
-            else
-            {
-                this.comments_listbox.Visibility = System.Windows.Visibility.Collapsed;
-                this.leave_comment_area.Visibility = System.Windows.Visibility.Collapsed;
-                this.comments_listbox.UpdateLayout();
-                this.expander.Content = "v";
-            }
+            ToggleCommentsSection();
         }
 
         void window_content_Unloaded(object sender, RoutedEventArgs e)
@@ -100,17 +88,12 @@ namespace nature_net.user_controls
                 window_manager.main_canvas.Children.Remove(keyboard_frame);
         }
 
-        void comment_textbox_LostKeyboardFocus(object sender, RoutedEventArgs e)
-        {
-            keyboard_frame.Visibility = System.Windows.Visibility.Collapsed;
-        }
-
         void comment_textbox_GotKeyboardFocus(object sender, RoutedEventArgs e)
         {
-            if (keyboard_frame == null)
-                keyboard_frame = new ContentControl();
             virtual_keyboard.ShowKeyboard(this, ref keyboard);
+            if (keyboard.init_text_checker == null) keyboard.init_text_checker = new InitialTextCheck(this.CheckInitialText);
             keyboard_frame.Visibility = System.Windows.Visibility.Visible;
+            CheckInitialText();
             if (keyboard != null)
             {
                 if (this.keyboard_frame.Content == null)
@@ -120,63 +103,88 @@ namespace nature_net.user_controls
                     this.keyboard_frame.Background = new SolidColorBrush(Colors.White);
                     window_manager.main_canvas.Children.Add(keyboard_frame);
                 }
-                keyboard.MoveAlongWith(parent);
+                keyboard.MoveAlongWith(parent, center_keyboard);
             }
         }
 
         void expander_Click(object sender, RoutedEventArgs e)
         {
-            expand_state = !expand_state;
-            if (expand_state)
+            ToggleCommentsSection();
+        }
+
+        void submit_comment_default_clicked(object sender, RoutedEventArgs e)
+        {
+            GotoAuthMode();
+        }
+
+        void submit_comment_reply_clicked(object sender, RoutedEventArgs e)
+        {
+            GotoAuthMode();
+        }
+
+        void cancel_comment_reply_clicked(object sender, RoutedEventArgs e)
+        {
+            GotoDefaultMode();
+        }
+
+        void submit_comment_auth_clicked(object sender, RoutedEventArgs e)
+        {
+            if (this.GetActiveTextBox().Text == "")
             {
-                this.comments_listbox.Visibility = System.Windows.Visibility.Visible;
-                this.leave_comment_area.Visibility = System.Windows.Visibility.Visible;
-                this.comments_listbox.UpdateLayout();
-                this.expander.Content = "^";
+                this.error_desc.Visibility = System.Windows.Visibility.Visible;
+                this.error_desc.Content = "Comment text is empty.";
+                return;
             }
+            // authenticate
+            naturenet_dataclassDataContext db = new naturenet_dataclassDataContext();
+            var auth_user = from u in db.Users
+                            where (u.name == this.selected_user.title.Text) && (u.password == this.pin.pin_string)
+                            select u;
+            if (auth_user.Count() == 1)
+                submit_text();
             else
             {
-                this.comments_listbox.Visibility = System.Windows.Visibility.Collapsed;
-                this.leave_comment_area.Visibility = System.Windows.Visibility.Collapsed;
-                this.comments_listbox.UpdateLayout();
-                this.expander.Content = "v";
-                //this.leave_comment_canvas.Strokes.Clear();
-                if (keyboard_frame != null) keyboard_frame.Visibility = System.Windows.Visibility.Collapsed;
-
-                this.leave_comment_panel.Visibility = System.Windows.Visibility.Collapsed;
-                this.add_comment_img.Visibility = System.Windows.Visibility.Visible;
-                //this.leave_comment_canvas.Visibility = System.Windows.Visibility.Visible;
-                
-                this.comment_user_id = -1;
-                //this.avatar.Source = new BitmapImage(new Uri(data[3]));
-                //this.comment_textbox.Focus();
+                this.error_desc.Visibility = System.Windows.Visibility.Visible;
+                this.error_desc.Content = "Authentication Failed.";
             }
         }
 
-        void submit_comment_Click(object sender, RoutedEventArgs e)
+        void cancel_comment_auth_clicked(object sender, RoutedEventArgs e)
         {
-            if (this.comment_textbox.Text == "") return;
+            this.submit_comment_auth.IsEnabled = false;
+            this.error_desc.Visibility = System.Windows.Visibility.Collapsed;
+            this.error_desc.Content = "";
+            this.pin_area.Visibility = System.Windows.Visibility.Collapsed;
+            this.pin.Reset(false);
+            CheckTextBoxText();
+            if (is_reply)
+                GotoReplyMode();
+            else
+                GotoDefaultMode();
+        }
+
+        void submit_text()
+        {
             bool is_design_idea = hide_expander;
             if (is_design_idea)
             {
-                naturenet_dataclassDataContext db = new naturenet_dataclassDataContext();
                 Contribution idea = new Contribution();
                 idea.date = DateTime.Now;
                 idea.location_id = 0;
-                idea.note = this.comment_textbox.Text;
-                db.Contributions.InsertOnSubmit(idea);
-                db.SubmitChanges();
-                int collection_id = configurations.get_or_create_collection(db, this.comment_user_id, 1, DateTime.Now);
+                idea.note = this.GetActiveTextBox().Text;
+                idea.tags = "Design Idea";
+                database_manager.InsertDesignIdea(idea, this.comment_user_id);
+                int collection_id = configurations.get_or_create_collection(this.comment_user_id, 1, DateTime.Now);
                 Collection_Contribution_Mapping map = new Collection_Contribution_Mapping();
                 map.collection_id = collection_id;
                 map.contribution_id = idea.id;
                 map.date = DateTime.Now;
-                db.Collection_Contribution_Mappings.InsertOnSubmit(map);
-                db.SubmitChanges();
+                database_manager.InsertCollectionContributionMapping(map);
 
                 if (the_item.Content != null)
                     ((design_ideas_listbox)the_item.Content).list_all_design_ideas();
-                window_manager.load_design_ideas();
+                //window_manager.load_design_ideas();
+                window_manager.close_submit_design_idea_window((window_frame)this.parent, idea.note);
                 //if (((design_ideas_listbox)the_item.Content).parent != null)
                 //    ((design_ideas_listbox)the_item.Content).parent.list_all_design_ideas();
             }
@@ -184,22 +192,20 @@ namespace nature_net.user_controls
             {
                 Feedback comment = new Feedback();
                 comment.date = DateTime.Now;
-                comment.note = this.comment_textbox.Text;
+                comment.note = this.GetActiveTextBox().Text;
                 comment.object_id = this._object_id;
                 comment.object_type = this._object_type.ToString();
-                if (comments_listbox._list.SelectedIndex == -1)
-                    comment.parent_id = 0;
-                else
-                {
-                    int p_id = (int)((item_generic)comments_listbox._list.Items[comments_listbox._list.SelectedIndex]).Tag;
-                    comment.parent_id = p_id;
-                }
+                //if (comments_listbox._list.SelectedIndex == -1)
+                //    comment.parent_id = 0;
+                //else
+                //{
+                    //int p_id = (int)((item_generic)comments_listbox._list.Items[comments_listbox._list.SelectedIndex]).Tag;
+                    comment.parent_id = reply_id;
+                //}
                 comment.technical_info = "";
                 comment.type_id = 1;
                 comment.user_id = this.comment_user_id;
-                naturenet_dataclassDataContext db = new naturenet_dataclassDataContext();
-                db.Feedbacks.InsertOnSubmit(comment);
-                db.SubmitChanges();
+                database_manager.InsertFeedback(comment);
                 if (this.the_item.Content != null)
                 {
                     try
@@ -213,10 +219,15 @@ namespace nature_net.user_controls
                 if (this._object_type.ToString() == "nature_net.Contribution")
                     window_manager.load_design_ideas();
             }
-            this.comment_textbox.SelectAll();
+            //this.GetActiveTextBox().SelectAll();
+            cancel_comment_auth_clicked(null, null);
+            GotoDefaultMode();
+            comment_textbox_default.Text = "";
+            comment_textbox_reply.Text = "";
+            CheckTextBoxText();
         }
 
-        void item_droped_on_leave_comment_area(object sender, SurfaceDragDropEventArgs e)
+        void item_dropped_on_leave_comment_area_auth(object sender, SurfaceDragDropEventArgs e)
         {
             string[] data = ((string)e.Cursor.Data).Split(new Char[] { ';' });
             if (data == null) return;
@@ -226,15 +237,13 @@ namespace nature_net.user_controls
             {
                 string username = data[3];
                 int user_id = Convert.ToInt32(data[1]);
-
-                this.add_comment_img.Visibility = System.Windows.Visibility.Collapsed;
-                //this.leave_comment_canvas.Visibility = System.Windows.Visibility.Collapsed;
-                
-                this.leave_comment_panel.Visibility = System.Windows.Visibility.Visible;
+                this.selected_user.title.Text = username;
                 this.comment_user_id = user_id;
-                this.avatar.Source = new BitmapImage(new Uri(data[2]));
-                this.comment_textbox.Text = "";
-                this.comment_textbox.Focus();
+                this.selected_user.avatar.Source = new BitmapImage(new Uri(data[2]));
+                this.submit_comment_auth.IsEnabled = true;
+                this.pin_area.Visibility = System.Windows.Visibility.Visible;
+                if (keyboard_frame != null) keyboard_frame.Visibility = System.Windows.Visibility.Collapsed;
+                this.pin.Reset(true);
             }
             e.Handled = true;
         }
@@ -253,7 +262,10 @@ namespace nature_net.user_controls
             //brush.Stretch = Stretch.None;
             //this.leave_comment_canvas.Background = brush;
 
+            this.comment_textbox_default.Text = configurations.comment_init_text;
+            this.comment_textbox_reply.Text = configurations.comment_init_text;
             this.parent = parent_frame;
+            this.pin.parent = parent_frame;
         }
 
         public void initialize_contents(UserControl uc, Type obj_type, int obj_id, UserControl parent_frame, double width)
@@ -270,14 +282,20 @@ namespace nature_net.user_controls
             //brush.Stretch = Stretch.None;
             //this.leave_comment_canvas.Background = brush;
 
+            this.comment_textbox_default.Text = configurations.comment_init_text;
+            this.comment_textbox_reply.Text = configurations.comment_init_text;
             this.parent = parent_frame;
+            this.pin.parent = parent_frame;
         }
 
         public void initialize_contents(UserControl uc, bool is_design, UserControl parent_frame)
         {
             //this.the_item.Content = uc;
             this.hide_expander = is_design;
-            
+            this.expander.Visibility = System.Windows.Visibility.Collapsed;
+            this.comments_listbox.Height = 0;
+            this.comment_textbox_default.Text = configurations.design_idea_init_text;
+            this.comment_textbox_reply.Text = configurations.design_idea_init_text;
             //this.add_comment_img.Source = configurations.img_drop_avatar_pic;
             //var brush = new ImageBrush();
             //brush.ImageSource = configurations.img_drop_avatar_pic;
@@ -289,15 +307,9 @@ namespace nature_net.user_controls
             //((design_ideas_listbox)the_item.Content).submit_button.Visibility = System.Windows.Visibility.Collapsed;
             //((design_ideas_listbox)the_item.Content).Height = configurations.design_idea_ext_window_width;
             //((design_ideas_listbox)the_item.Content).Background = new SolidColorBrush(Colors.White);
-            this.expand_state = true;
-            this.parent = parent_frame;
-        }
-
-        public void initialize_contents(UserControl uc)
-        {
             this.expand_state = false;
-            this.hide_expander = true;
-            this.the_item.Content = uc;
+            this.parent = parent_frame;
+            this.pin.parent = parent_frame;
         }
 
         // add an initial comment (that's not actually a comment; it is used to show a contribution's user provided attributes)
@@ -330,6 +342,8 @@ namespace nature_net.user_controls
             comment_item i = new comment_item();
             i._object_id = this._object_id; i._object_type = this._object_type;
             this.comments_listbox.populator.item_width = this.comments_listbox.Width;
+            this.comments_listbox.populator.total_number = this.number_comments;
+            this.comments_listbox.populator.reply_clicked_handler = new reply_clicked(this.replybutton_clicked);
             this.comments_listbox.populator.list_all_comments(i);
         }
 
@@ -346,10 +360,12 @@ namespace nature_net.user_controls
                 {
                     if (keyboard_frame.Visibility == System.Windows.Visibility.Visible)
                     {
-                        keyboard.MoveAlongWith(parent);
+                        this.UpdateLayout();
+                        keyboard.MoveAlongWith(parent, center_keyboard);
                     }
                 }
             }
+            pin.UpdateKeyboardPosition();
         }
 
         public UIElement GetKeyboardFrame()
@@ -359,7 +375,163 @@ namespace nature_net.user_controls
 
         public Control ControlToInjectInto
         {
-            get { return this.comment_textbox; }
+            get { return this.GetActiveTextBox(); }
+        }
+
+        private TextBox GetActiveTextBox()
+        {
+            if (is_reply)
+                return comment_textbox_reply;
+            else
+                return comment_textbox_default;
+        }
+
+        private void ToggleCommentsSection()
+        {
+            expand_state = !expand_state;
+            if (expand_state)
+            {
+                this.comments_section.Visibility = System.Windows.Visibility.Visible;
+                //this.comments_listbox.UpdateLayout();
+            }
+            else
+            {
+                this.comments_section.Visibility = System.Windows.Visibility.Collapsed;
+                //this.comments_listbox.UpdateLayout();
+                if (keyboard_frame != null) keyboard_frame.Visibility = System.Windows.Visibility.Collapsed;
+
+                this.comment_user_id = -1;
+
+                CheckTextBoxText();
+            }
+        }
+
+        private void PrepareForReply()
+        {
+            this.submit_comment_reply.Width = this.ActualWidth / 2;
+            this.cancel_comment_reply.Width = this.ActualWidth / 2;
+            this.comment_textbox_reply.Focus();
+            CheckInitialText();
+            //if (keyboard_frame != null) keyboard_frame.Visibility = System.Windows.Visibility.Collapsed;
+            UpdateKeyboardPosition();
+        }
+
+        private void PrepareForAuth()
+        {
+            if (keyboard_frame != null) keyboard_frame.Visibility = System.Windows.Visibility.Collapsed;
+            this.selected_user.title.Text = "Drag your avatar and drop it here.";
+            this.selected_user.center_panel.VerticalAlignment = VerticalAlignment.Center;
+            this.selected_user.avatar.Source = configurations.img_choose_avatar_pic;
+            this.selected_user.num_likes.Visibility = System.Windows.Visibility.Collapsed;
+            this.selected_user.description.Visibility = System.Windows.Visibility.Collapsed;
+            this.selected_user.user_info.Visibility = System.Windows.Visibility.Collapsed;
+            this.selected_user.right_panel.Visibility = System.Windows.Visibility.Collapsed;
+            this.selected_user.Background = Brushes.White;
+            this.submit_comment_auth.Width = this.ActualWidth/2;
+            this.cancel_comment_auth.Width = this.ActualWidth / 2;
+            this.submit_comment_auth.IsEnabled = false;
+        }
+
+        private void CheckTextBoxText()
+        {
+            if (GetActiveTextBox().Text == "")
+            {
+                GetActiveTextBox().Foreground = Brushes.Gray;
+                if (hide_expander)
+                    GetActiveTextBox().Text = configurations.design_idea_init_text;
+                else
+                    GetActiveTextBox().Text = configurations.comment_init_text;
+            }
+        }
+
+        private void replybutton_clicked(object sender, EventArgs e)
+        {
+            item_generic i = (item_generic)(((Button)sender).Tag);
+            this.reply_id = (int)i.Tag;
+            this.is_reply = true;
+
+            reply_item.Background = Brushes.White;
+            reply_item.username.Text = i.username.Text;
+            reply_item.user_desc.Visibility = Visibility.Collapsed; //i.user_desc.Content = configurations.GetDate_Formatted(cig.comment.date);
+            reply_item.number.Text = i.number.Text; //i.number.Visibility = System.Windows.Visibility.Collapsed;
+            reply_item.desc.Visibility = Visibility.Collapsed;// i.desc.Content = "Commented:";
+            reply_item.topleft_panel.VerticalAlignment = VerticalAlignment.Top;
+            reply_item.top_panel.Margin = new Thickness(5, 10, 5, 10);
+            reply_item.content.Text = i.content.Text;
+            //if (item_width != 0) i.Width = item_width + 2;
+            reply_item.avatar.Source = i.avatar.Source;
+            reply_item.Tag = i.Tag;
+            //reply_item.second_border.Margin = new Thickness(cig.level * 25, 0, 0, 0);
+            reply_item.first_border.BorderBrush = Brushes.Gray; reply_item.first_border.BorderThickness = new Thickness(3, 3, 3, 3);
+            reply_item.second_border.BorderBrush = Brushes.DarkGray; reply_item.second_border.BorderThickness = new Thickness(0, 0, 0, 0);
+
+            this.comment_textbox_reply.Text = comment_textbox_default.Text;
+            this.comment_textbox_reply.Foreground = comment_textbox_default.Foreground;
+
+            GotoReplyMode();
+        }
+
+        private void GotoDefaultMode()
+        {
+            this.leave_comment_area_default.IsEnabled = true;
+            this.submit_comment_default.Visibility = System.Windows.Visibility.Visible;
+
+            this.leave_comment_area_default.Visibility = System.Windows.Visibility.Visible;
+            this.leave_comment_area_reply.Visibility = System.Windows.Visibility.Collapsed;
+            this.leave_comment_area_auth.Visibility = System.Windows.Visibility.Collapsed;
+            if (is_reply)
+            {
+                this.comment_textbox_default.Text = comment_textbox_reply.Text;
+                this.comment_textbox_default.Foreground = comment_textbox_reply.Foreground;
+            }
+            this.is_reply = false;
+            this.comment_textbox_default.Focus();
+            CheckInitialText();
+            //if (keyboard_frame != null) keyboard_frame.Visibility = System.Windows.Visibility.Collapsed;
+            UpdateKeyboardPosition();
+            //CheckTextBoxText();
+        }
+
+        private void GotoReplyMode()
+        {
+            this.leave_comment_area_reply.IsEnabled = true;
+            this.buttons_reply.Visibility = System.Windows.Visibility.Visible;
+
+            this.leave_comment_area_default.Visibility = System.Windows.Visibility.Collapsed;
+            this.leave_comment_area_reply.Visibility = System.Windows.Visibility.Visible;
+            this.leave_comment_area_auth.Visibility = System.Windows.Visibility.Collapsed;
+            PrepareForReply();
+            //CheckTextBoxText();
+        }
+
+        private void GotoAuthMode()
+        {
+            if (is_reply)
+            {
+                this.leave_comment_area_reply.IsEnabled = false;
+                this.buttons_reply.Visibility = System.Windows.Visibility.Collapsed;
+            }
+            else
+            {
+                this.leave_comment_area_default.IsEnabled = false;
+                this.submit_comment_default.Visibility = System.Windows.Visibility.Collapsed;
+            }
+            //this.leave_comment_area_default.Visibility = System.Windows.Visibility.Collapsed;
+            //this.leave_comment_area_reply.Visibility = System.Windows.Visibility.Collapsed;
+            this.leave_comment_area_auth.Visibility = System.Windows.Visibility.Visible;
+            PrepareForAuth();
+        }
+
+        public bool CheckInitialText()
+        {
+            if (this.GetActiveTextBox().Foreground == Brushes.Gray)
+            {
+                this.GetActiveTextBox().Foreground = Brushes.Black;
+                GetActiveTextBox().Text = "";
+                return true;
+            }
+            else
+                return false;
         }
     }
 }

@@ -26,8 +26,8 @@ namespace nature_net.user_controls
 
             //Static Configuration Values:
             //this.top_panel.Margin = new Thickness(10, 5, 10, 5);
-            this.avatar.Width = 50;
-            this.avatar.Height = 50;
+            this.avatar.Width = configurations.comment_item_avatar_width;
+            this.avatar.Height = configurations.comment_item_avatar_width;
             //this.topright_panel.Margin = new Thickness(10, 0, 10, 0);
             //this.desc.Margin = new Thickness(10, 0, 10, 0);
             //this.content.Margin = new Thickness(10, 0, 10, 10);
@@ -55,6 +55,14 @@ namespace nature_net.user_controls
         public void set_touchevent(avatar_touch_down_handler touch_handler)
         {
             this.avatar.PreviewTouchDown += new EventHandler<TouchEventArgs>(touch_handler);
+        }
+
+        public void set_replybutton(reply_clicked reply_handler)
+        {
+            this.right_panel_border.Visibility = System.Windows.Visibility.Visible;
+            this.reply_icon.Source = configurations.img_reply_icon;
+            this.reply_button.PreviewTouchDown += new EventHandler<TouchEventArgs>(reply_handler);
+            this.reply_button.Tag = this;
         }
 
         public void set_number(int num, string num_desc)
@@ -109,4 +117,5 @@ namespace nature_net.user_controls
     public delegate void avatar_touch_down_handler(object sender, TouchEventArgs e);
     public delegate void thumbs_up(object sender, TouchEventArgs e);
     public delegate void thumbs_down(object sender, EventArgs e);
+    public delegate void reply_clicked(object sender, EventArgs e);
 }

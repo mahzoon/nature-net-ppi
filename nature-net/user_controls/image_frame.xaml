@@ -33,7 +33,7 @@
               UnloadedBehavior="Stop" IsManipulationEnabled="True" Panel.ZIndex="0"></MediaElement>
         </DockPanel>
         <StackPanel Name="the_content"> 
-        <ContentControl Name="window_content"></ContentControl>
+            <ContentControl Name="window_content"></ContentControl>
         </StackPanel>
     </StackPanel>
 

@@ -4,10 +4,10 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              mc:Ignorable="d" 
-              d:DesignHeight="210" d:DesignWidth="620" Width="620">
-    
-    <Canvas Name="keyboard_canvas" Height="210" Width="620" >
-        <Image Name="keyboard" Height="210" Width="620" >
+              d:DesignHeight="214" d:DesignWidth="620" Width="612">
+
+    <Canvas Name="keyboard_canvas" Height="214" Width="612" >
+        <Image Name="keyboard" Height="214" Width="612" >
             <!--<Image.Resources>
                 <Style TargetType="Image">
                     <Style.Triggers>

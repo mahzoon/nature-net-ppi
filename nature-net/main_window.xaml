@@ -6,7 +6,6 @@
         Title="Nature Net" Height="200" Width="800" Name="main_window" WindowStyle="None" WindowState="Maximized">
     
     <Window.Resources>
-        
         <Style x:Key="CursorStyle" TargetType="{x:Type ContentControl}">
             <Setter Property="BorderThickness" Value="3"/>
             <Setter Property="BorderBrush" Value="{DynamicResource {x:Static s:SurfaceColors.Accent1BrushKey}}"/>
@@ -24,7 +23,7 @@
                     </ControlTemplate>
                 </Setter.Value>
             </Setter>
-        </Style>        
+        </Style>     
     </Window.Resources>
     
     <DockPanel LastChildFill="True" Name="application_panel">
