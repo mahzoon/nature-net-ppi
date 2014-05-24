@@ -31,6 +31,7 @@ namespace nature_net.user_controls
         public bool auto_submit = false;
 
         public UserControl parent;
+        public bool center = true;
 
         public pin_box()
         {
@@ -61,6 +62,7 @@ namespace nature_net.user_controls
             num_digits = 0;
             pin = 0;
             digit1.Text = ""; digit2.Text = ""; digit3.Text = ""; digit4.Text = "";
+            pin_string = "";
             if (numpad == null || numpad_frame == null)
                 CreateNumpadKeyboard();
             else
@@ -69,7 +71,7 @@ namespace nature_net.user_controls
                 numpad_frame.Visibility = System.Windows.Visibility.Visible;
             else
                 numpad_frame.Visibility = System.Windows.Visibility.Collapsed;
-            numpad.MoveAlongWith(parent);
+            numpad.MoveAlongWith(parent, center);
         }
 
         void digit1_GotFocus(object sender, RoutedEventArgs e)
@@ -166,7 +168,7 @@ namespace nature_net.user_controls
                     if (numpad_frame.Visibility == System.Windows.Visibility.Visible)
                     {
                         this.UpdateLayout();
-                        numpad.MoveAlongWith(parent);
+                        numpad.MoveAlongWith(parent, center);
                     }
                 }
             }
@@ -187,6 +189,7 @@ namespace nature_net.user_controls
             numpad.submit_hit_handler = new submit_hit(submit);
             numpad.backspace_hit_handler = new backspace_hit(backspace);
             this.numpad_frame.Content = numpad;
+            numpad.parent_frame = numpad_frame;
             this.numpad_frame.Background = new SolidColorBrush(Colors.White);
             window_manager.main_canvas.Children.Add(numpad_frame);
             this.UpdateLayout();

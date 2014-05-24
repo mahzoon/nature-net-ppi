@@ -22,18 +22,22 @@
                         </DockPanel>
                     </Border>
 
-                    <DockPanel DockPanel.Dock="Top" LastChildFill="True" Name="top_panel" Margin="5,10,5,0">
-                        <Image Name="avatar" Width="75" Height="75"></Image>
-                        <StackPanel Name="topleft_panel" Margin="5,0,5,0" Orientation="Vertical"
-                                    HorizontalAlignment="Left" VerticalAlignment="Center">
-                            <TextBlock Name="username" HorizontalAlignment="Left" TextWrapping="Wrap" Width="100"> The NatureNet project is</TextBlock>
+                    <DockPanel DockPanel.Dock="Top" LastChildFill="False" Name="top_panel" Margin="5,10,5,0">
+                        <StackPanel Name="avatar_container" DockPanel.Dock="Left" >
+                            <Image Name="avatar" Width="75" Height="75"></Image>
+                        </StackPanel>
+                        <StackPanel DockPanel.Dock="Right" Width="70">
+                            <TextBlock Name="number" HorizontalAlignment="Right" TextWrapping="Wrap" Margin="5,0,0,0">
+                                The NatureNet project
+                            </TextBlock>
+                        </StackPanel>
+                        <StackPanel DockPanel.Dock="Left" Name="topleft_panel" Margin="5,0,5,0" Orientation="Vertical" HorizontalAlignment="Left" VerticalAlignment="Center">
+                            <TextBlock Name="username" HorizontalAlignment="Left" TextWrapping="Wrap" >
+                                The title goes here...
+                            </TextBlock>
                             <Label Name="user_desc" HorizontalAlignment="Left" FontStyle="Italic" FontSize="10" Margin="0" Padding="0,3,0,3" >Description</Label>
                         </StackPanel>
-                        <TextBlock Name="number" HorizontalAlignment="Right" TextWrapping="Wrap" Margin="5,0,0,0" DockPanel.Dock="Right">
-                            The NatureNet project
-                        </TextBlock>
                     </DockPanel>
-
                     <Label Name="desc" Margin="5,0,5,0" DockPanel.Dock="Top">Contributes/Suggests:</Label>
                     <TextBlock Name="content" Margin="5,0,5,5" DockPanel.Dock="Top" TextWrapping="Wrap" TextAlignment="Justify">
                 The NatureNet project is a citizen science project that incorporates crowdsourced interaction design.  Participants can collect and analyse scientific data using their mobile computing devices and a multi-touch tabletop, and they can also participate in the re-design of the interface by which their scientific contributions are made.  The role of the crowd in Naturenet is extended to include interaction design in addition to data collection and analysis.

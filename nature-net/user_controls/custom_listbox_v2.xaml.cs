@@ -83,7 +83,7 @@ namespace nature_net.user_controls
                 this._list.Background = Brushes.Transparent;
 
             //if (configurations.response_to_mouse_clicks)
-                this._list.SelectionChanged += new SelectionChangedEventHandler(_list_SelectionChanged);
+            this._list.SelectionChanged += new SelectionChangedEventHandler(_list_SelectionChanged);
         }
 
         void _list_PreviewMouseLeftButtonDown(object sender, MouseButtonEventArgs e)
@@ -402,7 +402,7 @@ namespace nature_net.user_controls
             {
 
             }
-            ScrollViewer scroll = configurations.GetDescendantByType(this._list, typeof(ScrollViewer)) as ScrollViewer;
+            FadingScrollViewer scroll = configurations.GetDescendantByType(this._list, typeof(FadingScrollViewer)) as FadingScrollViewer;
             if (is_horizontal)
                 last_scroll_offset = scroll.HorizontalOffset;
             else
@@ -528,7 +528,7 @@ namespace nature_net.user_controls
                 }
             }
 
-            ScrollViewer scroll = configurations.GetDescendantByType(this._list, typeof(ScrollViewer)) as ScrollViewer;
+            FadingScrollViewer scroll = configurations.GetDescendantByType(this._list, typeof(FadingScrollViewer)) as FadingScrollViewer;
             //double dv = touch_points[e.TouchDevice.Id].points[touch_points[e.TouchDevice.Id].points.Count - 1].Position.Y - touch_points[e.TouchDevice.Id].points[touch_points[e.TouchDevice.Id].points.Count - 2].Position.Y;
             //double dh = touch_points[e.TouchDevice.Id].points[touch_points[e.TouchDevice.Id].points.Count - 1].Position.X - touch_points[e.TouchDevice.Id].points[touch_points[e.TouchDevice.Id].points.Count - 2].Position.X;
 
@@ -820,6 +820,8 @@ namespace nature_net.user_controls
                 i.right_panel.Width = configurations.design_idea_right_panel_width;
                 //i.left_panel.VerticalAlignment = VerticalAlignment.Center; DockPanel.SetDock(i.number, Dock.Left); DockPanel.SetDock(i.txt_level1, Dock.Left);
                 i.top_value = idea.num_like;
+                i.drag_icon_vertical.Source = configurations.img_drag_vertical_icon;
+                if (configurations.show_vertical_drag) i.drag_icon_vertical_panel.Visibility = Visibility.Visible;
                 if (thumbs_up_handler != null)
                     i.avatar.Tag = i;
                 this._list.Items.Add(i);
@@ -951,6 +953,8 @@ namespace nature_net.user_controls
                 i.avatar.Width = configurations.user_item_avatar_width; i.avatar.Height = configurations.user_item_avatar_width;
                 i.user_info.Visibility = Visibility.Collapsed; i.user_info_date.Text = i.txt_level2.Text;
                 i.top_value = u.count;
+                i.drag_icon_vertical.Source = configurations.img_drag_vertical_icon;
+                if (configurations.show_vertical_drag) i.drag_icon_vertical_panel.Visibility = Visibility.Visible;
                 this._list.Items.Add(i);
             }
             if (header.atoz.IsChecked.Value && header.atoz_order != null) header.atoz_order();
@@ -985,12 +989,17 @@ namespace nature_net.user_controls
                 {
                     List<Feedback> comments = r.ToList<Feedback>();
                     List<comment_item_generic> comment_items = new List<comment_item_generic>();
-                    foreach (Feedback f in comments)
+                    List<List<comment_item_generic>> children_items = new List<List<comment_item_generic>>();
+                    for (int counter=0;counter<comments.Count; counter++)
                     {
+                        Feedback f = comments[counter];
                         int level = 0;
-                        comment_items.Add(create_comment_item(f, level));
-                        add_comment_items_for(f, ref level, comment_items, db);
+                        List<comment_item_generic> tmp_list = new List<comment_item_generic>();
+                        tmp_list.Add(create_comment_item(f, level));
+                        add_comment_items_for(f, ref level, tmp_list, db);
+                        add_children_to_list(tmp_list, children_items);
                     }
+                    condense_lists(children_items, comment_items);
                     e.Result = (object)comment_items;
                 }
                 else
@@ -1003,7 +1012,29 @@ namespace nature_net.user_controls
                 log.WriteErrorLog(ex);
             }
         }
-        public void add_comment_items_for(Feedback c, ref int level, List<comment_item_generic> current_items, naturenet_dataclassDataContext db)
+        private void add_children_to_list(List<comment_item_generic> tmp, List<List<comment_item_generic>> main_list)
+        {
+            // search through the main_list to find a place for insertion (main list should be kept sorted)
+            DateTime max_date_tmp = tmp[0].comment.date;
+            for (int t = 0; t < tmp.Count; t++)
+                if (tmp[t].comment.date > max_date_tmp)
+                    max_date_tmp = tmp[t].comment.date;
+            for (int counter = 0; counter < main_list.Count; counter++)
+            {
+                List<comment_item_generic> candidate = main_list[counter];
+                DateTime max_date_candidate = candidate[0].comment.date;
+                for (int i = 0; i < candidate.Count; i++)
+                    if (candidate[i].comment.date > max_date_candidate)
+                        max_date_candidate = candidate[i].comment.date;
+                if (max_date_tmp > max_date_candidate)
+                {
+                    main_list.Insert(counter, tmp);
+                    return;
+                }
+            }
+            main_list.Add(tmp);
+        }
+        private void add_comment_items_for(Feedback c, ref int level, List<comment_item_generic> current_items, naturenet_dataclassDataContext db)
         {
             var r = from c2 in db.Feedbacks
                     where (c2.Feedback_Type.name == "Comment") && (c2.parent_id == c.id)
@@ -1013,13 +1044,23 @@ namespace nature_net.user_controls
             {
                 List<Feedback> comments = r.ToList<Feedback>();
                 level++;
+                List<List<comment_item_generic>> children_items = new List<List<comment_item_generic>>();
                 foreach (Feedback f in comments)
                 {
+                    List<comment_item_generic> tmp_list = new List<comment_item_generic>();
                     int new_level = level;
-                    current_items.Add(create_comment_item(f, new_level));
-                    add_comment_items_for(f, ref new_level, current_items, db);
+                    tmp_list.Add(create_comment_item(f, new_level));
+                    add_comment_items_for(f, ref new_level, tmp_list, db);
+                    add_children_to_list(tmp_list, children_items);
                 }
+                condense_lists(children_items, current_items);
             }
+        }
+        private void condense_lists(List<List<comment_item_generic>> main_list, List<comment_item_generic> return_list)
+        {
+            for (int counter1 = 0; counter1 < main_list.Count; counter1++)
+                for (int counter2 = 0; counter2 < main_list[counter1].Count; counter2++)
+                    return_list.Add(main_list[counter1][counter2]);
         }
         public comment_item_generic create_comment_item(Feedback c, int level)
         {
@@ -1042,13 +1083,18 @@ namespace nature_net.user_controls
                    foreach (comment_item_generic cig in comments)
                    {
                        item_generic i = new item_generic();
-                       i.username.Text = cig.comment.User.name;
+                       //i.username.Text = cig.comment.User.name + ":"; TextBlock.SetFontWeight(i.username, FontWeights.Bold);
+                       i.username.Text = "";
+                       i.username.Inlines.Add(new Bold(new Run(cig.comment.User.name + ": ")));
+                       i.username.Inlines.Add(cig.comment.note);
                        i.user_desc.Visibility = Visibility.Collapsed; //i.user_desc.Content = configurations.GetDate_Formatted(cig.comment.date);
                        i.number.Text = configurations.GetDate_Formatted(cig.comment.date); //i.number.Visibility = System.Windows.Visibility.Collapsed;
+                       i.number.FontSize = configurations.design_idea_item_user_info_font_size;
                        i.desc.Visibility = Visibility.Collapsed;// i.desc.Content = "Commented:";
                        i.topleft_panel.VerticalAlignment = VerticalAlignment.Top;
                        i.top_panel.Margin = new Thickness(5, 10, 5, 10);
-                       i.content.Text = cig.comment.note;
+                       //i.content.Text = cig.comment.note;
+                       i.content.Visibility = Visibility.Collapsed;
                        if (item_width != 0) i.Width = item_width + 2;
                        i.avatar.Source = new BitmapImage(new Uri(configurations.GetAbsoluteAvatarPath() + cig.comment.User.avatar));
                        i.Tag = cig.comment.id;
@@ -1057,12 +1103,15 @@ namespace nature_net.user_controls
                        i.second_border.Margin = new Thickness(cig.level * 25, 0, 0, 0);
                        i.first_border.BorderBrush = Brushes.Gray; i.first_border.BorderThickness = new Thickness(0, 0, 0, 1);
                        i.second_border.BorderBrush = Brushes.DarkGray; i.second_border.BorderThickness = new Thickness(1, 0, 0, 0);
-                       if (this.reply_clicked_handler != null) i.set_replybutton(this.reply_clicked_handler);
+                       if (this.reply_clicked_handler != null && cig.level < (configurations.max_thread_reply - 1)) i.set_replybutton(this.reply_clicked_handler);
                        this._list.Items.Add(i);
                    }
 
                    if (this._list.Items.Count == 0)
                        this._list.Height = 0;
+                   else
+                       this._list.Height = Double.NaN;
+
                    this._list.Items.Refresh();
                    this._list.Padding = new Thickness(0);
                    this._list.UpdateLayout();
@@ -1146,6 +1195,8 @@ namespace nature_net.user_controls
                        i.Margin = items_margins;
                        i.user_info.Visibility = Visibility.Collapsed; i.user_info_date.Text = i.txt_level2.Text;
                        i.top_value = a.count;
+                       i.drag_icon_vertical.Source = configurations.img_drag_vertical_icon;
+                       if (configurations.show_vertical_drag) i.drag_icon_vertical_panel.Visibility = Visibility.Visible;
                        this._list.Items.Add(i);
                    }
                    if (header.atoz.IsChecked.Value && header.atoz_order != null) header.atoz_order();

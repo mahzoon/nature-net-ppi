@@ -9,17 +9,19 @@
              d:DesignWidth="300">
     <DockPanel LastChildFill="False">
         <ContentControl Name="the_item" DockPanel.Dock="Top"></ContentControl>
-        <Button Name="expander" DockPanel.Dock="Top" HorizontalAlignment="Left" Width="140" Height="40"
-                         VerticalContentAlignment="Center" HorizontalContentAlignment="Left"
-                         Background="#FF3E9D3E" Foreground="White" >
-            <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
-                <Image Name="comment_icon" Margin="5,0,0,0"></Image>
-                <TextBlock Name="comment_text1" Margin="10,0,0,0" VerticalAlignment="Center">Comments (</TextBlock>
-                <TextBlock Name="number_comments" VerticalAlignment="Center"></TextBlock>
-                <TextBlock Name="comment_text2" VerticalAlignment="Center">)</TextBlock>
-            </StackPanel>
-        </Button>
-
+        <DockPanel Name="expander_metadata_panel"  DockPanel.Dock="Top">
+            <Button Name="expander" DockPanel.Dock="Left" HorizontalAlignment="Left" Width="85" Margin="0,0,5,0"
+                             VerticalContentAlignment="Center" HorizontalContentAlignment="Left"
+                             Background="#FF3E9D3E" Foreground="White" >
+                <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                    <Image Name="comment_icon" Margin="5,0,0,0"></Image>
+                    <TextBlock Name="comment_text1" Margin="10,0,0,0" VerticalAlignment="Center"> (</TextBlock>
+                    <TextBlock Name="number_comments" VerticalAlignment="Center"></TextBlock>
+                    <TextBlock Name="comment_text2" VerticalAlignment="Center">)</TextBlock>
+                </StackPanel>
+            </Button>
+            <TextBlock Name="metadata"  DockPanel.Dock="Right" TextWrapping="Wrap" Margin="5"></TextBlock>
+        </DockPanel>
         <DockPanel Name="comments_section" DockPanel.Dock="Top">
 
             <StackPanel DockPanel.Dock="Top" Orientation="Vertical" AllowDrop="True" Name="leave_comment_area_default" Background="White">
@@ -30,7 +32,7 @@
                                      Foreground="White">
                         Submit
                     </Button>
-                    <TextBox DockPanel.Dock="Left" Name="comment_textbox_default" TextWrapping="Wrap" AcceptsReturn="True" Height="60"
+                    <TextBox DockPanel.Dock="Left" Name="comment_textbox_default" TextWrapping="Wrap" AcceptsReturn="True" MinHeight="60"
                              FontSize="15" FontFamily="Segoe UI" Background="White" Foreground="Gray" Padding="4">
                         Comment Textbox</TextBox>
                 </DockPanel>
@@ -53,7 +55,7 @@
                             Cancel
                         </Button>
                     </DockPanel>
-                    <TextBox DockPanel.Dock="Top" Name="comment_textbox_reply" TextWrapping="Wrap" AcceptsReturn="True" Height="60"
+                    <TextBox DockPanel.Dock="Top" Name="comment_textbox_reply" TextWrapping="Wrap" AcceptsReturn="True" MinHeight="60"
                              FontSize="15" FontFamily="Segoe UI" Background="White" Foreground="Gray" Padding="4">
                         Comment Textbox</TextBox>
                 </DockPanel>

@@ -20,6 +20,7 @@ namespace nature_net.user_controls
     public partial class avatar_list : UserControl
     {
         public Image return_value;
+        public ContentControl parent_frame;
 
         public avatar_list()
         {
@@ -45,6 +46,8 @@ namespace nature_net.user_controls
             Image s = (Image)listbox_avatars.SelectedItem;
             this.Tag = s.Tag;
             this.return_value.Source = s.Source;
+            if (parent_frame != null)
+                parent_frame.Visibility = System.Windows.Visibility.Collapsed;
         }
 
         public void MoveAlongWith(UserControl parent)

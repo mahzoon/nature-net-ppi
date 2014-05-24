@@ -37,6 +37,8 @@ namespace nature_net.user_controls
 
         bool is_reply = false;
         int reply_id = 0;
+
+        System.Threading.Timer error_timer;
         
         public bool center_keyboard = true;
 
@@ -63,6 +65,13 @@ namespace nature_net.user_controls
             this.comment_textbox_default.GotFocus += new RoutedEventHandler(comment_textbox_GotKeyboardFocus);
             this.comment_textbox_reply.GotFocus += new RoutedEventHandler(comment_textbox_GotKeyboardFocus);
 
+            if (!configurations.multi_keyboard)
+            {
+                comment_textbox_default.LostFocus += new RoutedEventHandler(textbox_LostFocus);
+                comment_textbox_reply.LostFocus += new RoutedEventHandler(textbox_LostFocus);
+                pin.LostFocus += new RoutedEventHandler(pin_LostFocus);
+            }
+
             this.Unloaded += new RoutedEventHandler(window_content_Unloaded);
             this.Loaded += new RoutedEventHandler(window_content_Loaded);
 
@@ -75,6 +84,17 @@ namespace nature_net.user_controls
             this.comments_listbox.comment_list = true;
 
             keyboard_frame = new ContentControl();
+            pin.center = center_keyboard;
+
+            this.comment_textbox_default.SizeChanged += new SizeChangedEventHandler(comment_textbox_SizeChanged);
+            this.comment_textbox_reply.SizeChanged += new SizeChangedEventHandler(comment_textbox_SizeChanged);
+            this.comments_listbox.SizeChanged += new SizeChangedEventHandler(comment_textbox_SizeChanged);
+        }
+
+        void comment_textbox_SizeChanged(object sender, SizeChangedEventArgs e)
+        {
+            if (keyboard != null)
+                keyboard.MoveAlongWith(parent, center_keyboard);
         }
 
         void window_content_Loaded(object sender, RoutedEventArgs e)
@@ -88,9 +108,22 @@ namespace nature_net.user_controls
                 window_manager.main_canvas.Children.Remove(keyboard_frame);
         }
 
+        void pin_LostFocus(object sender, RoutedEventArgs e)
+        {
+            if (pin.numpad_frame != null)
+                pin.numpad_frame.Visibility = System.Windows.Visibility.Collapsed;
+        }
+
+        void textbox_LostFocus(object sender, RoutedEventArgs e)
+        {
+            if (!comment_textbox_reply.IsFocused && !comment_textbox_default.IsFocused)// && !textbox_password.IsFocused)
+                keyboard_frame.Visibility = System.Windows.Visibility.Collapsed;
+        }
+
         void comment_textbox_GotKeyboardFocus(object sender, RoutedEventArgs e)
         {
             virtual_keyboard.ShowKeyboard(this, ref keyboard);
+            keyboard.parent_frame = keyboard_frame;
             if (keyboard.init_text_checker == null) keyboard.init_text_checker = new InitialTextCheck(this.CheckInitialText);
             keyboard_frame.Visibility = System.Windows.Visibility.Visible;
             CheckInitialText();
@@ -145,7 +178,9 @@ namespace nature_net.user_controls
             else
             {
                 this.error_desc.Visibility = System.Windows.Visibility.Visible;
-                this.error_desc.Content = "Authentication Failed.";
+                this.error_desc.Content = configurations.authentication_failed_text;
+                pin.Reset(true);
+                error_timer = new System.Threading.Timer(new System.Threading.TimerCallback(this.fade_error), null, 5000, System.Threading.Timeout.Infinite);
             }
         }
 
@@ -292,10 +327,12 @@ namespace nature_net.user_controls
         {
             //this.the_item.Content = uc;
             this.hide_expander = is_design;
-            this.expander.Visibility = System.Windows.Visibility.Collapsed;
+            //this.expander.Visibility = System.Windows.Visibility.Collapsed;
+            this.expander_metadata_panel.Visibility = System.Windows.Visibility.Collapsed;
             this.comments_listbox.Height = 0;
             this.comment_textbox_default.Text = configurations.design_idea_init_text;
             this.comment_textbox_reply.Text = configurations.design_idea_init_text;
+            
             //this.add_comment_img.Source = configurations.img_drop_avatar_pic;
             //var brush = new ImageBrush();
             //brush.ImageSource = configurations.img_drop_avatar_pic;
@@ -315,33 +352,71 @@ namespace nature_net.user_controls
         // add an initial comment (that's not actually a comment; it is used to show a contribution's user provided attributes)
         public void initialize_comments(Contribution the_contribution)
         {
-            string comment = "";
+            //string comment = "";
+            //if (the_contribution.note != null && the_contribution.note != "")
+            //    comment = the_contribution.note + "\r\n";
+            //comment += configurations.contribution_comment_date;
+            //comment += the_contribution.date.ToString();
+            //comment += "\r\n";
+            //if (the_contribution.tags != "")
+            //    comment = comment + configurations.contribution_comment_tag + the_contribution.tags + "\r\n";
+            //if (the_contribution.location_id != 0)
+            //    comment = comment + configurations.contribution_comment_location + the_contribution.location_id.ToString() + ": " + the_contribution.Location.name;
+            this.expander_metadata_panel.Background = Brushes.LightGray;
+            //Note
             if (the_contribution.note != null && the_contribution.note != "")
-                comment = the_contribution.note + "\r\n";
-            comment += configurations.contribution_comment_date;
-            comment += the_contribution.date.ToString();
-            comment += "\r\n";
-            if (the_contribution.tags != "")
-                comment = comment + configurations.contribution_comment_tag + the_contribution.tags + "\r\n";
+                metadata.Inlines.Add("Note: " + the_contribution.note);
+            else
+                metadata.Inlines.Add("Note: [Empty]");
+            metadata.Inlines.Add(new LineBreak());
+            //User and date
+            User u = configurations.find_user_of_contribution(the_contribution);
+            if (u == null)
+            {
+                metadata.Inlines.Add("Date: ");
+                metadata.Inlines.Add(new Bold(new Run(the_contribution.date.ToString())));
+            }
+            else
+            {
+                metadata.Inlines.Add(configurations.contribution_comment_user);
+                metadata.Inlines.Add(new Bold(new Run(u.name)));
+                metadata.Inlines.Add(" " + configurations.contribution_comment_date);
+                metadata.Inlines.Add(new Bold(new Run(the_contribution.date.ToString())));
+            }
+            metadata.Inlines.Add(new LineBreak());
+            //location
             if (the_contribution.location_id != 0)
-                comment = comment + configurations.contribution_comment_location + the_contribution.location_id.ToString() + ": " + the_contribution.Location.name;
+                metadata.Inlines.Add(configurations.contribution_comment_location + the_contribution.location_id.ToString() + ": " + the_contribution.Location.name);
+            else
+                metadata.Inlines.Add(configurations.contribution_comment_location + "not specified.");
+            metadata.Inlines.Add(new LineBreak());
+            //tags
+            if (the_contribution.tags != "")
+            {
+                metadata.Inlines.Add(configurations.contribution_comment_tag);
+                metadata.Inlines.Add(new Bold(new Run(the_contribution.tags)));
+            }
+            else
+            {
+                metadata.Inlines.Add(configurations.contribution_comment_tag + "[Empty]");
+            }
+            
+            //item_generic i = new item_generic();
+            //i.desc.Visibility = System.Windows.Visibility.Collapsed;
+            //i.top_panel.Visibility = System.Windows.Visibility.Collapsed;
+            //i.content.Text = comment;
+            //i.BorderBrush = Brushes.Gray;
+            //i.BorderThickness = new Thickness(0, 0, 0, 1);
+            //i.Margin = new Thickness(5, 7, 5, 0);
 
-            item_generic i = new item_generic();
-            i.desc.Visibility = System.Windows.Visibility.Collapsed;
-            i.top_panel.Visibility = System.Windows.Visibility.Collapsed;
-            i.content.Text = comment;
-            i.BorderBrush = Brushes.Gray;
-            i.BorderThickness = new Thickness(0, 0, 0, 1);
-            i.Margin = new Thickness(5, 7, 5, 0);
-
-            this.comments_listbox.populator.initial_item = i;
+            //this.comments_listbox.populator.initial_item = i;
         }
 
         public void list_all_comments()
         {
             comment_item i = new comment_item();
             i._object_id = this._object_id; i._object_type = this._object_type;
-            this.comments_listbox.populator.item_width = this.comments_listbox.Width;
+            this.comments_listbox.populator.item_width = this.comments_listbox._list.Width - 4;
             this.comments_listbox.populator.total_number = this.number_comments;
             this.comments_listbox.populator.reply_clicked_handler = new reply_clicked(this.replybutton_clicked);
             this.comments_listbox.populator.list_all_comments(i);
@@ -451,13 +526,17 @@ namespace nature_net.user_controls
             this.is_reply = true;
 
             reply_item.Background = Brushes.White;
-            reply_item.username.Text = i.username.Text;
+            reply_item.username.Text = "";
+            reply_item.username.Inlines.Add(i.username.Inlines.FirstInline);
+            reply_item.username.Inlines.Add(i.username.Inlines.LastInline);
             reply_item.user_desc.Visibility = Visibility.Collapsed; //i.user_desc.Content = configurations.GetDate_Formatted(cig.comment.date);
             reply_item.number.Text = i.number.Text; //i.number.Visibility = System.Windows.Visibility.Collapsed;
+            reply_item.number.FontSize = configurations.design_idea_item_user_info_font_size;
             reply_item.desc.Visibility = Visibility.Collapsed;// i.desc.Content = "Commented:";
             reply_item.topleft_panel.VerticalAlignment = VerticalAlignment.Top;
             reply_item.top_panel.Margin = new Thickness(5, 10, 5, 10);
-            reply_item.content.Text = i.content.Text;
+            //reply_item.content.Text = i.content.Text;
+            reply_item.content.Visibility = System.Windows.Visibility.Collapsed;
             //if (item_width != 0) i.Width = item_width + 2;
             reply_item.avatar.Source = i.avatar.Source;
             reply_item.Tag = i.Tag;
@@ -532,6 +611,16 @@ namespace nature_net.user_controls
             }
             else
                 return false;
+        }
+
+        public void fade_error(Object stateInfo)
+        {
+            this.error_desc.Dispatcher.BeginInvoke(DispatcherPriority.Normal,
+               new System.Action(() =>
+               {
+                   this.error_desc.Content = "";
+                   this.error_desc.Visibility = System.Windows.Visibility.Collapsed;
+               }));
         }
     }
 }

@@ -46,6 +46,8 @@ namespace nature_net.user_controls.v_keyboard
         public backspace_hit backspace_hit_handler;
         public submit_hit submit_hit_handler;
 
+        public ContentControl parent_frame;
+
         public virtual_numpad()
         {
             InitializeComponent();
@@ -89,6 +91,8 @@ namespace nature_net.user_controls.v_keyboard
                 this.Inject(((char)key_code.ShiftedCodePoint).ToString());
             else
                 this.Inject(((char)key_code.UnshiftedCodePoint).ToString());
+            if (parent_frame != null)
+                window_manager.UpdateZOrder(parent_frame, true);
         }
 
         private KeyAssignment get_key(double x, double y, TouchDevice td)
@@ -267,7 +271,7 @@ namespace nature_net.user_controls.v_keyboard
             //textbox.Text = sOriginalContent.Insert(iCaretIndex, sStuffToInsert);
         }
 
-        public void MoveAlongWith(UserControl parent)
+        public void MoveAlongWith(UserControl parent, bool center)
         {
             if (parent == null) return;
             MatrixTransform parent_matrix = (MatrixTransform)parent.RenderTransform;
@@ -275,9 +279,13 @@ namespace nature_net.user_controls.v_keyboard
             matrix.M11 = parent_matrix.Matrix.M11; matrix.M12 = parent_matrix.Matrix.M12;
             matrix.M21 = parent_matrix.Matrix.M21; matrix.M22 = parent_matrix.Matrix.M22;
             matrix.OffsetX = parent_matrix.Matrix.OffsetX; matrix.OffsetY = parent_matrix.Matrix.OffsetY;
-            double dx = (parent.ActualWidth / 2) - (this.ActualWidth / 2);
+            double dx = 0;
+            if (center)
+                dx = (parent.ActualWidth / 2) - (this.ActualWidth / 2);
             matrix.TranslatePrepend(dx, parent.ActualHeight);
             this.RenderTransform = new MatrixTransform(matrix);
+            if (parent_frame != null)
+                window_manager.UpdateZOrder(parent_frame, true);
         }
     }
 

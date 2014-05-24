@@ -14,7 +14,10 @@
             </StackPanel>
             <Border Name="right_panel_border" DockPanel.Dock="Right">
                 <DockPanel Name="right_panel" LastChildFill="True">
-                    <StackPanel Name="info_panel" DockPanel.Dock="Bottom" VerticalAlignment="Bottom">
+                    <StackPanel Name="drag_icon_vertical_panel" DockPanel.Dock="Right" VerticalAlignment="Center" Visibility="Visible">
+                        <Image Name="drag_icon_vertical" Margin="-5,0,0,0" Width="10" Height="30" ></Image>
+                    </StackPanel>
+                    <StackPanel Name="info_panel" DockPanel.Dock="Bottom" VerticalAlignment="Bottom" HorizontalAlignment="Center">
                         <TextBlock Name="txt_level2" TextWrapping="Wrap" HorizontalAlignment="Center">25 Nov 2013</TextBlock>
                         <TextBlock Name="txt_level3" TextWrapping="Wrap" HorizontalAlignment="Center">View Replies</TextBlock>
                     </StackPanel>

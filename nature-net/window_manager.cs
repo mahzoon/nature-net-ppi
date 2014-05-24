@@ -77,7 +77,7 @@ namespace nature_net
         {
             if (window_manager.image_frames.Count + 1 > configurations.max_image_display_frame)
                 return;
-
+            
             //window_frame frame = new window_frame();
             window_content content = new window_content();
             //contribution_view m = new contribution_view();

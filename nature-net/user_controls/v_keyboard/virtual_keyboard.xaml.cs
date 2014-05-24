@@ -50,6 +50,8 @@ namespace nature_net.user_controls
         public InitialTextCheck init_text_checker;
         public CharacterValidation validation_checker;
 
+        public ContentControl parent_frame;
+
         public virtual_keyboard()
         {
             InitializeComponent();
@@ -144,6 +146,8 @@ namespace nature_net.user_controls
                 else
                     this.Inject(((char)key_code.UnshiftedCodePoint).ToString());
             }
+            if (parent_frame != null)
+                window_manager.UpdateZOrder(parent_frame, true);
         }
 
         private KeyAssignment get_key(double x, double y, TouchDevice td)
@@ -327,6 +331,8 @@ namespace nature_net.user_controls
                 dx = (parent.ActualWidth / 2) - (this.Width / 2);
             matrix.TranslatePrepend(dx, parent.ActualHeight);
             this.RenderTransform = new MatrixTransform(matrix);
+            if (parent_frame != null)
+                window_manager.UpdateZOrder(parent_frame, true);
         }
     }
 

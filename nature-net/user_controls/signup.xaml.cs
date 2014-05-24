@@ -38,12 +38,16 @@ namespace nature_net.user_controls
             textbox_email.GotFocus += new RoutedEventHandler(textbox_GotFocus);
             //textbox_password.GotFocus += new RoutedEventHandler(textbox_GotFocus);
             user_pin.GotFocus += new RoutedEventHandler(user_pin_GotFocus);
-            textbox_name.LostFocus += new RoutedEventHandler(textbox_LostFocus);
-            textbox_email.LostFocus += new RoutedEventHandler(textbox_LostFocus);
-            //textbox_password.LostFocus += new RoutedEventHandler(textbox_LostFocus);
-            user_pin.LostFocus += new RoutedEventHandler(user_pin_LostFocus);
+
+            if (!configurations.multi_keyboard)
+            {
+                textbox_name.LostFocus += new RoutedEventHandler(textbox_LostFocus);
+                textbox_email.LostFocus += new RoutedEventHandler(textbox_LostFocus);
+                //textbox_password.LostFocus += new RoutedEventHandler(textbox_LostFocus);
+                user_pin.LostFocus += new RoutedEventHandler(user_pin_LostFocus);
+                avatar_image.LostFocus += new RoutedEventHandler(avatar_image_LostFocus);
+            }
             avatar_image.GotFocus += new RoutedEventHandler(avatar_image_GotFocus);
-            avatar_image.LostFocus += new RoutedEventHandler(avatar_image_LostFocus);
 
             this.button_submit.PreviewTouchDown += new EventHandler<TouchEventArgs>(button_submit_Click);
             this.button_next1.PreviewTouchDown += new EventHandler<TouchEventArgs>(button_next1_Click);
@@ -67,6 +71,7 @@ namespace nature_net.user_controls
             avatar_list_control.return_value = this.avatar_image;
             avatar_frame = new ContentControl();
             this.avatar_frame.Content = avatar_list_control;
+            avatar_list_control.parent_frame = avatar_frame;
             window_manager.main_canvas.Children.Add(avatar_frame);
             avatar_frame.Visibility = System.Windows.Visibility.Hidden;
             avatar_image.Source = configurations.img_choose_avatar_pic;
@@ -74,27 +79,33 @@ namespace nature_net.user_controls
 
         void user_pin_LostFocus(object sender, RoutedEventArgs e)
         {
-            if (user_pin.numpad_frame != null)
-                user_pin.numpad_frame.Visibility = System.Windows.Visibility.Collapsed;
+            if (!user_pin.numpad_frame.IsFocused)
+                if (user_pin.numpad_frame != null)
+                    user_pin.numpad_frame.Visibility = System.Windows.Visibility.Collapsed;
         }
 
         void user_pin_GotFocus(object sender, RoutedEventArgs e)
         {
+            avatar_image_LostFocus(null, null);
+            textbox_LostFocus(null, null);
             if (user_pin.numpad_frame != null)
                 user_pin.numpad_frame.Visibility = System.Windows.Visibility.Visible;
             else
                 user_pin.Reset(true);
-            user_pin.numpad.MoveAlongWith(parent);
+            user_pin.numpad.MoveAlongWith(parent, true);
         }
 
         void avatar_image_LostFocus(object sender, RoutedEventArgs e)
         {
             if (!avatar_frame.IsFocused)
-                avatar_frame.Visibility = System.Windows.Visibility.Collapsed;
+                if (avatar_frame != null)
+                    avatar_frame.Visibility = System.Windows.Visibility.Collapsed;
         }
 
         void avatar_image_GotFocus(object sender, RoutedEventArgs e)
         {
+            user_pin_LostFocus(null, null);
+            textbox_LostFocus(null, null);
             avatar_frame.Visibility = System.Windows.Visibility.Visible;
             avatar_list_control.MoveAlongWith(parent);
         }
@@ -162,15 +173,19 @@ namespace nature_net.user_controls
         void textbox_LostFocus(object sender, RoutedEventArgs e)
         {
             if (!textbox_email.IsFocused && !textbox_name.IsFocused)// && !textbox_password.IsFocused)
-                keyboard_frame.Visibility = System.Windows.Visibility.Collapsed;
+                if (keyboard_frame != null)
+                    keyboard_frame.Visibility = System.Windows.Visibility.Collapsed;
         }
 
         void textbox_GotFocus(object sender, RoutedEventArgs e)
         {
+            avatar_image_LostFocus(null, null);
+            user_pin_LostFocus(null, null);
             focused_textbox = (Control)sender;
             if (keyboard_frame == null)
                 keyboard_frame = new ContentControl();
             virtual_keyboard.ShowKeyboard(this, ref keyboard);
+            keyboard.parent_frame = keyboard_frame;
             if (keyboard.validation_checker == null) keyboard.validation_checker = new CharacterValidation(this.ValidateString);
             keyboard_frame.Visibility = System.Windows.Visibility.Visible;
             if (keyboard != null)
@@ -262,6 +277,12 @@ namespace nature_net.user_controls
         {
             reset();
             this.user_pin.Reset(false);
+            if (configurations.multi_keyboard)
+            {
+                if (keyboard_frame != null)
+                    keyboard_frame.Visibility = System.Windows.Visibility.Collapsed;
+            }
+            this.button_back2.Focus();
             this.consent_form_2.Visibility = System.Windows.Visibility.Visible;
             this.step1.FontWeight = FontWeights.Normal;
             this.step2.FontWeight = FontWeights.ExtraBold;
@@ -339,13 +360,13 @@ namespace nature_net.user_controls
 
             string consent_checkboxes = "";
             if (checkbox_agreement1.IsChecked.Value)
-                consent_checkboxes = consent_checkboxes + GetTextBlockText((TextBlock)(checkbox_agreement1.Content)) + ";" ;
+                consent_checkboxes = consent_checkboxes + configurations.GetTextBlockText((TextBlock)(checkbox_agreement1.Content)) + ";" ;
             if (checkbox_agreement2.IsChecked.Value)
-                consent_checkboxes = consent_checkboxes + GetTextBlockText((TextBlock)(checkbox_agreement2.Content)) + ";";
+                consent_checkboxes = consent_checkboxes + configurations.GetTextBlockText((TextBlock)(checkbox_agreement2.Content)) + ";";
             if (checkbox_agreement3.IsChecked.Value)
-                consent_checkboxes = consent_checkboxes + GetTextBlockText((TextBlock)(checkbox_agreement3.Content)) + ";";
+                consent_checkboxes = consent_checkboxes + configurations.GetTextBlockText((TextBlock)(checkbox_agreement3.Content)) + ";";
             if (checkbox_agreement4.IsChecked.Value)
-                consent_checkboxes = consent_checkboxes + GetTextBlockText((TextBlock)(checkbox_agreement4.Content));
+                consent_checkboxes = consent_checkboxes + configurations.GetTextBlockText((TextBlock)(checkbox_agreement4.Content));
 
             u.technical_info = textbox_name.Text + " signed the consent form on " + DateTime.Now.ToString() + "; " + consent_checkboxes;
 
@@ -383,23 +404,7 @@ namespace nature_net.user_controls
                 avatar_frame.Visibility = System.Windows.Visibility.Hidden;
         }
 
-        private string GetTextBlockText(TextBlock tb)
-        {
-            StringBuilder s = new StringBuilder();
-            foreach (var line in tb.Inlines)
-            {
-                if (line is LineBreak)
-                {
-                    s.Append("\r\n");
-                }
-                else if (line is Run)
-                {
-                    Run text = (Run)line;
-                    s.Append(text.Text);
-                }
-            }
-            return s.ToString();
-        }
+        
 
         private bool IsValid(string emailaddress)
         {

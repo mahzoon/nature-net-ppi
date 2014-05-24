@@ -15,7 +15,8 @@ namespace nature_net
         static string config_file = "config.ini";
         public static string line_break = "\r\n";
         static string log_file = "log.txt";
-        public static string contribution_comment_date = "Taken by: ";
+        public static string contribution_comment_date = "On ";
+        public static string contribution_comment_user = "Taken by ";
         public static string contribution_comment_tag = "Tags: ";
         public static string contribution_comment_location = "Location ";
         public static string designidea_date_desc = "Last Update: ";
@@ -25,6 +26,7 @@ namespace nature_net
         public static string users_no_date = "Just Created"; 
         public static string activities_date_desc = "Last Update: ";
         public static string activities_num_desc = "Contributions";
+        public static string authentication_failed_text = "Whoops! That PIN was incorrect. Please try again.";
 
         public static string signup_item_title = "Sign up";
         public static string submit_idea_item_title = "Submit Idea";
@@ -32,7 +34,7 @@ namespace nature_net
 
         public static string design_idea_listbox_header = "Design Ideas sorted by";
         public static string users_listbox_header = "Users sorted by";
-        public static string activities_listbox_header = "Users sorted by";
+        public static string activities_listbox_header = "Activities sorted by";
 
         public static string design_idea_lisbox_top_text = "Popular";
 
@@ -59,6 +61,7 @@ namespace nature_net
         public static bool use_existing_thumbnails = true;
         public static double drag_dy_dx_factor = 2.1;
         //public static double drag_dx_dy_factor = 1.0;
+        public static int max_thread_reply = 3;
 
         public static double drag_collection_theta = 5;
         public static double scroll_scale_factor = 5;
@@ -76,6 +79,8 @@ namespace nature_net
         public static bool right_panel_drag = true;
         public static bool whole_item_drag = false;
         public static bool center_commentarea_and_keyboard = false;
+        public static bool multi_keyboard = false;
+        public static bool show_vertical_drag = true;
         
         public static bool use_avatar_drag = false;
 
@@ -135,6 +140,7 @@ namespace nature_net
         static string thumbs_up_icon = "tu.jpg";
         static string thumbs_down_icon = "td.jpg";
         static string drag_icon = "drag.png";
+        static string drag_vertical_icon = "drag_vertical.png";
         static string comment_icon = "comment.png";
         static string reply_icon = "reply.png";
 
@@ -162,6 +168,7 @@ namespace nature_net
         public static ImageSource img_thumbs_up_icon;
         public static ImageSource img_thumbs_down_icon;
         public static ImageSource img_drag_icon;
+        public static ImageSource img_drag_vertical_icon;
         public static ImageSource img_comment_icon;
         public static ImageSource img_reply_icon;
 
@@ -176,13 +183,13 @@ namespace nature_net
         public static string title_font_name = "Calibri";
         public static Brush right_panel_background = Brushes.LightGray;
         public static Brush right_panel_border_color = Brushes.Gray;
-        public static double right_panel_width = 80;
+        public static double right_panel_width = 90;
         public static double user_item_avatar_width = 60;
         public static double comment_item_avatar_width = 20;
         public static double design_idea_item_title_font_size = 17;
         public static double design_idea_item_user_info_font_size = 10;
         public static double design_idea_item_avatar_width = 30;
-        public static double design_idea_right_panel_width = 45;
+        public static double design_idea_right_panel_width = 55;
 
         public static Random RAND = new Random();
         public static int SEED()
@@ -272,6 +279,7 @@ namespace nature_net
             img_thumbs_down_icon = new BitmapImage(new Uri(configurations.GetAbsoluteImagePath() + thumbs_down_icon));
             img_thumbs_down_icon = new BitmapImage(new Uri(configurations.GetAbsoluteImagePath() + thumbs_down_icon));
             img_drag_icon = new BitmapImage(new Uri(configurations.GetAbsoluteImagePath() + drag_icon));
+            img_drag_vertical_icon = new BitmapImage(new Uri(configurations.GetAbsoluteImagePath() + drag_vertical_icon));
             img_comment_icon = new BitmapImage(new Uri(configurations.GetAbsoluteImagePath() + comment_icon));
             img_reply_icon = new BitmapImage(new Uri(configurations.GetAbsoluteImagePath() + reply_icon));
         }
@@ -664,6 +672,7 @@ namespace nature_net
             max_image_display_frame = parser.GetValue("Parameters", "max_image_display_frame", 10);
             max_design_ideas_frame = parser.GetValue("Parameters", "max_design_ideas_frame", 10);
             max_activity_frame = parser.GetValue("Parameters", "max_activity_frame", 10);
+            max_thread_reply = parser.GetValue("Parameters", "max_thread_reply", 3);
             max_activity_frame_title_chars = parser.GetValue("Parameters", "max_activity_frame_title_chars", 10);
             //thumbnail_pixel_width = parser.GetValue("Parameters", "thumbnail_pixel_width",100);
             thumbnail_pixel_height = parser.GetValue("Parameters", "thumbnail_pixel_height", 100);
@@ -684,6 +693,8 @@ namespace nature_net
             right_panel_drag = parser.GetValue("Parameters", "right_panel_drag", true);
             whole_item_drag = parser.GetValue("Parameters", "whole_item_drag", false);
             center_commentarea_and_keyboard = parser.GetValue("Parameters", "center_commentarea_and_keyboard", false);
+            multi_keyboard = parser.GetValue("Parameters", "multi_keyboard", false);
+            show_vertical_drag = parser.GetValue("Parameters", "show_vertical_drag", true);
             update_period_ms = parser.GetValue("Parameters", "update_period_ms", 20000);
             scaling_mode = parser.GetValue("Parameters", "scaling_mode", BitmapScalingMode.Fant);
             click_opacity_on_collection_item = parser.GetValue("Parameters", "click_opacity_on_collection_item", 0.8);
@@ -730,6 +741,7 @@ namespace nature_net
             thumbs_up_icon = parser.GetValue("Files", "thumbs_up_icon", "tu.jpg");
             thumbs_down_icon = parser.GetValue("Files", "thumbs_down_icon", "td.jpg");
             drag_icon = parser.GetValue("Files", "drag_icon", "drag.png");
+            drag_vertical_icon = parser.GetValue("Files", "drag_vertical_icon", "drag_vertical.png");
             comment_icon = parser.GetValue("Files", "comment_icon", "comment.png");
             reply_icon = parser.GetValue("Files", "reply_icon", "reply.png");
             keyboard_click_wav = parser.GetValue("Files", "keyboard_click_wav", "click.wav");
@@ -776,6 +788,7 @@ namespace nature_net
             parser.SetValue("Parameters", "max_image_display_frame", max_image_display_frame);
             parser.SetValue("Parameters", "max_design_ideas_frame", max_design_ideas_frame);
             parser.SetValue("Parameters", "max_activity_frame", max_activity_frame);
+            parser.SetValue("Parameters", "max_thread_reply", max_thread_reply);
             parser.SetValue("Parameters", "max_activity_frame_title_chars", max_activity_frame_title_chars);
             //parser.SetValue("Parameters", "thumbnail_pixel_width",thumbnail_pixel_width);
             parser.SetValue("Parameters", "thumbnail_pixel_height", thumbnail_pixel_height);
@@ -796,6 +809,8 @@ namespace nature_net
             parser.SetValue("Parameters", "right_panel_drag", right_panel_drag);
             parser.SetValue("Parameters", "whole_item_drag", whole_item_drag);
             parser.SetValue("Parameters", "center_commentarea_and_keyboard", center_commentarea_and_keyboard);
+            parser.SetValue("Parameters", "multi_keyboard", multi_keyboard);
+            parser.SetValue("Parameters", "show_vertical_drag", show_vertical_drag);
             parser.SetValue("Parameters", "update_period_ms", update_period_ms);
             parser.SetValue("Parameters", "scaling_mode", scaling_mode);
             parser.SetValue("Parameters", "click_opacity_on_collection_item", click_opacity_on_collection_item);
@@ -843,6 +858,7 @@ namespace nature_net
             parser.SetValue("Files", "thumbs_down_icon", thumbs_down_icon);
             parser.SetValue("Files", "keyboard_click_wav", keyboard_click_wav);
             parser.SetValue("Files", "drag_icon", drag_icon);
+            parser.SetValue("Files", "drag_vertical_icon", drag_vertical_icon);
             parser.SetValue("Files", "comment_icon", comment_icon);
             parser.SetValue("Files", "reply_icon", reply_icon);
 
@@ -874,6 +890,24 @@ namespace nature_net
             //catch (Exception) { return 0; }
             a = item.top_value;
             return a;
+        }
+
+        public static string GetTextBlockText(System.Windows.Controls.TextBlock tb)
+        {
+            StringBuilder s = new StringBuilder();
+            foreach (var line in tb.Inlines)
+            {
+                if (line is System.Windows.Documents.LineBreak)
+                {
+                    s.Append("\r\n");
+                }
+                else if (line is System.Windows.Documents.Run)
+                {
+                    System.Windows.Documents.Run text = (System.Windows.Documents.Run)line;
+                    s.Append(text.Text);
+                }
+            }
+            return s.ToString();
         }
 
         public static bool IsFirstItemGreaterThanSecond(nature_net.user_controls.item_generic_v2 first, nature_net.user_controls.item_generic_v2 second, bool atoz, bool top, bool recent, int len_number_prefix, int len_date_prefix, bool asc)
@@ -944,6 +978,17 @@ namespace nature_net
             //            //_list.Remove(_list[j]);
             //            //_list.Insert(j, item1);
             //        }
+        }
+
+        public static User find_user_of_contribution(Contribution c)
+        {
+            naturenet_dataclassDataContext db = new naturenet_dataclassDataContext();
+            var users = from mappings in db.Collection_Contribution_Mappings
+                           where mappings.contribution_id == c.id
+                           select mappings.Collection.User;
+            if (users == null) return null;
+            if (users.Count() == 0) return null;
+            return users.First<User>();
         }
     }
 }

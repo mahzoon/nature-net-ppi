@@ -7,16 +7,38 @@
              mc:Ignorable="d" 
              d:DesignHeight="300" d:DesignWidth="300">
 
-    <!--<UserControl.Resources>
+    <UserControl.Resources>
         <Style x:Key="NewListBox" TargetType="{x:Type ListBox}">
             <Setter Property="Template">
                 <Setter.Value>
                     <ControlTemplate TargetType="{x:Type ListBox}">
                         <DockPanel>
                             <Border DockPanel.Dock="Top">
-                                <uc:FadingScrollViewer Margin="1" FadedEdgeThickness="65" FadedEdgeOpacity="0" FadedEdgeFalloffSpeed="0.1" BorderThickness="5" BorderBrush="DarkGray"
-                                                       CanContentScroll="True" VerticalScrollBarVisibility="Hidden" HorizontalScrollBarVisibility="Disabled" Visibility="Visible" PanningMode="VerticalOnly" >
+                                <uc:FadingScrollViewer Margin="1" FadedEdgeThickness="50" FadedEdgeOpacity="0" FadedEdgeFalloffSpeed="0.1" BorderThickness="5" BorderBrush="DarkGray"
+                                                       CanContentScroll="False" VerticalScrollBarVisibility="Hidden" HorizontalScrollBarVisibility="Hidden" Visibility="Visible" >
                                     <ItemsPresenter />
+
+                                    <uc:FadingScrollViewer.Template>
+                                        <ControlTemplate TargetType="{x:Type ScrollViewer}">
+                                            <Grid x:Name="Grid" Background="{TemplateBinding Background}">
+                                                <Grid.ColumnDefinitions>
+                                                    <ColumnDefinition Width="*"/>
+                                                    <ColumnDefinition Width="Auto"/>
+                                                </Grid.ColumnDefinitions>
+                                                <Grid.RowDefinitions>
+                                                    <RowDefinition Height="*"/>
+                                                    <RowDefinition Height="Auto"/>
+                                                </Grid.RowDefinitions>
+
+                                                <Border x:Name="PART_ScrollContentPresenterContainer">
+                                                    <ScrollContentPresenter x:Name="PART_ScrollContentPresenter" CanContentScroll="{TemplateBinding CanContentScroll}" CanHorizontallyScroll="False" CanVerticallyScroll="False" ContentTemplate="{TemplateBinding ContentTemplate}" Content="{TemplateBinding Content}" Grid.Column="0" Margin="{TemplateBinding Padding}" Grid.Row="0"/>
+                                                </Border>
+
+                                                <ScrollBar x:Name="PART_VerticalScrollBar" AutomationProperties.AutomationId="VerticalScrollBar" Cursor="Arrow" Grid.Column="1" Maximum="{TemplateBinding ScrollableHeight}" Minimum="0" Grid.Row="0" Visibility="{TemplateBinding ComputedVerticalScrollBarVisibility}" Value="{Binding VerticalOffset, Mode=OneWay, RelativeSource={RelativeSource TemplatedParent}}" ViewportSize="{TemplateBinding ViewportHeight}"/>
+                                                <ScrollBar x:Name="PART_HorizontalScrollBar" AutomationProperties.AutomationId="HorizontalScrollBar" Cursor="Arrow" Grid.Column="0" Maximum="{TemplateBinding ScrollableWidth}" Minimum="0" Orientation="Horizontal" Grid.Row="1" Visibility="{TemplateBinding ComputedHorizontalScrollBarVisibility}" Value="{Binding HorizontalOffset, Mode=OneWay, RelativeSource={RelativeSource TemplatedParent}}" ViewportSize="{TemplateBinding ViewportWidth}"/>
+                                            </Grid>
+                                        </ControlTemplate>
+                                    </uc:FadingScrollViewer.Template>
                                 </uc:FadingScrollViewer>
                             </Border>
                         </DockPanel>
@@ -24,11 +46,10 @@
                 </Setter.Value>
             </Setter>
         </Style>
-    </UserControl.Resources>-->
+    </UserControl.Resources>
     
     <DockPanel>
-        <ListBox Name="_list_vertical" ScrollViewer.HorizontalScrollBarVisibility="Hidden" ScrollViewer.VerticalScrollBarVisibility="Hidden"
-                 ScrollViewer.CanContentScroll="False" ScrollViewer.PanningMode="VerticalOnly">
+        <ListBox Name="_list_vertical" Style="{StaticResource NewListBox}" uc:FadingScrollViewer.PanningMode="VerticalOnly">
             <ListBox.ItemContainerStyle>
                 <Style TargetType="{x:Type ListBoxItem}">
                     <Setter Property="Template">
@@ -58,8 +79,8 @@
         </ListBox>
 
         <ListBox Name="_list_horizontal" BorderThickness="0" Background="Transparent" BorderBrush="Transparent"
-                 ScrollViewer.HorizontalScrollBarVisibility="Hidden" ScrollViewer.VerticalScrollBarVisibility="Hidden"
-                 ScrollViewer.CanContentScroll="False" ScrollViewer.PanningMode="HorizontalOnly">
+                 Style="{StaticResource NewListBox}" uc:FadingScrollViewer.PanningMode="HorizontalOnly">
+            
             <ListBox.ItemContainerStyle>
                 <Style TargetType="{x:Type ListBoxItem}">
                     <Setter Property="Template">
