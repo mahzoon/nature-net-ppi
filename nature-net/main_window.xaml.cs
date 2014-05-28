@@ -101,7 +101,7 @@ namespace nature_net
             try
             {
                 change_update_status(true);
-                file_manager.retrieve_and_process_media_changes_from_googledrive();
+                //file_manager.retrieve_and_process_media_changes_from_googledrive();
                 this.left_tab.load_users();
                 this.left_tab.load_design_ideas();
 				this.left_tab.load_activities();

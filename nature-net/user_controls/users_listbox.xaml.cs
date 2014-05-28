@@ -125,22 +125,25 @@ namespace nature_net.user_controls
 
         void atoz_order()
         {
-            configurations.SortItemGenericList(this.users_list._list.Items,
-                true, false, false, configurations.users_num_desc.Length, configurations.users_date_desc.Length, true, true);
+            if (this.users_list._list.Items.Count > 0)
+                configurations.SortItemGenericList(this.users_list._list.Items,
+                    true, false, false, configurations.users_num_desc.Length, configurations.users_date_desc.Length, true, true);
             //this.users_list._list.Items.Refresh();
         }
 
         void top_order()
         {
-            configurations.SortItemGenericList(this.users_list._list.Items,
-                false, true, false, configurations.users_num_desc.Length, configurations.users_date_desc.Length, true, true);
+            if (this.users_list._list.Items.Count > 0)
+                configurations.SortItemGenericList(this.users_list._list.Items,
+                    false, true, false, configurations.users_num_desc.Length, configurations.users_date_desc.Length, true, true);
             //this.users_list._list.Items.Refresh();
         }
 
         void recent_order()
         {
-            configurations.SortItemGenericList(this.users_list._list.Items,
-                false, false, true, configurations.users_num_desc.Length, configurations.users_date_desc.Length, true, true);
+            if (this.users_list._list.Items.Count > 0)
+                configurations.SortItemGenericList(this.users_list._list.Items,
+                    false, false, true, configurations.users_num_desc.Length, configurations.users_date_desc.Length, true, true);
             //this.users_list._list.Items.Refresh();
         }
 

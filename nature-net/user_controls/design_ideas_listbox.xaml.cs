@@ -142,22 +142,25 @@ namespace nature_net.user_controls
 
         void atoz_order()
         {
-            configurations.SortItemGenericList(this.design_ideas_list._list.Items,
-                true, false, false, configurations.designidea_num_desc.Length, configurations.designidea_date_desc.Length, true, true);
+            if (this.design_ideas_list._list.Items.Count > 0)
+                configurations.SortItemGenericList(this.design_ideas_list._list.Items,
+                    true, false, false, configurations.designidea_num_desc.Length, configurations.designidea_date_desc.Length, true, true);
             //this.design_ideas_list._list.Items.Refresh();
         }
 
         void top_order()
         {
-            configurations.SortItemGenericList(this.design_ideas_list._list.Items,
-                false, true, false, configurations.designidea_num_desc.Length, configurations.designidea_date_desc.Length, true, true);
+            if (this.design_ideas_list._list.Items.Count > 0)
+                configurations.SortItemGenericList(this.design_ideas_list._list.Items,
+                    false, true, false, configurations.designidea_num_desc.Length, configurations.designidea_date_desc.Length, true, true);
             //this.design_ideas_list._list.Items.Refresh();
         }
 
         void recent_order()
         {
-            configurations.SortItemGenericList(this.design_ideas_list._list.Items,
-                false, false, true, configurations.designidea_num_desc.Length, configurations.designidea_date_desc.Length, true, true);
+            if (this.design_ideas_list._list.Items.Count > 0)
+                configurations.SortItemGenericList(this.design_ideas_list._list.Items,
+                    false, false, true, configurations.designidea_num_desc.Length, configurations.designidea_date_desc.Length, true, true);
             //this.design_ideas_list._list.Items.Refresh();
         }
 

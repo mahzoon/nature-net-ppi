@@ -527,8 +527,10 @@ namespace nature_net.user_controls
 
             reply_item.Background = Brushes.White;
             reply_item.username.Text = "";
-            reply_item.username.Inlines.Add(i.username.Inlines.FirstInline);
-            reply_item.username.Inlines.Add(i.username.Inlines.LastInline);
+            string text = configurations.GetTextBlockText2(i.username);
+            string[] texts = text.Split(new char[] { ':' });
+            reply_item.username.Inlines.Add(new Bold(new Run(texts[0] + ": ")));
+            reply_item.username.Inlines.Add(texts[1]);
             reply_item.user_desc.Visibility = Visibility.Collapsed; //i.user_desc.Content = configurations.GetDate_Formatted(cig.comment.date);
             reply_item.number.Text = i.number.Text; //i.number.Visibility = System.Windows.Visibility.Collapsed;
             reply_item.number.FontSize = configurations.design_idea_item_user_info_font_size;

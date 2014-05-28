@@ -1153,7 +1153,10 @@ namespace nature_net.user_controls
                         activity_item ai = new activity_item();
                         ai.activity = a;
                         ai.count = cnt;
-                        ai.username = n1.First().name;
+                        if (cnt != 0)
+                            ai.username = n1.First().name;
+                        else
+                            ai.username = "";
                         if (cnt != 0)
                             last_time = n1.First().date;
                         ai.last_date = last_time;

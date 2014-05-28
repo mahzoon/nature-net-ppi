@@ -910,6 +910,34 @@ namespace nature_net
             return s.ToString();
         }
 
+        public static string GetTextBlockText2(System.Windows.Controls.TextBlock tb)
+        {
+            Drawing textBlockDrawing = VisualTreeHelper.GetDrawing(tb);
+            var sb = new StringBuilder();
+            WalkDrawingForText(sb, textBlockDrawing);
+            return sb.ToString();
+        }
+
+        private static void WalkDrawingForText(StringBuilder sb, Drawing d)
+        {
+            var glyphs = d as GlyphRunDrawing;
+            if (glyphs != null)
+            {
+                sb.Append(glyphs.GlyphRun.Characters.ToArray());
+            }
+            else
+            {
+                var g = d as DrawingGroup;
+                if (g != null)
+                {
+                    foreach (Drawing child in g.Children)
+                    {
+                        WalkDrawingForText(sb, child);
+                    }
+                }
+            }
+        }
+
         public static bool IsFirstItemGreaterThanSecond(nature_net.user_controls.item_generic_v2 first, nature_net.user_controls.item_generic_v2 second, bool atoz, bool top, bool recent, int len_number_prefix, int len_date_prefix, bool asc)
         {
             if (atoz)

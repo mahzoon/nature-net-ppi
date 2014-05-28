@@ -71,8 +71,9 @@ namespace nature_net.user_controls
         {
             //this.activities_list._list.Items.SortDescriptions.Clear();
             //this.activities_list._list.Items.SortDescriptions.Add(new SortDescription("username", ListSortDirection.Descending));
-            configurations.SortItemGenericList(this.activities_list._list.Items,
-                true, false, false, configurations.activities_num_desc.Length, configurations.activities_date_desc.Length, atoz_asc, true);
+            if (this.activities_list._list.Items.Count > 0)
+                configurations.SortItemGenericList(this.activities_list._list.Items,
+                    true, false, false, configurations.activities_num_desc.Length, configurations.activities_date_desc.Length, atoz_asc, true);
             //this.activities_list._list.Items.Refresh();
         }
 
@@ -80,8 +81,9 @@ namespace nature_net.user_controls
         {
             //this.activities_list._list.Items.SortDescriptions.Clear();
             //this.activities_list._list.Items.SortDescriptions.Add(new SortDescription("number", ListSortDirection.Ascending));
-            configurations.SortItemGenericList(this.activities_list._list.Items,
-                false, true, false, configurations.activities_num_desc.Length, configurations.activities_date_desc.Length, top_asc, true);
+            if (this.activities_list._list.Items.Count > 0)
+                configurations.SortItemGenericList(this.activities_list._list.Items,
+                    false, true, false, configurations.activities_num_desc.Length, configurations.activities_date_desc.Length, top_asc, true);
             //this.activities_list._list.Items.Refresh();
         }
 
@@ -89,8 +91,9 @@ namespace nature_net.user_controls
         {
             //this.activities_list._list.Items.SortDescriptions.Clear();
             //this.activities_list._list.Items.SortDescriptions.Add(new SortDescription("user_desc", ListSortDirection.Descending));
-            configurations.SortItemGenericList(this.activities_list._list.Items,
-                false, false, true, configurations.activities_num_desc.Length, configurations.activities_date_desc.Length, recent_asc, true);
+            if (this.activities_list._list.Items.Count > 0)
+                configurations.SortItemGenericList(this.activities_list._list.Items,
+                    false, false, true, configurations.activities_num_desc.Length, configurations.activities_date_desc.Length, recent_asc, true);
             //this.activities_list._list.Items.Refresh();
         }
 
