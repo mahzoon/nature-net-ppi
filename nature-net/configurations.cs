@@ -18,7 +18,7 @@ namespace nature_net
         public static string contribution_comment_date = "On ";
         public static string contribution_comment_user = "Taken by ";
         public static string contribution_comment_tag = "Tags: ";
-        public static string contribution_comment_location = "Location ";
+        public static string contribution_comment_location = "At ";
         public static string designidea_date_desc = "Last Update: ";
         public static string designidea_num_desc = "replies";
         public static string users_date_desc = "Last Update: ";
@@ -81,7 +81,8 @@ namespace nature_net
         public static bool center_commentarea_and_keyboard = false;
         public static bool multi_keyboard = false;
         public static bool show_vertical_drag = true;
-        
+        public static bool show_empty_metadata = false;
+        public static bool show_all_metadata = false;
         public static bool use_avatar_drag = false;
 
         public static List<Point> locations = new List<Point>();
@@ -695,6 +696,8 @@ namespace nature_net
             center_commentarea_and_keyboard = parser.GetValue("Parameters", "center_commentarea_and_keyboard", false);
             multi_keyboard = parser.GetValue("Parameters", "multi_keyboard", false);
             show_vertical_drag = parser.GetValue("Parameters", "show_vertical_drag", true);
+            show_empty_metadata = parser.GetValue("Parameters", "show_empty_metadata", false);
+            show_all_metadata = parser.GetValue("Parameters", "show_all_metadata", false);
             update_period_ms = parser.GetValue("Parameters", "update_period_ms", 20000);
             scaling_mode = parser.GetValue("Parameters", "scaling_mode", BitmapScalingMode.Fant);
             click_opacity_on_collection_item = parser.GetValue("Parameters", "click_opacity_on_collection_item", 0.8);
@@ -811,6 +814,8 @@ namespace nature_net
             parser.SetValue("Parameters", "center_commentarea_and_keyboard", center_commentarea_and_keyboard);
             parser.SetValue("Parameters", "multi_keyboard", multi_keyboard);
             parser.SetValue("Parameters", "show_vertical_drag", show_vertical_drag);
+            parser.SetValue("Parameters", "show_empty_metadata", show_empty_metadata);
+            parser.SetValue("Parameters", "show_all_metadata", show_all_metadata);
             parser.SetValue("Parameters", "update_period_ms", update_period_ms);
             parser.SetValue("Parameters", "scaling_mode", scaling_mode);
             parser.SetValue("Parameters", "click_opacity_on_collection_item", click_opacity_on_collection_item);

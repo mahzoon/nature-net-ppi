@@ -20,7 +20,12 @@
                     <TextBlock Name="comment_text2" VerticalAlignment="Center">)</TextBlock>
                 </StackPanel>
             </Button>
-            <TextBlock Name="metadata"  DockPanel.Dock="Right" TextWrapping="Wrap" Margin="5"></TextBlock>
+            <StackPanel Margin="5" DockPanel.Dock="Right" VerticalAlignment="Center">
+                <TextBlock Name="metadata1" TextWrapping="Wrap" VerticalAlignment="Center"></TextBlock>
+                <TextBlock Name="metadata2" TextWrapping="Wrap" VerticalAlignment="Center"></TextBlock>
+                <TextBlock Name="metadata3" TextWrapping="Wrap" VerticalAlignment="Center"></TextBlock>
+                <TextBlock Name="metadata4" TextWrapping="Wrap" VerticalAlignment="Center"></TextBlock>
+            </StackPanel>
         </DockPanel>
         <DockPanel Name="comments_section" DockPanel.Dock="Top">
 

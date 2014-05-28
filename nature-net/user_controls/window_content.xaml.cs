@@ -42,6 +42,9 @@ namespace nature_net.user_controls
         
         public bool center_keyboard = true;
 
+        private bool should_show_metadata3 = true;
+        private bool should_show_metadata4 = true;
+
         public window_content()
         {
             InitializeComponent();
@@ -365,40 +368,67 @@ namespace nature_net.user_controls
             this.expander_metadata_panel.Background = Brushes.LightGray;
             //Note
             if (the_contribution.note != null && the_contribution.note != "")
-                metadata.Inlines.Add("Note: " + the_contribution.note);
+                metadata1.Text = the_contribution.note;
             else
-                metadata.Inlines.Add("Note: [Empty]");
-            metadata.Inlines.Add(new LineBreak());
+            {
+                if (configurations.show_empty_metadata)
+                    metadata1.Text = "[Empty]";
+                else
+                    metadata1.Visibility = System.Windows.Visibility.Collapsed;
+            }
+            //metadata.Inlines.Add(new LineBreak());
+
             //User and date
             User u = configurations.find_user_of_contribution(the_contribution);
+            string date1 = configurations.GetDate_Formatted(the_contribution.date);
+            string date2 = the_contribution.date.ToString("hh:mm tt");
             if (u == null)
             {
-                metadata.Inlines.Add("Date: ");
-                metadata.Inlines.Add(new Bold(new Run(the_contribution.date.ToString())));
+                //metadata.Inlines.Add("Date: ");
+                metadata2.Inlines.Add(new Bold(new Run(date1 + " " + date2)));
             }
             else
             {
-                metadata.Inlines.Add(configurations.contribution_comment_user);
-                metadata.Inlines.Add(new Bold(new Run(u.name)));
-                metadata.Inlines.Add(" " + configurations.contribution_comment_date);
-                metadata.Inlines.Add(new Bold(new Run(the_contribution.date.ToString())));
+                metadata2.Inlines.Add(configurations.contribution_comment_user);
+                metadata2.Inlines.Add(new Bold(new Run(u.name)));
+                metadata2.Inlines.Add(" " + configurations.contribution_comment_date);
+                metadata2.Inlines.Add(new Bold(new Run(date1 + " " + date2)));
             }
-            metadata.Inlines.Add(new LineBreak());
+            //metadata.Inlines.Add(new LineBreak());
+
             //location
             if (the_contribution.location_id != 0)
-                metadata.Inlines.Add(configurations.contribution_comment_location + the_contribution.location_id.ToString() + ": " + the_contribution.Location.name);
+            {
+                metadata3.Inlines.Add(configurations.contribution_comment_location);
+                metadata3.Inlines.Add(new Bold(new Run(the_contribution.Location.name)));
+            }
             else
-                metadata.Inlines.Add(configurations.contribution_comment_location + "not specified.");
-            metadata.Inlines.Add(new LineBreak());
+            {
+                if (configurations.show_empty_metadata)
+                    metadata3.Inlines.Add("Location not specified.");
+                else
+                {
+                    metadata3.Visibility = System.Windows.Visibility.Collapsed;
+                    should_show_metadata3 = false;
+                }
+            }
+            //metadata.Inlines.Add(new LineBreak());
+
             //tags
             if (the_contribution.tags != "")
             {
-                metadata.Inlines.Add(configurations.contribution_comment_tag);
-                metadata.Inlines.Add(new Bold(new Run(the_contribution.tags)));
+                metadata4.Inlines.Add(configurations.contribution_comment_tag);
+                metadata4.Inlines.Add(new Bold(new Run(the_contribution.tags)));
             }
             else
             {
-                metadata.Inlines.Add(configurations.contribution_comment_tag + "[Empty]");
+                if (configurations.show_empty_metadata)
+                    metadata4.Inlines.Add(configurations.contribution_comment_tag + "[Empty]");
+                else
+                {
+                    metadata4.Visibility = System.Windows.Visibility.Collapsed;
+                    should_show_metadata4 = false;
+                }
             }
             
             //item_generic i = new item_generic();
@@ -468,10 +498,17 @@ namespace nature_net.user_controls
             {
                 this.comments_section.Visibility = System.Windows.Visibility.Visible;
                 //this.comments_listbox.UpdateLayout();
+                if (should_show_metadata3) metadata3.Visibility = System.Windows.Visibility.Visible;
+                if (should_show_metadata4) metadata4.Visibility = System.Windows.Visibility.Visible;
             }
             else
             {
                 this.comments_section.Visibility = System.Windows.Visibility.Collapsed;
+                if (!configurations.show_all_metadata)
+                {
+                    metadata3.Visibility = System.Windows.Visibility.Collapsed;
+                    metadata4.Visibility = System.Windows.Visibility.Collapsed;
+                }
                 //this.comments_listbox.UpdateLayout();
                 if (keyboard_frame != null) keyboard_frame.Visibility = System.Windows.Visibility.Collapsed;
 
