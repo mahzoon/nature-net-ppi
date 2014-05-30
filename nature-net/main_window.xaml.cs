@@ -53,6 +53,7 @@ namespace nature_net
 
 				this.workspace.ManipulationStarting += new EventHandler<ManipulationStartingEventArgs>(workspace_ManipulationStarting);
 				this.workspace.ManipulationDelta += new EventHandler<ManipulationDeltaEventArgs>(workspace_ManipulationDelta);
+                this.workspace.ManipulationCompleted += new EventHandler<ManipulationCompletedEventArgs>(workspace_ManipulationCompleted);
 				///this.workspace.ManipulationBoundaryFeedback += new EventHandler<ManipulationBoundaryFeedbackEventArgs>(workspace_ManipulationBoundaryFeedback);
 
                 this.workspace.AllowDrop = true;
@@ -276,6 +277,16 @@ namespace nature_net
                 try { user_controls.image_frame w2 = (user_controls.image_frame)element; w2.UpdateContents(); }
                 catch (Exception) { }
             }
+        }
+
+        void workspace_ManipulationCompleted(object sender, ManipulationCompletedEventArgs e)
+        {
+            FrameworkElement element = (FrameworkElement)e.Source;
+            if (element == null) return;
+            try { user_controls.window_frame w1 = (user_controls.window_frame)element; w1.UpdateContents(); }
+            catch (Exception) { }
+            try { user_controls.image_frame w2 = (user_controls.image_frame)element; w2.UpdateContents(); }
+            catch (Exception) { }
         }
 
         void load_locations_on_map(int screen_x)

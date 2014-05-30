@@ -60,7 +60,7 @@ namespace nature_net.user_controls
 
         public void hide_change_view()
         {
-            this.change_view.Visibility = System.Windows.Visibility.Hidden;
+            this.change_view.Visibility = System.Windows.Visibility.Collapsed;
         }
 
         void change_view_Click(object sender, RoutedEventArgs e)

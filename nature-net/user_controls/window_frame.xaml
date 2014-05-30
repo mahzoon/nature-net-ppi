@@ -10,7 +10,7 @@
     <DockPanel LastChildFill="True">
         <DockPanel Name="title_bar" DockPanel.Dock="Top" Background="#FF00AB00" Height="40">
             <StackPanel DockPanel.Dock="Right" Orientation="Horizontal">
-                <Button Name="change_view" Margin="2,2,2,2" Width="33" Height="33" Visibility="Hidden">
+                <Button Name="change_view" Margin="2" Width="33" Height="33" Visibility="Collapsed">
                     <Button.Style><Style><Setter Property="Button.Template"><Setter.Value>
                         <ControlTemplate>
                             <Border Name="border" BorderThickness="{TemplateBinding BorderThickness}" Padding="{TemplateBinding Padding}" BorderBrush="{TemplateBinding BorderBrush}" CornerRadius="5" Background="{TemplateBinding Background}">
@@ -19,7 +19,7 @@
                         </ControlTemplate>
                     </Setter.Value></Setter></Style></Button.Style>
                 </Button>
-                <Button Name="close" Margin="2,2,2,2" Width="33" Height="33">
+                <Button Name="close" Margin="10,2,2,2" Width="33" Height="33">
                     <Button.Style>
                         <Style>
                             <Setter Property="Button.Template">
@@ -35,9 +35,9 @@
                     </Button.Style>
                 </Button>
             </StackPanel>
-            <StackPanel DockPanel.Dock="Left" Orientation="Horizontal">
-                <Image Name="window_icon" Margin="5,5,5,5" Width="40"></Image>
-                <TextBlock Name="title" Foreground="White" TextWrapping="Wrap" Width="167" VerticalAlignment="Center">
+            <DockPanel DockPanel.Dock="Left">
+                <Image Name="window_icon" DockPanel.Dock="Left" Margin="5,5,5,5" Width="40"></Image>
+                <TextBlock Name="title" Foreground="White" TextWrapping="Wrap" VerticalAlignment="Center" DockPanel.Dock="Left">
                     Title
                 </TextBlock>
                 <!--<Label Name="title" Foreground="White" VerticalContentAlignment="Stretch" >
@@ -45,7 +45,7 @@
                         Title - The NatureNet project is a citizen science project that incorporates crowdsourced interaction design.  Participants can collect and analyse scientific data using their mobile computing devices and a multi-touch tabletop, and they can also participate in the re-design of the interface by which their scientific contributions are made.  The role of the crowd in Naturenet is extended to include interaction design in addition to data collection and analysis.
                     </AccessText>
                 </Label>-->
-            </StackPanel>
+            </DockPanel>
         </DockPanel>
         <ContentControl Name="window_content"></ContentControl>
     </DockPanel>
