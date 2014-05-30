@@ -79,7 +79,7 @@ namespace nature_net.user_controls
         public void list_all_design_ideas_sync()
         {
             this.design_ideas_list.populator.item_width = this.Width - 3;
-            this.design_ideas_list.populator.list_all_design_ideas();
+            this.design_ideas_list.populator.list_all_design_ideas_sync();
         }
 
         public void list_all_design_ideas()

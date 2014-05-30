@@ -700,7 +700,6 @@ namespace nature_net.user_controls
         public item_generic initial_item = null;
         public double item_width;
         public ListBox _list;
-        private readonly BackgroundWorker worker = new BackgroundWorker();
         public Thickness items_margins = new Thickness(0);
         public avatar_touch_down_handler avatar_drag;
         public list_header header;
@@ -709,14 +708,29 @@ namespace nature_net.user_controls
         //
         public TextBlock total_number;
         public reply_clicked reply_clicked_handler;
+        //
+        private readonly BackgroundWorker worker_design_ideas = new BackgroundWorker();
+        private readonly BackgroundWorker worker_activities = new BackgroundWorker();
+        private readonly BackgroundWorker worker_users = new BackgroundWorker();
+        private readonly BackgroundWorker worker_comments = new BackgroundWorker();
+
+        public list_populator()
+        {
+            worker_design_ideas.DoWork += new DoWorkEventHandler(get_all_design_ideas);
+            worker_design_ideas.RunWorkerCompleted += new RunWorkerCompletedEventHandler(display_all_design_ideas);
+            worker_activities.DoWork += new DoWorkEventHandler(get_all_activities);
+            worker_activities.RunWorkerCompleted += new RunWorkerCompletedEventHandler(display_all_activities);
+            worker_users.DoWork += new DoWorkEventHandler(get_all_users);
+            worker_users.RunWorkerCompleted += new RunWorkerCompletedEventHandler(display_all_users);
+            worker_comments.DoWork += new DoWorkEventHandler(get_all_comments);
+            worker_comments.RunWorkerCompleted += new RunWorkerCompletedEventHandler(display_all_comments);
+        }
 
         // for design ideas
         public void list_all_design_ideas()
         {
-            worker.DoWork += new DoWorkEventHandler(get_all_design_ideas);
-            worker.RunWorkerCompleted += new RunWorkerCompletedEventHandler(display_all_design_ideas);
-            if (!worker.IsBusy)
-                worker.RunWorkerAsync(null);
+            if (!worker_design_ideas.IsBusy)
+                worker_design_ideas.RunWorkerAsync(null);
         }
         public void get_all_design_ideas(object arg, DoWorkEventArgs e)
         {
@@ -836,10 +850,8 @@ namespace nature_net.user_controls
         // for users
         public void list_all_users()
         {
-            worker.DoWork += new DoWorkEventHandler(get_all_users);
-            worker.RunWorkerCompleted += new RunWorkerCompletedEventHandler(display_all_users);
-            if (!worker.IsBusy)
-                worker.RunWorkerAsync(null);
+            if (!worker_users.IsBusy)
+                worker_users.RunWorkerAsync(null);
         }
         public void get_all_users(object arg, DoWorkEventArgs e)
         {
@@ -967,10 +979,8 @@ namespace nature_net.user_controls
         // for comments
         public void list_all_comments(comment_item item)
         {
-            worker.DoWork += new DoWorkEventHandler(get_all_comments);
-            worker.RunWorkerCompleted += new RunWorkerCompletedEventHandler(display_all_comments);
-            if (!worker.IsBusy)
-                worker.RunWorkerAsync(item);
+            if (!worker_comments.IsBusy)
+                worker_comments.RunWorkerAsync(item);
         }
         public void get_all_comments(object arg, DoWorkEventArgs e)
         {
@@ -1121,10 +1131,8 @@ namespace nature_net.user_controls
         // for activities
         public void list_all_activities()
         {
-            worker.DoWork += new DoWorkEventHandler(get_all_activities);
-            worker.RunWorkerCompleted += new RunWorkerCompletedEventHandler(display_all_activities);
-            if (!worker.IsBusy)
-                worker.RunWorkerAsync();
+            if (!worker_activities.IsBusy)
+                worker_activities.RunWorkerAsync();
         }
         public void get_all_activities(object arg, DoWorkEventArgs e)
         {
@@ -1159,6 +1167,7 @@ namespace nature_net.user_controls
                             ai.username = "";
                         if (cnt != 0)
                             last_time = n1.First().date;
+                        
                         ai.last_date = last_time;
                         activity_items.Add(ai);
                     }

@@ -255,7 +255,7 @@ namespace nature_net.user_controls
                 }
                 this.list_all_comments();
                 if (this._object_type.ToString() == "nature_net.Contribution")
-                    window_manager.load_design_ideas();
+                    window_manager.load_design_ideas_sync();
             }
             //this.GetActiveTextBox().SelectAll();
             cancel_comment_auth_clicked(null, null);
