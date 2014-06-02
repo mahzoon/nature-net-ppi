@@ -202,7 +202,7 @@ namespace nature_net
             frame.window_content.Content = content;
             content.list_all_comments();
 
-            window_manager.collection_frames.Add(frame);
+            window_manager.activity_frames.Add(frame);
             open_window(frame, pos_x, pos_y);
             string title = activity_name;
             if (activity_name.Length > configurations.max_activity_frame_title_chars)
@@ -219,8 +219,13 @@ namespace nature_net
             double h = frame.ActualHeight;
             try { h = ((window_content)(frame.window_content.Content)).the_item.ActualHeight; }
             catch (Exception) { }
+            double w = frame.ActualWidth;
+            try { w = ((window_content)(frame.window_content.Content)).the_item.ActualWidth; }
+            catch (Exception) { }
             if (pos_y > window_manager.main_canvas.ActualHeight - h)
                 pos_y = window_manager.main_canvas.ActualHeight - h;
+            if (pos_x > window_manager.main_canvas.ActualWidth - w)
+                pos_x = window_manager.main_canvas.ActualWidth - w;
             TranslateTransform m = new TranslateTransform(pos_x, pos_y);
             Matrix matrix = m.Value;
             frame.RenderTransform = new MatrixTransform(matrix);
@@ -245,8 +250,9 @@ namespace nature_net
         public static void close_window(window_frame frame)
         {
             collection_frames.Remove(frame);
+            activity_frames.Remove(frame);
             image_display_frames.Remove(frame);
-            design_ideas_frames.Remove(frame);
+            design_ideas_frames.Remove(frame); 
             main_canvas.Children.Remove(frame);
         }
 

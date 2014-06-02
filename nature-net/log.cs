@@ -17,11 +17,9 @@ namespace nature_net
                 reader.Close();
 
                 StreamWriter writer = new StreamWriter(configurations.GetAbsoluteLogFilePath());
-                writer.WriteLine("--START--");
-                writer.WriteLine(e.Message);
-                writer.WriteLine(whole);
-                writer.WriteLine(e.StackTrace);
-                writer.WriteLine("--END--");
+                string error = "--- START ON: " + DateTime.Now.ToString() + " ---\r\nMessage: " + e.Message +
+                    "\r\n" + e.StackTrace + "--- END (" + DateTime.Now.ToString() + ") ---\r\n" + whole;
+                writer.WriteLine(error);
                 writer.Close();
             }
             catch (Exception) { }

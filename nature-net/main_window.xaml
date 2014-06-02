@@ -3,7 +3,7 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:uc="clr-namespace:nature_net.user_controls"
         xmlns:s ="http://schemas.microsoft.com/surface/2008"
-        Title="Nature Net" Height="200" Width="800" Name="main_window" WindowStyle="None" WindowState="Maximized" Topmost="True">
+        Title="Nature Net" Height="200" Width="800" Name="main_window" WindowStyle="None" WindowState="Maximized">
     
     <Window.Resources>
         <Style x:Key="CursorStyle" TargetType="{x:Type ContentControl}">
