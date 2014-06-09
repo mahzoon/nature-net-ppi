@@ -60,6 +60,12 @@ namespace nature_net
     partial void InsertAction(Action instance);
     partial void UpdateAction(Action instance);
     partial void DeleteAction(Action instance);
+    partial void InsertInteraction_Type(Interaction_Type instance);
+    partial void UpdateInteraction_Type(Interaction_Type instance);
+    partial void DeleteInteraction_Type(Interaction_Type instance);
+    partial void InsertInteraction_Log(Interaction_Log instance);
+    partial void UpdateInteraction_Log(Interaction_Log instance);
+    partial void DeleteInteraction_Log(Interaction_Log instance);
     #endregion
 		
 		public naturenet_dataclassDataContext() : 
@@ -177,6 +183,22 @@ namespace nature_net
 			get
 			{
 				return this.GetTable<Action>();
+			}
+		}
+		
+		public System.Data.Linq.Table<Interaction_Type> Interaction_Types
+		{
+			get
+			{
+				return this.GetTable<Interaction_Type>();
+			}
+		}
+		
+		public System.Data.Linq.Table<Interaction_Log> Interaction_Logs
+		{
+			get
+			{
+				return this.GetTable<Interaction_Log>();
 			}
 		}
 	}
@@ -2906,6 +2928,367 @@ namespace nature_net
 						this._user_id = default(int);
 					}
 					this.SendPropertyChanged("User");
+				}
+			}
+		}
+		
+		public event PropertyChangingEventHandler PropertyChanging;
+		
+		public event PropertyChangedEventHandler PropertyChanged;
+		
+		protected virtual void SendPropertyChanging()
+		{
+			if ((this.PropertyChanging != null))
+			{
+				this.PropertyChanging(this, emptyChangingEventArgs);
+			}
+		}
+		
+		protected virtual void SendPropertyChanged(String propertyName)
+		{
+			if ((this.PropertyChanged != null))
+			{
+				this.PropertyChanged(this, new PropertyChangedEventArgs(propertyName));
+			}
+		}
+	}
+	
+	[global::System.Data.Linq.Mapping.TableAttribute(Name="dbo.Interaction_Type")]
+	public partial class Interaction_Type : INotifyPropertyChanging, INotifyPropertyChanged
+	{
+		
+		private static PropertyChangingEventArgs emptyChangingEventArgs = new PropertyChangingEventArgs(String.Empty);
+		
+		private int _id;
+		
+		private string _type;
+		
+		private EntitySet<Interaction_Log> _Interaction_Logs;
+		
+    #region Extensibility Method Definitions
+    partial void OnLoaded();
+    partial void OnValidate(System.Data.Linq.ChangeAction action);
+    partial void OnCreated();
+    partial void OnidChanging(int value);
+    partial void OnidChanged();
+    partial void OntypeChanging(string value);
+    partial void OntypeChanged();
+    #endregion
+		
+		public Interaction_Type()
+		{
+			this._Interaction_Logs = new EntitySet<Interaction_Log>(new Action<Interaction_Log>(this.attach_Interaction_Logs), new Action<Interaction_Log>(this.detach_Interaction_Logs));
+			OnCreated();
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_id", AutoSync=AutoSync.OnInsert, DbType="Int NOT NULL IDENTITY", IsPrimaryKey=true, IsDbGenerated=true)]
+		public int id
+		{
+			get
+			{
+				return this._id;
+			}
+			set
+			{
+				if ((this._id != value))
+				{
+					this.OnidChanging(value);
+					this.SendPropertyChanging();
+					this._id = value;
+					this.SendPropertyChanged("id");
+					this.OnidChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_type", DbType="NVarChar(64) NOT NULL", CanBeNull=false)]
+		public string type
+		{
+			get
+			{
+				return this._type;
+			}
+			set
+			{
+				if ((this._type != value))
+				{
+					this.OntypeChanging(value);
+					this.SendPropertyChanging();
+					this._type = value;
+					this.SendPropertyChanged("type");
+					this.OntypeChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.AssociationAttribute(Name="Interaction_Type_Interaction_Log", Storage="_Interaction_Logs", ThisKey="id", OtherKey="type")]
+		public EntitySet<Interaction_Log> Interaction_Logs
+		{
+			get
+			{
+				return this._Interaction_Logs;
+			}
+			set
+			{
+				this._Interaction_Logs.Assign(value);
+			}
+		}
+		
+		public event PropertyChangingEventHandler PropertyChanging;
+		
+		public event PropertyChangedEventHandler PropertyChanged;
+		
+		protected virtual void SendPropertyChanging()
+		{
+			if ((this.PropertyChanging != null))
+			{
+				this.PropertyChanging(this, emptyChangingEventArgs);
+			}
+		}
+		
+		protected virtual void SendPropertyChanged(String propertyName)
+		{
+			if ((this.PropertyChanged != null))
+			{
+				this.PropertyChanged(this, new PropertyChangedEventArgs(propertyName));
+			}
+		}
+		
+		private void attach_Interaction_Logs(Interaction_Log entity)
+		{
+			this.SendPropertyChanging();
+			entity.Interaction_Type = this;
+		}
+		
+		private void detach_Interaction_Logs(Interaction_Log entity)
+		{
+			this.SendPropertyChanging();
+			entity.Interaction_Type = null;
+		}
+	}
+	
+	[global::System.Data.Linq.Mapping.TableAttribute(Name="dbo.Interaction_Log")]
+	public partial class Interaction_Log : INotifyPropertyChanging, INotifyPropertyChanged
+	{
+		
+		private static PropertyChangingEventArgs emptyChangingEventArgs = new PropertyChangingEventArgs(String.Empty);
+		
+		private long _id;
+		
+		private int _type;
+		
+		private System.DateTime _date;
+		
+		private int _touch_id;
+		
+		private double _touch_x;
+		
+		private double _touch_y;
+		
+		private string _details;
+		
+		private EntityRef<Interaction_Type> _Interaction_Type;
+		
+    #region Extensibility Method Definitions
+    partial void OnLoaded();
+    partial void OnValidate(System.Data.Linq.ChangeAction action);
+    partial void OnCreated();
+    partial void OnidChanging(long value);
+    partial void OnidChanged();
+    partial void OntypeChanging(int value);
+    partial void OntypeChanged();
+    partial void OndateChanging(System.DateTime value);
+    partial void OndateChanged();
+    partial void Ontouch_idChanging(int value);
+    partial void Ontouch_idChanged();
+    partial void Ontouch_xChanging(double value);
+    partial void Ontouch_xChanged();
+    partial void Ontouch_yChanging(double value);
+    partial void Ontouch_yChanged();
+    partial void OndetailsChanging(string value);
+    partial void OndetailsChanged();
+    #endregion
+		
+		public Interaction_Log()
+		{
+			this._Interaction_Type = default(EntityRef<Interaction_Type>);
+			OnCreated();
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_id", AutoSync=AutoSync.OnInsert, DbType="BigInt NOT NULL IDENTITY", IsPrimaryKey=true, IsDbGenerated=true)]
+		public long id
+		{
+			get
+			{
+				return this._id;
+			}
+			set
+			{
+				if ((this._id != value))
+				{
+					this.OnidChanging(value);
+					this.SendPropertyChanging();
+					this._id = value;
+					this.SendPropertyChanged("id");
+					this.OnidChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_type", DbType="Int NOT NULL")]
+		public int type
+		{
+			get
+			{
+				return this._type;
+			}
+			set
+			{
+				if ((this._type != value))
+				{
+					if (this._Interaction_Type.HasLoadedOrAssignedValue)
+					{
+						throw new System.Data.Linq.ForeignKeyReferenceAlreadyHasValueException();
+					}
+					this.OntypeChanging(value);
+					this.SendPropertyChanging();
+					this._type = value;
+					this.SendPropertyChanged("type");
+					this.OntypeChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_date", DbType="DateTime NOT NULL")]
+		public System.DateTime date
+		{
+			get
+			{
+				return this._date;
+			}
+			set
+			{
+				if ((this._date != value))
+				{
+					this.OndateChanging(value);
+					this.SendPropertyChanging();
+					this._date = value;
+					this.SendPropertyChanged("date");
+					this.OndateChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_touch_id", DbType="Int NOT NULL")]
+		public int touch_id
+		{
+			get
+			{
+				return this._touch_id;
+			}
+			set
+			{
+				if ((this._touch_id != value))
+				{
+					this.Ontouch_idChanging(value);
+					this.SendPropertyChanging();
+					this._touch_id = value;
+					this.SendPropertyChanged("touch_id");
+					this.Ontouch_idChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_touch_x", DbType="Float NOT NULL")]
+		public double touch_x
+		{
+			get
+			{
+				return this._touch_x;
+			}
+			set
+			{
+				if ((this._touch_x != value))
+				{
+					this.Ontouch_xChanging(value);
+					this.SendPropertyChanging();
+					this._touch_x = value;
+					this.SendPropertyChanged("touch_x");
+					this.Ontouch_xChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_touch_y", DbType="Float NOT NULL")]
+		public double touch_y
+		{
+			get
+			{
+				return this._touch_y;
+			}
+			set
+			{
+				if ((this._touch_y != value))
+				{
+					this.Ontouch_yChanging(value);
+					this.SendPropertyChanging();
+					this._touch_y = value;
+					this.SendPropertyChanged("touch_y");
+					this.Ontouch_yChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_details", DbType="NVarChar(MAX)")]
+		public string details
+		{
+			get
+			{
+				return this._details;
+			}
+			set
+			{
+				if ((this._details != value))
+				{
+					this.OndetailsChanging(value);
+					this.SendPropertyChanging();
+					this._details = value;
+					this.SendPropertyChanged("details");
+					this.OndetailsChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.AssociationAttribute(Name="Interaction_Type_Interaction_Log", Storage="_Interaction_Type", ThisKey="type", OtherKey="id", IsForeignKey=true)]
+		public Interaction_Type Interaction_Type
+		{
+			get
+			{
+				return this._Interaction_Type.Entity;
+			}
+			set
+			{
+				Interaction_Type previousValue = this._Interaction_Type.Entity;
+				if (((previousValue != value) 
+							|| (this._Interaction_Type.HasLoadedOrAssignedValue == false)))
+				{
+					this.SendPropertyChanging();
+					if ((previousValue != null))
+					{
+						this._Interaction_Type.Entity = null;
+						previousValue.Interaction_Logs.Remove(this);
+					}
+					this._Interaction_Type.Entity = value;
+					if ((value != null))
+					{
+						value.Interaction_Logs.Add(this);
+						this._type = value.id;
+					}
+					else
+					{
+						this._type = default(int);
+					}
+					this.SendPropertyChanged("Interaction_Type");
 				}
 			}
 		}

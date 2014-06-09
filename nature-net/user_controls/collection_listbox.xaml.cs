@@ -296,6 +296,7 @@ namespace nature_net.user_controls
 
         public void list_contributions_in_location(int location)
         {
+            this.contributions.content_name = "contributions in location: " + location.ToString();
             worker.WorkerReportsProgress = true;
             worker.DoWork += new DoWorkEventHandler(get_contributions_in_location);
             worker.ProgressChanged += new ProgressChangedEventHandler(progress_changed);
@@ -306,6 +307,7 @@ namespace nature_net.user_controls
 
         public void list_contributions_in_activity(int activity_id)
         {
+            this.contributions.content_name = "contributions in activity: " + activity_id.ToString();
             worker.WorkerReportsProgress = true;
             worker.DoWork += new DoWorkEventHandler(get_contributions_in_activity);
             worker.ProgressChanged += new ProgressChangedEventHandler(progress_changed);
@@ -317,6 +319,7 @@ namespace nature_net.user_controls
         public void list_all_contributions(string username)
         {
             this.collection_username = username;
+            this.contributions.content_name = "contributions for user: " + username;
             worker.WorkerReportsProgress = true;
             worker.DoWork += new DoWorkEventHandler(get_all_contributions);
             worker.ProgressChanged += new ProgressChangedEventHandler(progress_changed);
@@ -442,11 +445,13 @@ namespace nature_net.user_controls
 
                        string[] title = this.parent.get_title().Split(new string[] { " (" }, StringSplitOptions.RemoveEmptyEntries);
                        this.parent.set_title(title[0]);
+                       this.contributions.content_name = this.contributions.content_name + " ;" + title[0] + " (" + items.Count + ")";
                    }
                    else
                    {
                        string[] title = this.parent.get_title().Split(new string[] { " (" }, StringSplitOptions.RemoveEmptyEntries);
                        this.parent.set_title(title[0] + " (" + items.Count + ")");
+                       this.contributions.content_name = this.contributions.content_name + " ;" + title[0] + " (" + items.Count + ")";
                    }
                    this.contributions._list.Items.Refresh();
                    window_manager.contribution_collection_opened(this.collection_username);
@@ -579,13 +584,17 @@ namespace nature_net.user_controls
             return ci;
         }
 
-        bool item_selected(object i)
+        bool item_selected(object i, System.Windows.Input.TouchEventArgs e)
         {
             collection_listbox_item item = (collection_listbox_item)i;
             collection_item ci = (collection_item)item.img.Tag;
-            window_manager.open_contribution_window(ci,
-                item.PointToScreen(new Point(0, 0)).X - window_manager.main_canvas.PointToScreen(new Point(0,0)).X,
-                item.PointToScreen(new Point(0, 0)).Y, ci.ToString());
+            if (ci != null)
+            {
+                log.WriteInteractionLog(17, "tapped the collection item, contribution id: " + ci._contribution.id, e.TouchDevice);
+                window_manager.open_contribution_window(ci,
+                    item.PointToScreen(new Point(0, 0)).X - window_manager.main_canvas.PointToScreen(new Point(0, 0)).X,
+                    item.PointToScreen(new Point(0, 0)).Y, ci.ToString());
+            }
             return true;
         }
 

@@ -32,6 +32,7 @@ namespace nature_net.user_controls
         int max_pos_x = 250;
 
         public item_generic_v2 submit_idea;
+        list_refresher refresher;
 
         public design_ideas_listbox()
         {
@@ -42,6 +43,7 @@ namespace nature_net.user_controls
             create_submit_design_item();
             
             this.design_ideas_list.initialize(false, "design idea", new ItemSelected(item_selected));
+            this.design_ideas_list.content_name = "Design ideas listbox";
             //this.design_ideas_list.populator.initial_item = submit_idea;
             header.atoz_order = new AToZOrder(this.atoz_order);
             header.top_order = new TopOrder(this.top_order);
@@ -52,6 +54,8 @@ namespace nature_net.user_controls
             //this.design_ideas_list.populator.thumbs_down_handler = new thumbs_down(this.dislike_touched);
 
             this.design_ideas_list.Background = Brushes.White;
+            this.refresher = new list_refresher();
+            this.refresher.design_ideas_populator = this.design_ideas_list.populator;
         }
 
         void submit_PreviewTouchDown(object sender, TouchEventArgs e)//RoutedEventArgs e)
@@ -62,15 +66,17 @@ namespace nature_net.user_controls
         void submit_PreviewTouchUp(object sender, TouchEventArgs e)//RoutedEventArgs e)
         {
             submit_idea.Background = Brushes.White;
+            log.WriteInteractionLog(7, "", e.TouchDevice);
             window_manager.open_design_idea_window_ext(this, last_pos_x, submit_idea.PointToScreen(new Point(0, 0)).Y);
             last_pos_x = last_pos_x + pos_x_increment;
             if (last_pos_x > max_pos_x) last_pos_x = init_pos_x;
         }
 
-        bool item_selected(object i)
+        bool item_selected(object i, TouchEventArgs e)
         {
             item_generic_v2 item = (item_generic_v2)i;
             string[] idea_item = ("design idea;" + item.ToString()).Split(new Char[] { ';' });
+            log.WriteInteractionLog(16, "tapped the listbox item: " + item.ToString(), e.TouchDevice);
             window_manager.open_design_idea_window(idea_item, 65, item.PointToScreen(new Point(0, 0)).Y);
             //window_manager.open_design_idea_window(item, 0, item.PointToScreen(new Point(0, 0)).Y);
             return true;
@@ -84,12 +90,17 @@ namespace nature_net.user_controls
 
         public void list_all_design_ideas()
         {
-            this.Dispatcher.BeginInvoke(DispatcherPriority.Normal,
-               new System.Action(() =>
-               {
-                   this.design_ideas_list.populator.item_width = this.Width - 3;
-                   this.design_ideas_list.populator.list_all_design_ideas();
-               }));
+            if (!configurations.use_list_refresher)
+            {
+                this.Dispatcher.BeginInvoke(DispatcherPriority.Normal,
+                   new System.Action(() =>
+                   {
+                       //this.design_ideas_list.populator.item_width = this.Width - 3;
+                       this.design_ideas_list.populator.list_all_design_ideas();
+                   }));
+            }
+            else
+                refresher.list_all_design_ideas();
         }
 
         public void list_design_ideas_and_highlight(string title, bool highlight, TabControl tb)
@@ -118,11 +129,11 @@ namespace nature_net.user_controls
                        this.design_ideas_list._list.ScrollToCenterOfView(i);
                        i.Background = Brushes.Gray;
                        //double y = lbi.TransformToAncestor(Application.Current.MainWindow).Transform(new Point(0, 0)).Y;
-                       double x = 0;
+                       double y = 0;
                        if (this.design_ideas_list._list.Tag != null)
-                           x = (double)this.design_ideas_list._list.Tag;
+                           y = (double)this.design_ideas_list._list.Tag;
                        string[] idea_item = ("design idea;" + i.ToString()).Split(new Char[] { ';' });
-                       window_manager.open_design_idea_window(idea_item, 65, x + 40);//lbi.PointToScreen(new Point(0,0)).Y);
+                       window_manager.open_design_idea_window(idea_item, 65, y + 40);//lbi.PointToScreen(new Point(0,0)).Y);
                    }
                    else
                        i.Background = Brushes.White;
@@ -167,7 +178,7 @@ namespace nature_net.user_controls
         void like_touched(object sender, TouchEventArgs te)
         {
             item_generic_v2 i = (item_generic_v2)sender;
-            i.like_touched(sender, te);
+            i.like_touched(null, te);
             //this.design_ideas_list._list.Items.Refresh();
             //this.design_ideas_list.populator.list_all_design_ideas();
         }

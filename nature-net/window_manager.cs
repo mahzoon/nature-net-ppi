@@ -44,14 +44,14 @@ namespace nature_net
             c_listbox.parent = frame;
             c_listbox.list_contributions_in_location(location_id);
             //content.initialize_contents(c_listbox);
-            content.initialize_contents(c_listbox, Type.GetType("nature_net.Location"), location_id, frame);
+            content.initialize_contents(c_listbox, Type.GetType("nature_net.Location"), location_id, frame, configurations.frame_title + " in " + location_id.ToString() + ": " + location);
             frame.window_content.Content = content;
             
             content.list_all_comments();
 
             window_manager.collection_frames.Add(frame);
             open_window(frame, pos_x - (frame.Width / 2), pos_y - (c_listbox.Height));
-            frame.set_title("Contributions in " + location_id.ToString() + ": " + location);
+            frame.set_title(configurations.frame_title + " in " + location_id.ToString() + ": " + location);
         }
 
         public static void open_collection_window(string username, int userid, double pos_x, double pos_y)
@@ -64,13 +64,13 @@ namespace nature_net
             collection_listbox c_listbox = new collection_listbox();
             c_listbox.parent = frame;
             c_listbox.list_all_contributions(username);
-            content.initialize_contents(c_listbox, Type.GetType("nature_net.User"), userid, frame);
+            content.initialize_contents(c_listbox, Type.GetType("nature_net.User"), userid, frame, username + "'s " + configurations.frame_title);
             frame.window_content.Content = content;
             content.list_all_comments();
 
             window_manager.collection_frames.Add(frame);
             open_window(frame, pos_x, pos_y);
-            frame.set_title(username + "'s contributions");
+            frame.set_title(username + "'s " + configurations.frame_title);
         }
 
         public static void open_contribution_window(collection_item citem, double pos_x, double pos_y, string ctype)
@@ -141,14 +141,14 @@ namespace nature_net
 
             i.Background = new SolidColorBrush(Colors.White);
             i.Width = frame.Width;
-            content.initialize_contents(i, Type.GetType("nature_net.Contribution"), Convert.ToInt32(idea_item[1]), frame);
+            content.initialize_contents(i, Type.GetType("nature_net.Contribution"), Convert.ToInt32(idea_item[1]), frame, idea_item[5] + "'s " + title);
 
             frame.window_content.Content = content;
 
             window_manager.design_ideas_frames.Add(frame);
             open_window(frame, pos_x, pos_y);
             frame.hide_change_view();
-            frame.set_title(title);
+            frame.set_title(idea_item[5] + "'s " + title);
         }
 
         public static void open_design_idea_window_ext(design_ideas_listbox parent, double pos_x, double pos_y)
@@ -198,16 +198,16 @@ namespace nature_net
             collection_listbox c_listbox = new collection_listbox();
             c_listbox.parent = frame;
             c_listbox.list_contributions_in_activity(activity_id);
-            content.initialize_contents(c_listbox, Type.GetType("nature_net.Activity"), activity_id, frame);
+            content.initialize_contents(c_listbox, Type.GetType("nature_net.Activity"), activity_id, frame, activity_name + "'s " + configurations.frame_title);
             frame.window_content.Content = content;
             content.list_all_comments();
 
             window_manager.activity_frames.Add(frame);
             open_window(frame, pos_x, pos_y);
             string title = activity_name;
-            if (activity_name.Length > configurations.max_activity_frame_title_chars)
-                title = activity_name.Substring(0, 10) + "...";
-            frame.set_title(title + "'s contributions");
+            //if (activity_name.Length > configurations.max_activity_frame_title_chars)
+            //    title = activity_name.Substring(0, 10) + "...";
+            frame.set_title(title + "'s " + configurations.frame_title);
         }
 
         private static void open_window(window_frame frame, double pos_x, double pos_y)

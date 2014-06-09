@@ -37,7 +37,7 @@
                                      Foreground="White">
                         Submit
                     </Button>
-                    <TextBox DockPanel.Dock="Left" Name="comment_textbox_default" TextWrapping="Wrap" AcceptsReturn="True" MinHeight="60"
+                    <TextBox DockPanel.Dock="Left" Name="comment_textbox_default" TextWrapping="Wrap" AcceptsReturn="True" MinHeight="60" MaxHeight="150"
                              FontSize="15" FontFamily="Segoe UI" Background="White" Foreground="Gray" Padding="4">
                         Comment Textbox</TextBox>
                 </DockPanel>
@@ -60,7 +60,7 @@
                             Cancel
                         </Button>
                     </DockPanel>
-                    <TextBox DockPanel.Dock="Top" Name="comment_textbox_reply" TextWrapping="Wrap" AcceptsReturn="True" MinHeight="60"
+                    <TextBox DockPanel.Dock="Top" Name="comment_textbox_reply" TextWrapping="Wrap" AcceptsReturn="True" MinHeight="60" MaxHeight="150"
                              FontSize="15" FontFamily="Segoe UI" Background="White" Foreground="Gray" Padding="4">
                         Comment Textbox</TextBox>
                 </DockPanel>

@@ -70,6 +70,7 @@ namespace nature_net.user_controls
         
         void close_Click(object sender, RoutedEventArgs e)
         {
+            log.WriteInteractionLog(19, "frame closed with title: " + this.title.Text, ((TouchEventArgs)e).TouchDevice);
             window_manager.close_window(this);
         }
 

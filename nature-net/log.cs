@@ -24,5 +24,32 @@ namespace nature_net
             }
             catch (Exception) { }
         }
+
+        public static void WriteInteractionLog(int type, string details, System.Windows.Input.TouchDevice t)
+        {
+            Interaction_Log i = new Interaction_Log();
+            i.date = DateTime.Now;i.details = details;i.type = type;
+            if (t != null)
+            {
+                i.touch_id = t.Id;
+                i.touch_x = t.GetTouchPoint(null).Position.X;
+                i.touch_y = t.GetTouchPoint(null).Position.Y;
+            }
+            else
+            {
+                i.touch_id = -1;
+                i.touch_x = -1;
+                i.touch_y = -1;
+            }
+            database_manager.InsertInteraction(i);
+        }
+
+        public static void WriteInteractionLog(int type, string details, double x, double y)
+        {
+            Interaction_Log i = new Interaction_Log();
+            i.date = DateTime.Now; i.details = details; i.type = type;
+            i.touch_id = -1; i.touch_x = x; i.touch_y = y;
+            database_manager.InsertInteraction(i);
+        }
     }
 }

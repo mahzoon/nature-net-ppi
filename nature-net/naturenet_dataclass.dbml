@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8"?><Database Name="nature-net" Class="naturenet_dataclassDataContext" xmlns="http://schemas.microsoft.com/linqtosql/dbml/2007">
-  <Connection Mode="AppSettings" ConnectionString="Data Source=CCIF46KWS1308WS\SQLEXPRESS;Initial Catalog=nature-net;Integrated Security=True" SettingsObjectName="nature_net.Properties.Settings" SettingsPropertyName="nature_netConnectionString" Provider="System.Data.SqlClient" />
+  <Connection Mode="AppSettings" ConnectionString="Data Source=(local);Initial Catalog=nature-net;Integrated Security=True" SettingsObjectName="nature_net.Properties.Settings" SettingsPropertyName="nature_netConnectionString" Provider="System.Data.SqlClient" />
   <Table Name="dbo.Action_Type" Member="Action_Types">
     <Type Name="Action_Type">
       <Column Name="id" Type="System.Int32" DbType="Int NOT NULL IDENTITY" IsPrimaryKey="true" IsDbGenerated="true" CanBeNull="false" />
@@ -133,6 +133,25 @@
       <Column Name="technical_info" Type="System.String" DbType="NVarChar(MAX)" CanBeNull="true" />
       <Association Name="Action_Type_Action" Member="Action_Type" ThisKey="type_id" OtherKey="id" Type="Action_Type" IsForeignKey="true" />
       <Association Name="User_Action" Member="User" ThisKey="user_id" OtherKey="id" Type="User" IsForeignKey="true" />
+    </Type>
+  </Table>
+  <Table Name="dbo.Interaction_Type" Member="Interaction_Types">
+    <Type Name="Interaction_Type">
+      <Column Name="id" Type="System.Int32" DbType="Int NOT NULL IDENTITY" IsPrimaryKey="true" IsDbGenerated="true" CanBeNull="false" />
+      <Column Name="type" Type="System.String" DbType="NVarChar(64) NOT NULL" CanBeNull="false" />
+      <Association Name="Interaction_Type_Interaction_Log" Member="Interaction_Logs" ThisKey="id" OtherKey="type" Type="Interaction_Log" />
+    </Type>
+  </Table>
+  <Table Name="dbo.Interaction_Log" Member="Interaction_Logs">
+    <Type Name="Interaction_Log">
+      <Column Name="id" Type="System.Int64" DbType="BigInt NOT NULL IDENTITY" IsPrimaryKey="true" IsDbGenerated="true" CanBeNull="false" />
+      <Column Name="type" Type="System.Int32" DbType="Int NOT NULL" CanBeNull="false" />
+      <Column Name="date" Type="System.DateTime" DbType="DateTime NOT NULL" CanBeNull="false" />
+      <Column Name="touch_id" Type="System.Int32" DbType="Int NOT NULL" CanBeNull="false" />
+      <Column Name="touch_x" Type="System.Double" DbType="Float NOT NULL" CanBeNull="false" />
+      <Column Name="touch_y" Type="System.Double" DbType="Float NOT NULL" CanBeNull="false" />
+      <Column Name="details" Type="System.String" DbType="NVarChar(MAX)" CanBeNull="true" />
+      <Association Name="Interaction_Type_Interaction_Log" Member="Interaction_Type" ThisKey="type" OtherKey="id" Type="Interaction_Type" IsForeignKey="true" />
     </Type>
   </Table>
 </Database>

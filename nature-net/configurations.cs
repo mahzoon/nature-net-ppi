@@ -27,6 +27,7 @@ namespace nature_net
         public static string activities_date_desc = "Last Update: ";
         public static string activities_num_desc = "Contributions";
         public static string authentication_failed_text = "Whoops! That PIN was incorrect. Please try again.";
+        public static string frame_title = "Observations";
 
         public static string signup_item_title = "Sign up";
         public static string submit_idea_item_title = "Submit Idea";
@@ -84,6 +85,7 @@ namespace nature_net
         public static bool show_empty_metadata = false;
         public static bool show_all_metadata = false;
         public static bool use_avatar_drag = false;
+        public static bool use_list_refresher = false;
 
         public static List<Point> locations = new List<Point>();
         public static int location_dot_diameter = 55;
@@ -660,6 +662,7 @@ namespace nature_net
             users_no_date = parser.GetValue("General", "users_no_date", "Just Created");
             activities_date_desc = parser.GetValue("General", "activities_date_desc", "Last Update: ");
             activities_num_desc = parser.GetValue("General", "activities_num_desc", "Contributions");
+            frame_title = parser.GetValue("General", "frame_title", "Observations");
 
             // Parameters
             high_contrast = parser.GetValue("Parameters", "high_contrast", false);
@@ -698,6 +701,7 @@ namespace nature_net
             show_vertical_drag = parser.GetValue("Parameters", "show_vertical_drag", true);
             show_empty_metadata = parser.GetValue("Parameters", "show_empty_metadata", false);
             show_all_metadata = parser.GetValue("Parameters", "show_all_metadata", false);
+            use_list_refresher = parser.GetValue("Parameters", "use_list_refresher", false);
             update_period_ms = parser.GetValue("Parameters", "update_period_ms", 20000);
             scaling_mode = parser.GetValue("Parameters", "scaling_mode", BitmapScalingMode.Fant);
             click_opacity_on_collection_item = parser.GetValue("Parameters", "click_opacity_on_collection_item", 0.8);
@@ -778,6 +782,7 @@ namespace nature_net
             parser.SetValue("General", "users_no_date", users_no_date);
             parser.SetValue("General", "activities_date_desc", activities_date_desc);
             parser.SetValue("General", "activities_num_desc", activities_num_desc);
+            parser.SetValue("General", "frame_title", frame_title);
 
             // Parameters
             parser.SetValue("Parameters", "high_contrast", high_contrast);
@@ -816,6 +821,7 @@ namespace nature_net
             parser.SetValue("Parameters", "show_vertical_drag", show_vertical_drag);
             parser.SetValue("Parameters", "show_empty_metadata", show_empty_metadata);
             parser.SetValue("Parameters", "show_all_metadata", show_all_metadata);
+            parser.SetValue("Parameters", "use_list_refresher", use_list_refresher);
             parser.SetValue("Parameters", "update_period_ms", update_period_ms);
             parser.SetValue("Parameters", "scaling_mode", scaling_mode);
             parser.SetValue("Parameters", "click_opacity_on_collection_item", click_opacity_on_collection_item);

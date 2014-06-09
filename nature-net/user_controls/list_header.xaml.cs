@@ -40,16 +40,28 @@ namespace nature_net.user_controls
 
         private void top_Checked(object sender, RoutedEventArgs e)
         {
+            TouchDevice td = null;
+            try { td = ((TouchEventArgs)e).TouchDevice; }
+            catch (Exception) { }
+            log.WriteInteractionLog(9, (string)(this.title.Content), td);
             if (top_order != null) top_order();
         }
 
         private void recent_Checked(object sender, RoutedEventArgs e)
         {
+            TouchDevice td = null;
+            try { td = ((TouchEventArgs)e).TouchDevice; }
+            catch (Exception) { }
+            log.WriteInteractionLog(10, (string)(this.title.Content), td);
             if (recent_order != null) recent_order();
         }
 
         private void atoz_Checked(object sender, RoutedEventArgs e)
         {
+            TouchDevice td = null;
+            try { td = ((TouchEventArgs)e).TouchDevice; }
+            catch (Exception) { }
+            log.WriteInteractionLog(8, (string)(this.title.Content), td);
             if (atoz_order != null) atoz_order();
         }
     }

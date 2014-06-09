@@ -58,5 +58,13 @@ namespace nature_net
 			db.Actions.InsertOnSubmit(a); db.SubmitChanges(); }
             catch (Exception e) { log.WriteErrorLog(e); }
         }
+
+        public static void InsertInteraction(Interaction_Log i)
+        {
+            naturenet_dataclassDataContext db = new naturenet_dataclassDataContext();
+            db.Interaction_Logs.InsertOnSubmit(i);
+            try { db.SubmitChanges(); }
+            catch (Exception e) { log.WriteErrorLog(e); }
+        }
     }
 }

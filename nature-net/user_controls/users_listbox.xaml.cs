@@ -29,6 +29,8 @@ namespace nature_net.user_controls
         int pos_x_increment = 30;
         int max_pos_x = 250;
 
+        list_refresher refresher;
+
         public users_listbox()
         {
             InitializeComponent();
@@ -37,6 +39,7 @@ namespace nature_net.user_controls
             create_signup_item();
 
             this.users_list.initialize(false, "user", new ItemSelected(this.item_selected));
+            this.users_list.content_name = "Users listbox";
             //this.users_list.populator.initial_item = signup;
             header.atoz_order = new AToZOrder(this.atoz_order);
             header.top_order = new TopOrder(this.top_order);
@@ -44,6 +47,8 @@ namespace nature_net.user_controls
             this.users_list.populator.header = header;
 
             this.users_list.Background = Brushes.White;
+            this.refresher = new list_refresher();
+            this.refresher.users_populator = this.users_list.populator;
         }
 
         void signup_PreviewTouchDown(object sender, TouchEventArgs e)
@@ -54,6 +59,7 @@ namespace nature_net.user_controls
         void signup_PreviewTouchUp(object sender, TouchEventArgs e)
         {
             signup.Background = Brushes.White;
+            log.WriteInteractionLog(5, "", e.TouchDevice);
             window_manager.open_signup_window(last_pos_x, signup.PointToScreen(new Point(0, 0)).Y);
             last_pos_x = last_pos_x + pos_x_increment;
             if (last_pos_x > max_pos_x) last_pos_x = init_pos_x;
@@ -61,12 +67,17 @@ namespace nature_net.user_controls
 
         public void list_all_users()
         {
-            this.Dispatcher.BeginInvoke(DispatcherPriority.Normal,
-               new System.Action(() =>
-               {
-                   this.users_list.populator.item_width = this.Width - 3;
-                   this.users_list.populator.list_all_users();
-               }));
+            if (!configurations.use_list_refresher)
+            {
+                this.Dispatcher.BeginInvoke(DispatcherPriority.Normal,
+                   new System.Action(() =>
+                   {
+                       //this.users_list.populator.item_width = this.Width - 3;
+                       this.users_list.populator.list_all_users();
+                   }));
+            }
+            else
+                refresher.list_all_users();
         }
 
         public void list_users_and_highlight(string username, bool highlight, TabControl tb)
@@ -116,9 +127,10 @@ namespace nature_net.user_controls
             return null;
         }
 
-        bool item_selected(object i)
+        bool item_selected(object i, TouchEventArgs e)
         {
             item_generic_v2 item = (item_generic_v2)i;
+            log.WriteInteractionLog(14, "tapped the listbox item: " + item.ToString(), e.TouchDevice);
             window_manager.open_collection_window((string)item.title.Text, (int)item.Tag, 65, item.PointToScreen(new Point(0, 0)).Y);
             return true;
         }

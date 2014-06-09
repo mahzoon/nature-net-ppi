@@ -69,6 +69,7 @@ namespace nature_net.user_controls
             //this.form1.Visibility = System.Windows.Visibility.Visible;
             avatar_list_control = new avatar_list();
             avatar_list_control.return_value = this.avatar_image;
+            avatar_list_control.Background = Brushes.White;
             avatar_frame = new ContentControl();
             this.avatar_frame.Content = avatar_list_control;
             avatar_list_control.parent_frame = avatar_frame;
@@ -119,8 +120,6 @@ namespace nature_net.user_controls
 
         protected override void OnManipulationBoundaryFeedback(ManipulationBoundaryFeedbackEventArgs e)
         {
-            double y = e.BoundaryFeedback.Translation.Y;
-
             e.Handled = true;
         }
 
@@ -229,6 +228,8 @@ namespace nature_net.user_controls
             this.step1.FontWeight = FontWeights.Normal;
             this.step2.FontWeight = FontWeights.ExtraBold;
             this.step3.FontWeight = FontWeights.Normal;
+
+            log.WriteInteractionLog(32, "", ((TouchEventArgs)e).TouchDevice);
         }
 
         private void button_next2_Click(object sender, RoutedEventArgs e)
@@ -241,6 +242,7 @@ namespace nature_net.user_controls
                 this.step1.FontWeight = FontWeights.Normal;
                 this.step2.FontWeight = FontWeights.Normal;
                 this.step3.FontWeight = FontWeights.ExtraBold;
+                log.WriteInteractionLog(34, "", ((TouchEventArgs)e).TouchDevice);
             }
             else
             {
@@ -250,6 +252,7 @@ namespace nature_net.user_controls
                     checkbox_agreement1.BorderThickness = new Thickness(5);
                     required1.Foreground = Brushes.Red;
                     required1.FontWeight = FontWeights.Bold;
+                    log.WriteInteractionLog(33, "Checkbox1 was not checked.", ((TouchEventArgs)e).TouchDevice);
                     return;
                 }
                 if (!checkbox_agreement2.IsChecked.Value)
@@ -258,6 +261,7 @@ namespace nature_net.user_controls
                     checkbox_agreement2.BorderThickness = new Thickness(5);
                     required2.Foreground = Brushes.Red;
                     required2.FontWeight = FontWeights.Bold;
+                    log.WriteInteractionLog(33, "Checkbox2 was not checked.", ((TouchEventArgs)e).TouchDevice);
                     return;
                 }
             }
@@ -271,6 +275,7 @@ namespace nature_net.user_controls
             this.step1.FontWeight = FontWeights.ExtraBold;
             this.step2.FontWeight = FontWeights.Normal;
             this.step3.FontWeight = FontWeights.Normal;
+            log.WriteInteractionLog(35, "", ((TouchEventArgs)e).TouchDevice);
         }
 
         private void button_back2_Click(object sender, RoutedEventArgs e)
@@ -287,6 +292,7 @@ namespace nature_net.user_controls
             this.step1.FontWeight = FontWeights.Normal;
             this.step2.FontWeight = FontWeights.ExtraBold;
             this.step3.FontWeight = FontWeights.Normal;
+            log.WriteInteractionLog(36, "", ((TouchEventArgs)e).TouchDevice);
         }
 
         private void button_submit_Click(object sender, RoutedEventArgs e)
@@ -299,6 +305,7 @@ namespace nature_net.user_controls
                 textbox_name.BorderThickness = new Thickness(5);
                 desc.Text = "Name is empty.";
                 textbox_name.Focus();
+                log.WriteInteractionLog(37, "Name was empty.", ((TouchEventArgs)e).TouchDevice);
                 return;
             }
             if (textbox_email.Text == "")
@@ -307,6 +314,7 @@ namespace nature_net.user_controls
                 textbox_email.BorderThickness = new Thickness(5);
                 desc.Text = "Email is empty.";
                 textbox_email.Focus();
+                log.WriteInteractionLog(37, "Email was empty.", ((TouchEventArgs)e).TouchDevice);
                 return;
             }
             if (!IsValid(textbox_email.Text))
@@ -315,6 +323,7 @@ namespace nature_net.user_controls
                 textbox_email.BorderThickness = new Thickness(5);
                 desc.Text = "Enter a valid email address.";
                 textbox_email.Focus();
+                log.WriteInteractionLog(37, "Email was not valid.", ((TouchEventArgs)e).TouchDevice);
                 return;
             }
             if (user_pin.IsEmpty())
@@ -323,6 +332,7 @@ namespace nature_net.user_controls
                 user_pin.BorderThickness = new Thickness(5);
                 desc.Text = "Choose a PIN.";
                 user_pin.Focus();
+                log.WriteInteractionLog(37, "PIN was empty.", ((TouchEventArgs)e).TouchDevice);
                 return;
             }
             if (avatar_list_control.Tag == null)
@@ -331,6 +341,7 @@ namespace nature_net.user_controls
                 avatar_border.BorderThickness = new Thickness(5);
                 desc.Text = "Please select an avatar.";
                 avatar_image.Focus();
+                log.WriteInteractionLog(37, "Avatar was empty.", ((TouchEventArgs)e).TouchDevice);
                 return;
             }
             naturenet_dataclassDataContext db = new naturenet_dataclassDataContext();
@@ -344,6 +355,7 @@ namespace nature_net.user_controls
                 textbox_name.BorderBrush = Brushes.Red;
                 textbox_name.BorderThickness = new Thickness(5);
                 desc.Text = "This name has already been taken, choose another.";
+                log.WriteInteractionLog(37, "User exists.", ((TouchEventArgs)e).TouchDevice);
                 return;
             }
 
@@ -376,8 +388,9 @@ namespace nature_net.user_controls
                 desc.Text = "Congratulations!";
                 //file_manager.add_user_to_googledrive(u.id, u.name, u.avatar);
                 window_manager.close_signup_window((window_frame)parent, u.name);
+                log.WriteInteractionLog(38, "Username=" + u.name, ((TouchEventArgs)e).TouchDevice);
             }
-            catch (Exception) { desc.Text = "Could not complete the operation."; }
+            catch (Exception ex) { desc.Text = "Could not complete the operation."; log.WriteErrorLog(ex); }
         }
 
         private void reset()

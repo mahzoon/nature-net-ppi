@@ -168,6 +168,7 @@ namespace nature_net
                 if (data.Count() < 4) return;
                 string username = data[3];
                 int user_id = Convert.ToInt32(data[1]);
+                log.WriteInteractionLog(14, "user collection opened by dragging; user id: " + user_id, e.Cursor.GetPosition(null).X, e.Cursor.GetPosition(null).Y);
                 window_manager.open_collection_window(username, user_id,
                     e.Cursor.GetPosition(sender as IInputElement).X, e.Cursor.GetPosition(sender as IInputElement).Y);
                 e.Handled = true;
@@ -175,6 +176,7 @@ namespace nature_net
             if (context == "design idea")
             {
                 if (data.Count() < 7) return;
+                log.WriteInteractionLog(16, "design idea opened by dragging; contribution id: " + data[1], e.Cursor.GetPosition(null).X, e.Cursor.GetPosition(null).Y);
                 window_manager.open_design_idea_window(data, e.Cursor.GetPosition(sender as IInputElement).X,
                     e.Cursor.GetPosition(sender as IInputElement).Y);
                 e.Handled = true;
@@ -182,6 +184,7 @@ namespace nature_net
             if (context == "Image" || context == "Audio" || context == "Video" || context == "Media")
             {
                 nature_net.user_controls.collection_item ci = (nature_net.user_controls.collection_item)(e.Cursor.Data);
+                log.WriteInteractionLog(17, context + " contribution opened by dragging; contribution id: " + ci._contribution.id, e.Cursor.GetPosition(null).X, e.Cursor.GetPosition(null).Y);
                 window_manager.open_contribution_window(ci, e.Cursor.GetPosition(sender as IInputElement).X,
                     e.Cursor.GetPosition(sender as IInputElement).Y, context);
                 e.Handled = true;
@@ -189,6 +192,7 @@ namespace nature_net
             if (context == "comment")
             {
                 if (data.Count() < 7) return;
+                //log.WriteInteractionLog(43, context, e.Cursor.GetPosition(null).X, e.Cursor.GetPosition(null).Y);
                 window_manager.open_design_idea_window(data, e.Cursor.GetPosition(sender as IInputElement).X,
                     e.Cursor.GetPosition(sender as IInputElement).Y, "Comment");
                 e.Handled = true;
@@ -196,10 +200,12 @@ namespace nature_net
             if (context == "activity")
             {
                 if (data.Count() < 7) return;
+                log.WriteInteractionLog(15, "activity collection opened by dragging; activity id: " + data[1], e.Cursor.GetPosition(null).X, e.Cursor.GetPosition(null).Y);
                 window_manager.open_activity_window(data[3], Convert.ToInt32(data[1]), e.Cursor.GetPosition(sender as IInputElement).X,
                     e.Cursor.GetPosition(sender as IInputElement).Y);
                 e.Handled = true;
             }
+            log.WriteInteractionLog(43, context, e.Cursor.GetPosition(null).X, e.Cursor.GetPosition(null).Y);
         }
 
         void workspace_ManipulationStarting(object sender, ManipulationStartingEventArgs e)
@@ -283,9 +289,17 @@ namespace nature_net
         {
             FrameworkElement element = (FrameworkElement)e.Source;
             if (element == null) return;
-            try { user_controls.window_frame w1 = (user_controls.window_frame)element; w1.UpdateContents(); }
+            try
+            {
+                user_controls.window_frame w1 = (user_controls.window_frame)element; w1.UpdateContents();
+                log.WriteInteractionLog(18, "frame title: " + w1.title.Text, (TouchDevice)e.Device);
+            }
             catch (Exception) { }
-            try { user_controls.image_frame w2 = (user_controls.image_frame)element; w2.UpdateContents(); }
+            try
+            {
+                user_controls.image_frame w2 = (user_controls.image_frame)element; w2.UpdateContents();
+                log.WriteInteractionLog(21, "contribution id: " + w2.item._contribution.id, (TouchDevice)e.Device);
+            }
             catch (Exception) { }
         }
 
@@ -340,6 +354,7 @@ namespace nature_net
                       where l.id == (int)dot.Tag
                       select l;
             Location location = loc.Single<Location>();
+            log.WriteInteractionLog(11, "Location: " + location.id.ToString(), e.TouchDevice);
             window_manager.open_location_collection_window(location.name, location.id, Canvas.GetLeft(dot), Canvas.GetTop(dot));
         }
 
@@ -351,6 +366,7 @@ namespace nature_net
                       where l.id == (int)dot.Tag
                       select l;
             Location location = loc.Single<Location>();
+            log.WriteInteractionLog(11, "Location: " + location.id.ToString(), e.TouchDevice);
             window_manager.open_location_collection_window(location.name, location.id, Canvas.GetLeft(dot) + (dot.Width / 2), Canvas.GetTop(dot) + (dot.Height / 2));
         }
 

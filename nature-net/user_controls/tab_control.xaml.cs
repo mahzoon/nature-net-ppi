@@ -47,8 +47,11 @@ namespace nature_net.user_controls
                 this.tab.BorderThickness = new Thickness(2, 0, 0, 0);
             }
             this.tab.SelectedIndex = selected_tab_id;
+            this.users_listbox.users_list.populator.item_width = users_listbox.Width - 3;
             this.users_listbox.list_all_users();
+            this.activities_listbox.activities_list.populator.item_width = activities_listbox.Width - 3;
             this.activities_listbox.list_all_activities();
+            this.design_ideas_listbox.design_ideas_list.populator.item_width = design_ideas_listbox.Width - 3;
             this.design_ideas_listbox.list_all_design_ideas();
         }
 
@@ -86,7 +89,11 @@ namespace nature_net.user_controls
         {
             TabItem tab = sender as TabItem;
             TabControl control = tab.Parent as TabControl;
+            TextBlock tb1 = (TextBlock)(tab).Header;
+            TextBlock tb2 = (TextBlock)((TabItem)control.SelectedItem).Header;
+            log.WriteInteractionLog(2, "from " + tb2.Text + " to " + tb1.Text, e.TouchDevice);
             control.SelectedItem = tab;
+            
             //e.Handled = true;
         }
     }

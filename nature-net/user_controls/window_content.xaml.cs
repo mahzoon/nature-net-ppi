@@ -145,21 +145,29 @@ namespace nature_net.user_controls
 
         void expander_Click(object sender, RoutedEventArgs e)
         {
+            if (expand_state) log.WriteInteractionLog(23, "object_type: " + _object_type + "; object_id: " + _object_id.ToString(), ((TouchEventArgs)e).TouchDevice);
+            else log.WriteInteractionLog(22, "object_type: " + _object_type + "; object_id: " + _object_id.ToString(), ((TouchEventArgs)e).TouchDevice);
             ToggleCommentsSection();
         }
 
         void submit_comment_default_clicked(object sender, RoutedEventArgs e)
         {
+            if (hide_expander) // design idea
+                log.WriteInteractionLog(28, "Idea; Text: " + this.GetActiveTextBox().Text, ((TouchEventArgs)e).TouchDevice);
+            else // comment
+                log.WriteInteractionLog(27, "Comment; Text: " + this.GetActiveTextBox().Text + "; object_type: " + _object_type + "; object_id: " + _object_id.ToString() , ((TouchEventArgs)e).TouchDevice);
             GotoAuthMode();
         }
 
         void submit_comment_reply_clicked(object sender, RoutedEventArgs e)
         {
+            log.WriteInteractionLog(27, "Reply id: " + reply_id + "; Text: " + this.GetActiveTextBox().Text + "; object_type: " + _object_type + "; object_id: " + _object_id.ToString(), ((TouchEventArgs)e).TouchDevice);
             GotoAuthMode();
         }
 
         void cancel_comment_reply_clicked(object sender, RoutedEventArgs e)
         {
+            log.WriteInteractionLog(39, "Reply id: " + reply_id + "; Text: " + this.GetActiveTextBox().Text + "; object_type: " + _object_type + "; object_id: " + _object_id.ToString(), ((TouchEventArgs)e).TouchDevice);
             GotoDefaultMode();
         }
 
@@ -169,6 +177,10 @@ namespace nature_net.user_controls
             {
                 this.error_desc.Visibility = System.Windows.Visibility.Visible;
                 this.error_desc.Content = "Comment text is empty.";
+                if (is_reply)
+                    log.WriteInteractionLog(41, (hide_expander?"Idea":"Comment") + "; Reply id: " + reply_id + "; Text is empty; object_type: " + _object_type + "; object_id: " + _object_id.ToString(), ((TouchEventArgs)e).TouchDevice);
+                else
+                    log.WriteInteractionLog(41, (hide_expander?"Idea":"Comment") + "; Text is empty; object_type: " + _object_type + "; object_id: " + _object_id.ToString(), ((TouchEventArgs)e).TouchDevice);
                 return;
             }
             // authenticate
@@ -177,9 +189,19 @@ namespace nature_net.user_controls
                             where (u.name == this.selected_user.title.Text) && (u.password == this.pin.pin_string)
                             select u;
             if (auth_user.Count() == 1)
-                submit_text();
+            {
+                if (is_reply)
+                    log.WriteInteractionLog(31, (hide_expander ? "Idea" : "Comment") + "; Reply id: " + reply_id + "; Text: " + this.GetActiveTextBox().Text + "; object_type: " + _object_type + "; object_id: " + _object_id.ToString(), ((TouchEventArgs)e).TouchDevice);
+                else
+                    log.WriteInteractionLog(31, (hide_expander ? "Idea" : "Comment") + "; Text: " + this.GetActiveTextBox().Text + "; object_type: " + _object_type + "; object_id: " + _object_id.ToString(), ((TouchEventArgs)e).TouchDevice);
+                submit_text(e);
+            }
             else
             {
+                if (is_reply)
+                    log.WriteInteractionLog(30, (hide_expander?"Idea":"Comment") + "; Reply id: " + reply_id + "; Text: " + this.GetActiveTextBox().Text + "; object_type: " + _object_type + "; object_id: " + _object_id.ToString(), ((TouchEventArgs)e).TouchDevice);
+                else
+                    log.WriteInteractionLog(30, (hide_expander ? "Idea" : "Comment") + "; Text: " + this.GetActiveTextBox().Text + "; object_type: " + _object_type + "; object_id: " + _object_id.ToString(), ((TouchEventArgs)e).TouchDevice);
                 this.error_desc.Visibility = System.Windows.Visibility.Visible;
                 this.error_desc.Content = configurations.authentication_failed_text;
                 pin.Reset(true);
@@ -196,12 +218,18 @@ namespace nature_net.user_controls
             this.pin.Reset(false);
             CheckTextBoxText();
             if (is_reply)
+            {
+                if (e!= null) log.WriteInteractionLog(40, "Reply id was: " + reply_id + "; Text: " + this.GetActiveTextBox().Text + "; object_type: " + _object_type + "; object_id: " + _object_id.ToString(), ((TouchEventArgs)e).TouchDevice);
                 GotoReplyMode();
+            }
             else
+            {
+                if (e != null) log.WriteInteractionLog(40, "Text: " + this.GetActiveTextBox().Text + "; object_type: " + _object_type + "; object_id: " + _object_id.ToString(), ((TouchEventArgs)e).TouchDevice);
                 GotoDefaultMode();
+            }
         }
 
-        void submit_text()
+        void submit_text(RoutedEventArgs e)
         {
             bool is_design_idea = hide_expander;
             if (is_design_idea)
@@ -222,6 +250,7 @@ namespace nature_net.user_controls
                 if (the_item.Content != null)
                     ((design_ideas_listbox)the_item.Content).list_all_design_ideas();
                 //window_manager.load_design_ideas();
+                log.WriteInteractionLog(42, "Idea" + "; Text: " + this.GetActiveTextBox().Text + "; object_type: " + _object_type + "; object_id: " + _object_id.ToString(), ((TouchEventArgs)e).TouchDevice);
                 window_manager.close_submit_design_idea_window((window_frame)this.parent, idea.note);
                 //if (((design_ideas_listbox)the_item.Content).parent != null)
                 //    ((design_ideas_listbox)the_item.Content).parent.list_all_design_ideas();
@@ -238,12 +267,20 @@ namespace nature_net.user_controls
                 //else
                 //{
                     //int p_id = (int)((item_generic)comments_listbox._list.Items[comments_listbox._list.SelectedIndex]).Tag;
+                if (is_reply)
                     comment.parent_id = reply_id;
+                else
+                    comment.parent_id = 0;
                 //}
                 comment.technical_info = "";
                 comment.type_id = 1;
                 comment.user_id = this.comment_user_id;
                 database_manager.InsertFeedback(comment);
+                if (is_reply)
+                    log.WriteInteractionLog(42, "Comment; Reply id: " + reply_id + "; Text: " + this.GetActiveTextBox().Text + "; object_type: " + _object_type + "; object_id: " + _object_id.ToString(), ((TouchEventArgs)e).TouchDevice);
+                else
+                    log.WriteInteractionLog(42, "Comment; Text: " + this.GetActiveTextBox().Text + "; object_type: " + _object_type + "; object_id: " + _object_id.ToString(), ((TouchEventArgs)e).TouchDevice);
+
                 if (this.the_item.Content != null)
                 {
                     try
@@ -254,6 +291,7 @@ namespace nature_net.user_controls
                     catch (Exception) { }
                 }
                 this.list_all_comments();
+                
                 if (this._object_type.ToString() == "nature_net.Contribution")
                     window_manager.load_design_ideas_sync();
             }
@@ -282,16 +320,21 @@ namespace nature_net.user_controls
                 this.pin_area.Visibility = System.Windows.Visibility.Visible;
                 if (keyboard_frame != null) keyboard_frame.Visibility = System.Windows.Visibility.Collapsed;
                 this.pin.Reset(true);
+                if (is_reply)
+                    log.WriteInteractionLog(29, (hide_expander ? "Idea" : "Comment") + "; user id: " + user_id + "reply id: " + reply_id + "; Text: " + this.GetActiveTextBox().Text + "; object_type: " + _object_type + "; object_id: " + _object_id.ToString(), e.Cursor.GetPosition(null).X, e.Cursor.GetPosition(null).Y);
+                else
+                    log.WriteInteractionLog(29, (hide_expander ? "Idea" : "Comment") + "; user id: " + user_id + "; Text: " + this.GetActiveTextBox().Text + "; object_type: " + _object_type + "; object_id: " + _object_id.ToString(), e.Cursor.GetPosition(null).X, e.Cursor.GetPosition(null).Y);
             }
             e.Handled = true;
         }
 
-        public void initialize_contents(UserControl uc, Type obj_type, int obj_id, UserControl parent_frame)
+        public void initialize_contents(UserControl uc, Type obj_type, int obj_id, UserControl parent_frame, string listbox_name)
         {
             this.the_item.Content = uc;
             this._object_id = obj_id;
             this._object_type = obj_type;
             this.comments_listbox._list.Width = parent_frame.Width;
+            this.comments_listbox.content_name = listbox_name + "; " + "object id = " + obj_id;
             this.list_all_comments();
             
             //this.add_comment_img.Source = configurations.img_drop_avatar_pic;
@@ -308,6 +351,7 @@ namespace nature_net.user_controls
 
         public void initialize_contents(UserControl uc, Type obj_type, int obj_id, UserControl parent_frame, double width)
         {
+            this.comments_listbox.content_name = "object id = " + obj_id;
             this.the_item.Content = uc;
             this._object_id = obj_id;
             this._object_type = obj_type;
@@ -452,7 +496,7 @@ namespace nature_net.user_controls
             this.comments_listbox.populator.list_all_comments(i);
         }
 
-        bool item_selected(object i)
+        bool item_selected(object i, TouchEventArgs e)
         {
             return false;
         }
@@ -561,6 +605,7 @@ namespace nature_net.user_controls
             item_generic i = (item_generic)(((Button)sender).Tag);
             this.reply_id = (int)i.Tag;
             this.is_reply = true;
+            log.WriteInteractionLog(26, "Reply id: " + reply_id + " ; Text: " + this.GetActiveTextBox().Text + "; object_type: " + _object_type + "; object_id: " + _object_id.ToString(), ((TouchEventArgs)e).TouchDevice);
 
             reply_item.Background = Brushes.White;
             reply_item.username.Text = "";
@@ -603,6 +648,7 @@ namespace nature_net.user_controls
                 this.comment_textbox_default.Foreground = comment_textbox_reply.Foreground;
             }
             this.is_reply = false;
+            this.reply_id = 0;
             this.comment_textbox_default.Focus();
             CheckInitialText();
             //if (keyboard_frame != null) keyboard_frame.Visibility = System.Windows.Visibility.Collapsed;

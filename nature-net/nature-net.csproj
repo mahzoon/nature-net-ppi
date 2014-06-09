@@ -100,6 +100,7 @@
     <Compile Include="database_manager.cs" />
     <Compile Include="file_manager.cs" />
     <Compile Include="iniparser.cs" />
+    <Compile Include="list_refresher.cs" />
     <Compile Include="log.cs" />
     <Compile Include="naturenet_dataclass.designer.cs">
       <AutoGen>True</AutoGen>

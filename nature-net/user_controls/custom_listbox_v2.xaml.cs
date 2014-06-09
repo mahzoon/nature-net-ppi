@@ -40,6 +40,8 @@ namespace nature_net.user_controls
         private Canvas debug_canvas;
         private List<DependencyObject> hitResultsList = new List<DependencyObject>();
 
+        public string content_name = "";
+
         public custom_listbox_v2()
         {
             InitializeComponent();
@@ -314,7 +316,7 @@ namespace nature_net.user_controls
             //string data = drag_prefix + ";" + ((int)item.Tag).ToString() + ";" + avatar + ";" +
             //    (string)item.title.Text + ";" + item.description.Text + ";" + "" + ";" + "";
             string data = drag_prefix + ";" + item.ToString();
-
+            log.WriteInteractionLog(4, "start dragging the listbox item: " + item.ToString(), e.TouchDevice);
             Microsoft.Surface.Presentation.SurfaceDragCursor startDragOkay =
                 Microsoft.Surface.Presentation.SurfaceDragDrop.BeginDragDrop(
                   this._list,                 // The SurfaceListBox object that the cursor is dragged out from.
@@ -348,7 +350,7 @@ namespace nature_net.user_controls
             if (img.img.Tag == null) return false;
 
             collection_item item = (collection_item)img.img.Tag;
-
+            log.WriteInteractionLog(4, "start dragging the contribution id: " + item._contribution.id, input);
             Microsoft.Surface.Presentation.SurfaceDragCursor startDragOkay =
                 Microsoft.Surface.Presentation.SurfaceDragDrop.BeginDragDrop(
                   this._list,                 // The SurfaceListBox object that the cursor is dragged out from.
@@ -375,7 +377,32 @@ namespace nature_net.user_controls
             //}
             bool do_deselect = true;
             if (item_selected != null)
-                do_deselect = item_selected(item);
+                do_deselect = item_selected(item, null);
+            if (do_deselect)
+                _list.SelectedIndex = -1;
+            else
+            {
+                if (last_selected_index == _list.SelectedIndex)
+                    _list.SelectedIndex = -1;
+            }
+            this.last_selected_index = _list.SelectedIndex;
+        }
+
+        private void _list_select_item(object item, TouchEventArgs e)
+        {
+            //if (list_comments)
+            //{
+            //    string[] idea_item = ("comment;" + item.ToString()).Split(new Char[] { ';' });
+            //    //window_manager.open_design_idea_window(idea_item,
+            //    //    configurations.RANDOM((int)(window_manager.main_canvas.ActualWidth - item.ActualWidth) - 20,
+            //    //    (int)(window_manager.main_canvas.ActualWidth - item.ActualWidth)),
+            //    //    item.PointToScreen(new Point(0, 0)).Y);
+            //    _list.SelectedIndex = -1;
+            //    return;
+            //}
+            bool do_deselect = true;
+            if (item_selected != null)
+                do_deselect = item_selected(item, e);
             if (do_deselect)
                 _list.SelectedIndex = -1;
             else
@@ -608,7 +635,7 @@ namespace nature_net.user_controls
                             //_list.SelectedItem = element;
                             try
                             {
-                                _list_select_item(selected_item);
+                                _list_select_item(selected_item, e);
                             }
                             catch (Exception e2) { log.WriteErrorLog(e2); }
                         }
@@ -629,6 +656,12 @@ namespace nature_net.user_controls
                 //}
                 //catch (Exception) { }
                 //last_scroll_offset = scroll.VerticalOffset;
+                if (collection_list)
+                    log.WriteInteractionLog(24, this.content_name, e.TouchDevice);
+                else if (comment_list)
+                    log.WriteInteractionLog(25, this.content_name, e.TouchDevice);
+                else
+                    log.WriteInteractionLog(1, this.content_name, e.TouchDevice);
             }
             if (touch_points[e.TouchDevice.Id].initial_attended_item != null)
                 attend_on_item(false, touch_points[e.TouchDevice.Id].initial_attended_item);
@@ -1188,35 +1221,38 @@ namespace nature_net.user_controls
             this._list.Items.Dispatcher.BeginInvoke(DispatcherPriority.Normal,
                new System.Action(() =>
                {
-                   this._list.Items.Clear();
-                   if (initial_item != null)
-                       this._list.Items.Add(initial_item);
-
-                   List<activity_item> activities = (List<activity_item>)e.Result;
-                   foreach (activity_item a in activities)
-                   {
-                       item_generic_v2 i = new item_generic_v2();
-                       i.title.Text = a.activity.name; i.title.Margin = new Thickness(5);
-                       i.description.Text = a.activity.description; i.description.Margin = new Thickness(5);
-                       i.txt_level2.Text = configurations.GetDate_Formatted(a.last_date);
-                       i.txt_level3.Text = a.username; i.number.Text = a.count.ToString();
-                       i.Tag = a.activity.id;
-                       i.txt_level1.Visibility = Visibility.Collapsed;
-                       i.left_panel.Visibility = Visibility.Collapsed;
-                       if (item_width != 0) i.Width = item_width;
-                       i.Margin = items_margins;
-                       i.user_info.Visibility = Visibility.Collapsed; i.user_info_date.Text = i.txt_level2.Text;
-                       i.top_value = a.count;
-                       i.drag_icon_vertical.Source = configurations.img_drag_vertical_icon;
-                       if (configurations.show_vertical_drag) i.drag_icon_vertical_panel.Visibility = Visibility.Visible;
-                       this._list.Items.Add(i);
-                   }
-                   if (header.atoz.IsChecked.Value && header.atoz_order != null) header.atoz_order();
-                   if (header.top.IsChecked.Value && header.top_order != null) header.top_order();
-                   if (header.recent.IsChecked.Value && header.recent_order != null) header.recent_order();
-                   this._list.Items.Refresh();
-                   this._list.UpdateLayout();
+                   display_all_activities((List<activity_item>)e.Result);
                }));
+        }
+        public void display_all_activities(List<activity_item> activities)
+        {
+            this._list.Items.Clear();
+            if (initial_item != null)
+                this._list.Items.Add(initial_item);
+
+            foreach (activity_item a in activities)
+            {
+                item_generic_v2 i = new item_generic_v2();
+                i.title.Text = a.activity.name; i.title.Margin = new Thickness(5);
+                i.description.Text = a.activity.description; i.description.Margin = new Thickness(5);
+                i.txt_level2.Text = configurations.GetDate_Formatted(a.last_date);
+                i.txt_level3.Text = a.username; i.number.Text = a.count.ToString();
+                i.Tag = a.activity.id;
+                i.txt_level1.Visibility = Visibility.Collapsed;
+                i.left_panel.Visibility = Visibility.Collapsed;
+                if (item_width != 0) i.Width = item_width;
+                i.Margin = items_margins;
+                i.user_info.Visibility = Visibility.Collapsed; i.user_info_date.Text = i.txt_level2.Text;
+                i.top_value = a.count;
+                i.drag_icon_vertical.Source = configurations.img_drag_vertical_icon;
+                if (configurations.show_vertical_drag) i.drag_icon_vertical_panel.Visibility = Visibility.Visible;
+                this._list.Items.Add(i);
+            }
+            if (header.atoz.IsChecked.Value && header.atoz_order != null) header.atoz_order();
+            if (header.top.IsChecked.Value && header.top_order != null) header.top_order();
+            if (header.recent.IsChecked.Value && header.recent_order != null) header.recent_order();
+            this._list.Items.Refresh();
+            this._list.UpdateLayout();
         }
     }
 
@@ -1269,5 +1305,5 @@ namespace nature_net.user_controls
         public Control initial_attended_item;
     }
 
-    public delegate bool ItemSelected(object i);
+    public delegate bool ItemSelected(object i, TouchEventArgs e);
 }
