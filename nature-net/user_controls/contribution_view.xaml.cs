@@ -73,9 +73,9 @@ namespace nature_net.user_controls
                 {
                     the_image.Source = configurations.img_sound_image_pic;
                     the_image.UpdateLayout();
-                    string fname = i._contribution.media_url;
-                    string ext = fname.Substring(fname.Length - 4, 4);
-                    the_media.Source = new Uri(configurations.GetAbsoluteContributionPath() + item._contribution.id.ToString() + ext);
+                    //string fname = i._contribution.media_url;
+                    //string ext = fname.Substring(fname.Length - 4, 4);
+                    the_media.Source = new Uri(configurations.GetAbsoluteContributionPath() + item._contribution.id.ToString());
                     the_media.Play();
                     return;
                 }
@@ -99,9 +99,9 @@ namespace nature_net.user_controls
                     the_image.Source = window_manager.thumbnails[i._contribution.id];
                     the_image.UpdateLayout();
                 }
-                string fname = i._contribution.media_url;
-                string ext = fname.Substring(fname.Length - 4, 4);
-                the_media.Source = new Uri(configurations.GetAbsoluteContributionPath() + item._contribution.id.ToString() + ext);
+                //string fname = i._contribution.media_url;
+                //string ext = fname.Substring(fname.Length - 4, 4);
+                the_media.Source = new Uri(configurations.GetAbsoluteContributionPath() + item._contribution.id.ToString());
                 //the_media.Visibility = System.Windows.Visibility.Visible;
                 //the_image.Visibility = System.Windows.Visibility.Collapsed;
                 //string fname = i._contribution.media_url;
@@ -147,14 +147,15 @@ namespace nature_net.user_controls
             int contribution_id = (int)e.Argument;
             if (!window_manager.downloaded_contributions.Contains(contribution_id))
             {
-                naturenet_dataclassDataContext db = new naturenet_dataclassDataContext();
+                naturenet_dataclassDataContext db = database_manager.GetTableTopDB();
                 var result1 = from c in db.Contributions
                               where c.id == contribution_id
                               select c;
                 if (result1.Count() != 0)
                 {
                     Contribution contrib = result1.First<Contribution>();
-                    bool result = file_manager.download_file_from_googledirve(contrib.media_url, contribution_id);
+                    //bool result = file_manager.download_file_from_googledirve(contrib.media_url, contribution_id);
+                    bool result = file_manager.download_file(contrib.media_url, contribution_id);
                     if (result) window_manager.downloaded_contributions.Add(contribution_id);
                 }
             }

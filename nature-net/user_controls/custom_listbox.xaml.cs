@@ -346,7 +346,7 @@ namespace nature_net.user_controls
             e.Result = (object)(new List<design_idea_item>());
             try
             {
-                naturenet_dataclassDataContext db = new naturenet_dataclassDataContext();
+                naturenet_dataclassDataContext db = database_manager.GetTableTopDB();
                 var r = from d in db.Design_Ideas
                         orderby d.date descending
                         select d;
@@ -413,7 +413,7 @@ namespace nature_net.user_controls
             e.Result = (object)(new List<user_item>());
             try
             {
-                naturenet_dataclassDataContext db = new naturenet_dataclassDataContext();
+                naturenet_dataclassDataContext db = database_manager.GetTableTopDB();
                 var r = from u in db.Users
                         where u.id != 0
                         orderby u.name
@@ -483,7 +483,7 @@ namespace nature_net.user_controls
             try
             {
                 comment_item item = (comment_item)e.Argument;
-                naturenet_dataclassDataContext db = new naturenet_dataclassDataContext();
+                naturenet_dataclassDataContext db = database_manager.GetTableTopDB();
                 var r = from c in db.Feedbacks
                         where (c.Feedback_Type.name == "Comment") && (c.object_type == item._object_type.ToString())
                         && (c.object_id == item._object_id)
@@ -549,7 +549,7 @@ namespace nature_net.user_controls
             e.Result = (object)(new List<Activity>());
             try
             {
-                naturenet_dataclassDataContext db = new naturenet_dataclassDataContext();
+                naturenet_dataclassDataContext db = database_manager.GetTableTopDB();
                 var r = from a in db.Activities
                         where (a.name != "Free Observation") && (a.name != "Design Idea")
                         select a;

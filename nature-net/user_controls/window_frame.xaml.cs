@@ -60,7 +60,7 @@ namespace nature_net.user_controls
 
         public void hide_change_view()
         {
-            this.change_view.Visibility = System.Windows.Visibility.Hidden;
+            this.change_view.Visibility = System.Windows.Visibility.Collapsed;
         }
 
         void change_view_Click(object sender, RoutedEventArgs e)
@@ -70,6 +70,7 @@ namespace nature_net.user_controls
         
         void close_Click(object sender, RoutedEventArgs e)
         {
+            log.WriteInteractionLog(19, "frame closed with title: " + this.title.Text, ((TouchEventArgs)e).TouchDevice);
             window_manager.close_window(this);
         }
 

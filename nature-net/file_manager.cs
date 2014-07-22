@@ -17,8 +17,26 @@ namespace nature_net
 {
     public class file_manager
     {
+        public static bool download_file(string file_name, int contribution_id)
+        {
+            try
+            {
+                System.IO.FileStream file_stream = new System.IO.FileStream(
+                            configurations.GetAbsoluteContributionPath() + contribution_id.ToString(), System.IO.FileMode.CreateNew);
+                file_stream.Close();
+                WebClient client = new WebClient();
+                client.Headers.Add("user-agent", "Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.2; .NET CLR 1.0.3705;)");
+                client.DownloadFile(file_name, configurations.GetAbsoluteContributionPath() + contribution_id.ToString());
+                return true;
+            }
+            catch (Exception e)
+            {
+                log.WriteErrorLog(e);
+                return false;
+            }
+        }
 
-        public static bool download_file_from_googledirve(string file_name, int contribution_id)
+        public static bool download_file_from_googledrive(string file_name, int contribution_id)
         {
             try
             {
@@ -94,7 +112,7 @@ namespace nature_net
                 }
             } while (!String.IsNullOrEmpty(request.PageToken));
 
-            naturenet_dataclassDataContext db = new naturenet_dataclassDataContext();
+            naturenet_dataclassDataContext db = database_manager.GetTableTopDB();
             foreach (Change c in result)
             {
                 try
@@ -277,7 +295,7 @@ namespace nature_net
             List<string> usernames = configurations.GetUserNameList_GDText(users_list);
             List<string> avatars = configurations.GetAvatarList_GDText(users_list);
 
-            naturenet_dataclassDataContext db = new naturenet_dataclassDataContext();
+            naturenet_dataclassDataContext db = database_manager.GetTableTopDB();
             var ru = from u in db.Users
                      where u.id > 0
                      select u.name;
@@ -335,7 +353,7 @@ namespace nature_net
             reader.Close();
             List<string> ideas = ideas_list.Split(new Char[] { '\r', '\n' }, StringSplitOptions.RemoveEmptyEntries).ToList<string>();
 
-            naturenet_dataclassDataContext db = new naturenet_dataclassDataContext();
+            naturenet_dataclassDataContext db = database_manager.GetTableTopDB();
             var r = from c in db.Contributions
                     select c.note;
             List<string> notes = r.ToList<string>();

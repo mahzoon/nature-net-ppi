@@ -67,9 +67,9 @@ namespace nature_net.user_controls
                 {
                     the_item.Background = new ImageBrush(configurations.img_sound_image_pic);
                     the_item.UpdateLayout();
-                    string fname = i._contribution.media_url;
-                    string ext = fname.Substring(fname.Length - 4, 4);
-                    the_media.Source = new Uri(configurations.GetAbsoluteContributionPath() + item._contribution.id.ToString() + ext);
+                    //string fname = i._contribution.media_url;
+                    //string ext = fname.Substring(fname.Length - 4, 4);
+                    the_media.Source = new Uri(configurations.GetAbsoluteContributionPath() + item._contribution.id.ToString());
                     the_media.Play();
                     return;
                 }
@@ -96,9 +96,9 @@ namespace nature_net.user_controls
                     the_item.Background = new ImageBrush(window_manager.thumbnails[i._contribution.id]);
                     the_item.UpdateLayout();
                 }
-                string fname = i._contribution.media_url;
-                string ext = fname.Substring(fname.Length - 4, 4);
-                the_media.Source = new Uri(configurations.GetAbsoluteContributionPath() + item._contribution.id.ToString() + ext);
+                //string fname = i._contribution.media_url;
+                //string ext = fname.Substring(fname.Length - 4, 4);
+                the_media.Source = new Uri(configurations.GetAbsoluteContributionPath() + item._contribution.id.ToString());
                 the_media.Play();
                 the_media.MediaOpened += new RoutedEventHandler(the_media_MediaOpened);
                 //the_media.Loaded += new RoutedEventHandler(the_media_Loaded);
@@ -111,20 +111,21 @@ namespace nature_net.user_controls
             int contribution_id = (int)e.Argument;
             if (!window_manager.downloaded_contributions.Contains(contribution_id))
             {
-                naturenet_dataclassDataContext db = new naturenet_dataclassDataContext();
+                naturenet_dataclassDataContext db = database_manager.GetTableTopDB();
                 var result1 = from c in db.Contributions
                               where c.id == contribution_id
                               select c;
                 if (result1.Count() != 0)
                 {
                     Contribution contrib = result1.First<Contribution>();
-                    bool result = file_manager.download_file_from_googledirve(contrib.media_url, contribution_id);
+                    //bool result = file_manager.download_file_from_googledirve(contrib.media_url, contribution_id);
+                    bool result = file_manager.download_file(contrib.media_url, contribution_id);
                     if (result) window_manager.downloaded_contributions.Add(contribution_id);
                 }
             }
             try
             {
-                ImageSource src = new BitmapImage(new Uri(configurations.GetAbsoluteContributionPath() + contribution_id.ToString() + ".jpg"));
+                ImageSource src = new BitmapImage(new Uri(configurations.GetAbsoluteContributionPath() + contribution_id.ToString()));
                 src.Freeze();
                 the_image = src;
                 //window_manager.contributions.Add(contribution_id, src);

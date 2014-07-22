@@ -15,10 +15,12 @@ namespace nature_net
         static string config_file = "config.ini";
         public static string line_break = "\r\n";
         static string log_file = "log.txt";
+        public static string site_name = "aces";
+        public static bool write_interaction_log = false;
         public static string contribution_comment_date = "On ";
         public static string contribution_comment_user = "Taken by ";
         public static string contribution_comment_tag = "Tags: ";
-        public static string contribution_comment_location = "Location ";
+        public static string contribution_comment_location = "At ";
         public static string designidea_date_desc = "Last Update: ";
         public static string designidea_num_desc = "replies";
         public static string users_date_desc = "Last Update: ";
@@ -27,6 +29,7 @@ namespace nature_net
         public static string activities_date_desc = "Last Update: ";
         public static string activities_num_desc = "Contributions";
         public static string authentication_failed_text = "Whoops! That PIN was incorrect. Please try again.";
+        public static string frame_title = "Observations";
 
         public static string signup_item_title = "Sign up";
         public static string submit_idea_item_title = "Submit Idea";
@@ -81,8 +84,10 @@ namespace nature_net
         public static bool center_commentarea_and_keyboard = false;
         public static bool multi_keyboard = false;
         public static bool show_vertical_drag = true;
-        
+        public static bool show_empty_metadata = false;
+        public static bool show_all_metadata = false;
         public static bool use_avatar_drag = false;
+        public static bool use_list_refresher = false;
 
         public static List<Point> locations = new List<Point>();
         public static int location_dot_diameter = 55;
@@ -539,7 +544,7 @@ namespace nature_net
 
         public static int get_or_create_collection(int user_id, int activity_id, DateTime dt)
         {
-            naturenet_dataclassDataContext db = new naturenet_dataclassDataContext();
+            naturenet_dataclassDataContext db = database_manager.GetTableTopDB();
             var r = from c in db.Collections
                     where ((c.user_id == user_id) && c.activity_id == activity_id)
                     orderby c.date descending
@@ -648,6 +653,8 @@ namespace nature_net
 
             // General variables
             //line_break = parser.GetValue("General", "line_break", "\r\n");
+            site_name = parser.GetValue("General", "site_name", "aces");
+            write_interaction_log = parser.GetValue("General", "write_interaction_log", false);
             log_file = parser.GetValue("General", "log_file", "log.txt");
             contribution_comment_date = parser.GetValue("General", "contribution_comment_date", "Taken by: ");
             contribution_comment_tag = parser.GetValue("General", "contribution_comment_tag", "Tags: ");
@@ -659,6 +666,7 @@ namespace nature_net
             users_no_date = parser.GetValue("General", "users_no_date", "Just Created");
             activities_date_desc = parser.GetValue("General", "activities_date_desc", "Last Update: ");
             activities_num_desc = parser.GetValue("General", "activities_num_desc", "Contributions");
+            frame_title = parser.GetValue("General", "frame_title", "Observations");
 
             // Parameters
             high_contrast = parser.GetValue("Parameters", "high_contrast", false);
@@ -695,6 +703,9 @@ namespace nature_net
             center_commentarea_and_keyboard = parser.GetValue("Parameters", "center_commentarea_and_keyboard", false);
             multi_keyboard = parser.GetValue("Parameters", "multi_keyboard", false);
             show_vertical_drag = parser.GetValue("Parameters", "show_vertical_drag", true);
+            show_empty_metadata = parser.GetValue("Parameters", "show_empty_metadata", false);
+            show_all_metadata = parser.GetValue("Parameters", "show_all_metadata", false);
+            use_list_refresher = parser.GetValue("Parameters", "use_list_refresher", false);
             update_period_ms = parser.GetValue("Parameters", "update_period_ms", 20000);
             scaling_mode = parser.GetValue("Parameters", "scaling_mode", BitmapScalingMode.Fant);
             click_opacity_on_collection_item = parser.GetValue("Parameters", "click_opacity_on_collection_item", 0.8);
@@ -775,6 +786,7 @@ namespace nature_net
             parser.SetValue("General", "users_no_date", users_no_date);
             parser.SetValue("General", "activities_date_desc", activities_date_desc);
             parser.SetValue("General", "activities_num_desc", activities_num_desc);
+            parser.SetValue("General", "frame_title", frame_title);
 
             // Parameters
             parser.SetValue("Parameters", "high_contrast", high_contrast);
@@ -811,6 +823,9 @@ namespace nature_net
             parser.SetValue("Parameters", "center_commentarea_and_keyboard", center_commentarea_and_keyboard);
             parser.SetValue("Parameters", "multi_keyboard", multi_keyboard);
             parser.SetValue("Parameters", "show_vertical_drag", show_vertical_drag);
+            parser.SetValue("Parameters", "show_empty_metadata", show_empty_metadata);
+            parser.SetValue("Parameters", "show_all_metadata", show_all_metadata);
+            parser.SetValue("Parameters", "use_list_refresher", use_list_refresher);
             parser.SetValue("Parameters", "update_period_ms", update_period_ms);
             parser.SetValue("Parameters", "scaling_mode", scaling_mode);
             parser.SetValue("Parameters", "click_opacity_on_collection_item", click_opacity_on_collection_item);
@@ -910,6 +925,34 @@ namespace nature_net
             return s.ToString();
         }
 
+        public static string GetTextBlockText2(System.Windows.Controls.TextBlock tb)
+        {
+            Drawing textBlockDrawing = VisualTreeHelper.GetDrawing(tb);
+            var sb = new StringBuilder();
+            WalkDrawingForText(sb, textBlockDrawing);
+            return sb.ToString();
+        }
+
+        private static void WalkDrawingForText(StringBuilder sb, Drawing d)
+        {
+            var glyphs = d as GlyphRunDrawing;
+            if (glyphs != null)
+            {
+                sb.Append(glyphs.GlyphRun.Characters.ToArray());
+            }
+            else
+            {
+                var g = d as DrawingGroup;
+                if (g != null)
+                {
+                    foreach (Drawing child in g.Children)
+                    {
+                        WalkDrawingForText(sb, child);
+                    }
+                }
+            }
+        }
+
         public static bool IsFirstItemGreaterThanSecond(nature_net.user_controls.item_generic_v2 first, nature_net.user_controls.item_generic_v2 second, bool atoz, bool top, bool recent, int len_number_prefix, int len_date_prefix, bool asc)
         {
             if (atoz)
@@ -982,7 +1025,7 @@ namespace nature_net
 
         public static User find_user_of_contribution(Contribution c)
         {
-            naturenet_dataclassDataContext db = new naturenet_dataclassDataContext();
+            naturenet_dataclassDataContext db = database_manager.GetTableTopDB();
             var users = from mappings in db.Collection_Contribution_Mappings
                            where mappings.contribution_id == c.id
                            select mappings.Collection.User;

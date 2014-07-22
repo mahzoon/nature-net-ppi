@@ -296,6 +296,7 @@ namespace nature_net.user_controls
 
         public void list_contributions_in_location(int location)
         {
+            this.contributions.content_name = "contributions in location: " + location.ToString();
             worker.WorkerReportsProgress = true;
             worker.DoWork += new DoWorkEventHandler(get_contributions_in_location);
             worker.ProgressChanged += new ProgressChangedEventHandler(progress_changed);
@@ -306,6 +307,7 @@ namespace nature_net.user_controls
 
         public void list_contributions_in_activity(int activity_id)
         {
+            this.contributions.content_name = "contributions in activity: " + activity_id.ToString();
             worker.WorkerReportsProgress = true;
             worker.DoWork += new DoWorkEventHandler(get_contributions_in_activity);
             worker.ProgressChanged += new ProgressChangedEventHandler(progress_changed);
@@ -317,6 +319,7 @@ namespace nature_net.user_controls
         public void list_all_contributions(string username)
         {
             this.collection_username = username;
+            this.contributions.content_name = "contributions for user: " + username;
             worker.WorkerReportsProgress = true;
             worker.DoWork += new DoWorkEventHandler(get_all_contributions);
             worker.ProgressChanged += new ProgressChangedEventHandler(progress_changed);
@@ -327,7 +330,7 @@ namespace nature_net.user_controls
 
         public void get_all_contributions(object arg, DoWorkEventArgs e)
         {
-            naturenet_dataclassDataContext db = new naturenet_dataclassDataContext();
+            naturenet_dataclassDataContext db = database_manager.GetTableTopDB();
             var result1 = from c in db.Collection_Contribution_Mappings
                           where (c.Collection.User.name == (string)e.Argument) && (c.Collection.activity_id != 1)
                           select c.Contribution;
@@ -442,11 +445,13 @@ namespace nature_net.user_controls
 
                        string[] title = this.parent.get_title().Split(new string[] { " (" }, StringSplitOptions.RemoveEmptyEntries);
                        this.parent.set_title(title[0]);
+                       this.contributions.content_name = this.contributions.content_name + " ;" + title[0] + " (" + items.Count + ")";
                    }
                    else
                    {
                        string[] title = this.parent.get_title().Split(new string[] { " (" }, StringSplitOptions.RemoveEmptyEntries);
                        this.parent.set_title(title[0] + " (" + items.Count + ")");
+                       this.contributions.content_name = this.contributions.content_name + " ;" + title[0] + " (" + items.Count + ")";
                    }
                    this.contributions._list.Items.Refresh();
                    window_manager.contribution_collection_opened(this.collection_username);
@@ -455,7 +460,7 @@ namespace nature_net.user_controls
 
         public void get_contributions_in_location(object arg, DoWorkEventArgs e)
         {
-            naturenet_dataclassDataContext db = new naturenet_dataclassDataContext();
+            naturenet_dataclassDataContext db = database_manager.GetTableTopDB();
             var result1 = from c in db.Collection_Contribution_Mappings
                           where (c.Contribution.location_id == (int)e.Argument) && (c.Collection.activity_id != 1)
                           select c.Contribution;
@@ -491,7 +496,7 @@ namespace nature_net.user_controls
 
         public void get_contributions_in_activity(object arg, DoWorkEventArgs e)
         {
-            naturenet_dataclassDataContext db = new naturenet_dataclassDataContext();
+            naturenet_dataclassDataContext db = database_manager.GetTableTopDB();
             var result0 = from c0 in db.Collection_Contribution_Mappings
                           where c0.Collection.activity_id == (int)e.Argument
                           orderby c0.Contribution.date descending
@@ -530,29 +535,39 @@ namespace nature_net.user_controls
             int i = c.id;
 
             if (c.media_url == null) return ci;
-            string fname = c.media_url;
-            string ext = fname.Substring(fname.Length - 4, 4);
-            ext = ext.ToLower();
-            if (ext == ".jpg" || ext == ".bmp" || ext == ".png")
-                ci.is_image = true;
-            if (ext == ".wmv" || ext == ".mpg" || ext == "mpeg" || ext == ".avi" || ext == ".mp4" || ext == ".3gp" || ext == ".mov")
-                ci.is_video = true;
-            if (ext == ".wav" || ext == ".mp3")
-                ci.is_audio = true;
+            //string fname = c.media_url;
+            //string ext = fname.Substring(fname.Length - 4, 4);
+            //ext = ext.ToLower();
+            //if (ext == ".jpg" || ext == ".bmp" || ext == ".png")
+            //    ci.is_image = true;
+            //if (ext == ".wmv" || ext == ".mpg" || ext == "mpeg" || ext == ".avi" || ext == ".mp4" || ext == ".3gp" || ext == ".mov")
+            //    ci.is_video = true;
+            //if (ext == ".wav" || ext == ".mp3")
+            //    ci.is_audio = true;
+            if (c.tags != null)
+            {
+                if (c.tags.Contains("Photo"))
+                    ci.is_image = true;
+                if (c.tags.Contains("Video"))
+                    ci.is_video = true;
+                if (c.tags.Contains("Audio"))
+                    ci.is_audio = true;
+            }
 
             if (!window_manager.thumbnails.ContainsKey(i))
             {
                 if (!window_manager.downloaded_contributions.Contains(i))
                 {
-                    bool result = file_manager.download_file_from_googledirve(c.media_url, i);
+                    //bool result = file_manager.download_file_from_googledirve(c.media_url, i);
+                    bool result = file_manager.download_file(c.media_url, i);
                     if (result) window_manager.downloaded_contributions.Add(i);
                 }
 
                 ImageSource img = null;
                 if (ci.is_image)
-                    img = configurations.GetThumbnailFromImage(i.ToString() + ext, configurations.thumbnail_pixel_height);
+                    img = configurations.GetThumbnailFromImage(i.ToString(), configurations.thumbnail_pixel_height);
                 if (ci.is_video)
-                    img = configurations.GetThumbnailFromVideo(i.ToString() + ext, configurations.thumbnail_video_span, configurations.thumbnail_pixel_height);
+                    img = configurations.GetThumbnailFromVideo(i.ToString(), configurations.thumbnail_video_span, configurations.thumbnail_pixel_height);
                 if (ci.is_audio)
                     img = configurations.img_sound_image_pic;
                 if (img == null)
@@ -579,13 +594,17 @@ namespace nature_net.user_controls
             return ci;
         }
 
-        bool item_selected(object i)
+        bool item_selected(object i, System.Windows.Input.TouchEventArgs e)
         {
             collection_listbox_item item = (collection_listbox_item)i;
             collection_item ci = (collection_item)item.img.Tag;
-            window_manager.open_contribution_window(ci,
-                item.PointToScreen(new Point(0, 0)).X - window_manager.main_canvas.PointToScreen(new Point(0,0)).X,
-                item.PointToScreen(new Point(0, 0)).Y, ci.ToString());
+            if (ci != null)
+            {
+                log.WriteInteractionLog(17, "tapped the collection item, contribution id: " + ci._contribution.id, e.TouchDevice);
+                window_manager.open_contribution_window(ci,
+                    item.PointToScreen(new Point(0, 0)).X - window_manager.main_canvas.PointToScreen(new Point(0, 0)).X,
+                    item.PointToScreen(new Point(0, 0)).Y, ci.ToString());
+            }
             return true;
         }
 

@@ -52,7 +52,7 @@ namespace nature_net.user_controls
         {
             string id = "-1";
             if (this.Tag != null)
-                id = ((int)this.Tag).ToString();
+                id = (Convert.ToInt32(this.Tag)).ToString();
             string c = "";
             if (this.description.Text != null)
                 c = this.description.Text;
@@ -109,6 +109,10 @@ namespace nature_net.user_controls
             database_manager.InsertFeedback(f);
             window_manager.load_design_ideas_sync();
             te.Handled = true;
+            if (sender == null)
+                log.WriteInteractionLog(12, "item: " + this.ToString(), te.TouchDevice);
+            else
+                log.WriteInteractionLog(13, "item: " + this.ToString(), te.TouchDevice);
         }
     }
 }
