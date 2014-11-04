@@ -48,6 +48,8 @@ namespace nature_net.user_controls
             header.atoz_order = new AToZOrder(this.atoz_order);
             header.top_order = new TopOrder(this.top_order);
             header.recent_order = new RecentOrder(this.recent_order);
+            header.done_checked_changed = new DoneCheckChanged(filter_checks_changed);
+            header.not_done_checked_changed = new NotDoneCheckChanged(filter_checks_changed);
             this.design_ideas_list.populator.header = header;
             like_handler = new thumbs_up(this.like_touched);
             this.design_ideas_list.populator.thumbs_up_handler = like_handler;
@@ -56,6 +58,8 @@ namespace nature_net.user_controls
             this.design_ideas_list.Background = Brushes.White;
             this.refresher = new list_refresher();
             this.refresher.design_ideas_populator = this.design_ideas_list.populator;
+
+            this.header.filter_grid.Visibility = System.Windows.Visibility.Visible;
         }
 
         void submit_PreviewTouchDown(object sender, TouchEventArgs e)//RoutedEventArgs e)
@@ -77,8 +81,8 @@ namespace nature_net.user_controls
             item_generic_v2 item = (item_generic_v2)i;
             string[] idea_item = ("design idea;" + item.ToString()).Split(new Char[] { ';' });
             log.WriteInteractionLog(16, "tapped the listbox item: " + item.ToString(), e.TouchDevice);
-            window_manager.open_design_idea_window(idea_item, 65, item.PointToScreen(new Point(0, 0)).Y);
-            //window_manager.open_design_idea_window(item, 0, item.PointToScreen(new Point(0, 0)).Y);
+            //window_manager.open_design_idea_window(idea_item, 65, item.PointToScreen(new Point(0, 0)).Y);
+            window_manager.open_design_idea_window(item, 65, item.PointToScreen(new Point(0, 0)).Y);
             return true;
         }
 
@@ -133,7 +137,8 @@ namespace nature_net.user_controls
                        if (this.design_ideas_list._list.Tag != null)
                            y = (double)this.design_ideas_list._list.Tag;
                        string[] idea_item = ("design idea;" + i.ToString()).Split(new Char[] { ';' });
-                       window_manager.open_design_idea_window(idea_item, 65, y + 40);//lbi.PointToScreen(new Point(0,0)).Y);
+                       //window_manager.open_design_idea_window(idea_item, 65, y + 40);//lbi.PointToScreen(new Point(0,0)).Y);
+                       window_manager.open_design_idea_window(i, 65, y + 40);//lbi.PointToScreen(new Point(0,0)).Y);
                    }
                    else
                        i.Background = Brushes.White;
@@ -149,6 +154,13 @@ namespace nature_net.user_controls
                     return i;
             }
             return null;
+        }
+
+        void filter_checks_changed()
+        {
+            this.design_ideas_list.populator.show_done = header.is_done_checked();
+            this.design_ideas_list.populator.show_not_done = header.is_not_done_checked();
+            list_all_design_ideas();
         }
 
         void atoz_order()

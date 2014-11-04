@@ -23,8 +23,9 @@
                     </Border>
 
                     <DockPanel DockPanel.Dock="Top" LastChildFill="False" Name="top_panel" Margin="5,10,5,0">
-                        <StackPanel Name="avatar_container" DockPanel.Dock="Left" >
-                            <Image Name="avatar" Width="75" Height="75"></Image>
+                        <StackPanel Name="avatar_container" DockPanel.Dock="Left" Orientation="Horizontal" >
+                            <Image Name="avatar" Width="75" Height="75" VerticalAlignment="Top"></Image>
+                            <Image Name="affiliation_icon_small" HorizontalAlignment="Left" Margin="5,0,0,0" Width="20" Height="20" VerticalAlignment="Top" Visibility="Collapsed"></Image>
                         </StackPanel>
                         <StackPanel DockPanel.Dock="Right" Width="70">
                             <TextBlock Name="number" HorizontalAlignment="Right" TextWrapping="Wrap" Margin="5,0,0,0">
@@ -32,9 +33,9 @@
                             </TextBlock>
                         </StackPanel>
                         <StackPanel DockPanel.Dock="Left" Name="topleft_panel" Margin="5,0,5,0" Orientation="Vertical" HorizontalAlignment="Left" VerticalAlignment="Center">
-                            <TextBlock Name="username" HorizontalAlignment="Left" TextWrapping="Wrap" >
-                                The title goes here...
-                            </TextBlock>
+                                <TextBlock Name="username" HorizontalAlignment="Left" TextWrapping="Wrap" >
+                                    The title goes here...
+                                </TextBlock>
                             <Label Name="user_desc" HorizontalAlignment="Left" FontStyle="Italic" FontSize="10" Margin="0" Padding="0,3,0,3" >Description</Label>
                         </StackPanel>
                     </DockPanel>

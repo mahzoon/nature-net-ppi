@@ -12,6 +12,7 @@
         <DockPanel Name="the_item" LastChildFill="False" IsManipulationEnabled="True">
 
             <DockPanel Name="title_bar" Background="#0000AB00" LastChildFill="False" DockPanel.Dock="top" Panel.ZIndex="1">
+                <TextBlock Name="title_text" DockPanel.Dock="Left" VerticalAlignment="Top" Margin="10,12,10,10"></TextBlock>
                 <Button Name="close" Margin="3" Width="33" Height="33" DockPanel.Dock="Right">
                     <Button.Style>
                         <Style>

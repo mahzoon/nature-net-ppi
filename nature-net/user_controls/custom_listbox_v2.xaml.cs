@@ -316,13 +316,14 @@ namespace nature_net.user_controls
             //string data = drag_prefix + ";" + ((int)item.Tag).ToString() + ";" + avatar + ";" +
             //    (string)item.title.Text + ";" + item.description.Text + ";" + "" + ";" + "";
             string data = drag_prefix + ";" + item.ToString();
+            item.drag_prefix = drag_prefix;
             log.WriteInteractionLog(4, "start dragging the listbox item: " + item.ToString(), e.TouchDevice);
             Microsoft.Surface.Presentation.SurfaceDragCursor startDragOkay =
                 Microsoft.Surface.Presentation.SurfaceDragDrop.BeginDragDrop(
                   this._list,                 // The SurfaceListBox object that the cursor is dragged out from.
                   item,                       // The item object that is dragged from the drag source.
                   cursorVisual,               // The visual element of the cursor.
-                  data,                       // The data associated with the cursor.
+                  item,                       // The data associated with the cursor.
                   devices,                    // The input devices that start dragging the cursor.
                   DragDropEffects.Copy);      // The allowed drag-and-drop effects of the operation.
 
@@ -742,6 +743,9 @@ namespace nature_net.user_controls
         public TextBlock total_number;
         public reply_clicked reply_clicked_handler;
         //
+        public bool show_done = true;
+        public bool show_not_done = true;
+        //
         private readonly BackgroundWorker worker_design_ideas = new BackgroundWorker();
         private readonly BackgroundWorker worker_activities = new BackgroundWorker();
         private readonly BackgroundWorker worker_users = new BackgroundWorker();
@@ -789,6 +793,9 @@ namespace nature_net.user_controls
             {
                 naturenet_dataclassDataContext db = database_manager.GetTableTopDB();
                 var r = from d in db.Design_Ideas
+                        where (d.status != configurations.status_implemented || show_done) &&
+                                (d.status == configurations.status_implemented || show_not_done) &&
+                                (d.status != configurations.status_deleted)
                         orderby d.date descending
                         select d;
                 if (r == null)
@@ -821,14 +828,58 @@ namespace nature_net.user_controls
                         }
                     }
                     design_idea_item i = new design_idea_item();
-                    ImageSource src = new BitmapImage(new Uri(configurations.GetAbsoluteAvatarPath() + d.avatar));
-                    src.Freeze();
-                    i.img = src;
+                    try
+                    {
+                        ImageSource src = new BitmapImage(new Uri(configurations.GetAbsoluteAvatarPath() + d.avatar));
+                        src.Freeze();
+                        i.img = src;
+                    }
+                    catch (Exception) { i.img = null; }
                     i.design_idea = d;
                     i.count = num_comments;
                     i.last_date = last_time;
                     i.num_dislike = num_dislike;
                     i.num_like = num_like;
+
+                    i.username = i.design_idea.name;
+                    i.affiliation = i.design_idea.affiliation;
+                    if (i.design_idea.name == "Default User")
+                    {
+                        i.username = configurations.default_user_text;
+                        //i.affiliation = configurations.default_user_affiliation;
+                        if (i.design_idea.web_username != null)
+                        {
+                            var webusers = from w in db.WebUsers
+                                           where w.username == i.design_idea.web_username
+                                           select w;
+                            if (webusers.Count() == 1)
+                            {
+                                WebUser webuser = webusers.Single<WebUser>();
+                                i.username = webuser.username + configurations.default_user_desc;
+                                //i.affiliation = configurations.default_webuser_affiliation;
+                                if (webuser.user_id.HasValue)
+                                {
+                                    var users = from u in db.Users
+                                                where u.id == webuser.user_id.Value
+                                                select u;
+                                    if (users.Count() == 1)
+                                    {
+                                        User the_user = users.Single<User>();
+                                        i.username = the_user.name + configurations.default_user_desc;
+                                        try
+                                        {
+                                            ImageSource src = new BitmapImage(new Uri(configurations.GetAbsoluteAvatarPath() + the_user.avatar));
+                                            src.Freeze();
+                                            i.img = src;
+                                        }
+                                        catch (Exception) { i.img = null; }
+                                        i.affiliation = the_user.affiliation;
+                                    }
+                                }
+                            }
+                        }
+                    }
+
                     ideas.Add(i);
                 }
                 return ideas;
@@ -853,17 +904,37 @@ namespace nature_net.user_controls
                 TextBlock.SetFontWeight(i.title, FontWeights.Normal);
                 i.title.FontSize = configurations.design_idea_item_title_font_size;
                 i.user_info.Margin = new Thickness(5);
-                i.user_info_name.Text = idea.design_idea.name; i.user_info_date.Text = configurations.GetDate_Formatted(idea.last_date);
+                if (idea.img == null)
+                    i.user_info_icon.Visibility = Visibility.Collapsed;
+                else
+                    i.user_info_icon.Source = idea.img;
+                i.user_info_name.Text = idea.username;
+                //i.user_info_date.Text = configurations.GetDate_Formatted(idea.last_date);
+                i.user_info_date.Text = configurations.GetDate_Formatted(idea.design_idea.date);
                 i.user_info_name.Margin = new Thickness(2, 0, 0, 0); i.user_info_date.Margin = new Thickness(2, 0, 2, 0);
                 i.user_info_name.FontSize = configurations.design_idea_item_user_info_font_size; i.user_info_date.FontSize = configurations.design_idea_item_user_info_font_size;
-                i.user_info_icon.Source = idea.img; i.number.Text = idea.count.ToString(); i.number_icon.Visibility = Visibility.Collapsed;
+                i.number.Text = idea.count.ToString(); i.number_icon.Visibility = Visibility.Collapsed;
                 i.txt_level1.Text = configurations.designidea_num_desc;
                 i.txt_level2.Visibility = Visibility.Collapsed; i.txt_level3.Visibility = Visibility.Collapsed;
                 i.avatar.Source = configurations.img_thumbs_up_icon; i.num_likes.Content = idea.num_like.ToString();
-                i.avatar.Width = configurations.design_idea_item_avatar_width; i.avatar.Height = configurations.design_idea_item_avatar_width; i.avatar.Margin = new Thickness(5); i.avatar.Tag = i;
+                i.avatar.Width = configurations.design_idea_item_avatar_width; i.avatar.Height = configurations.design_idea_item_avatar_width; i.avatar.Margin = new Thickness(5,5,5,0); i.avatar.Tag = i;
                 i.Tag = idea.design_idea.id;
                 i.Margin = items_margins;
                 if (item_width != 0) i.Width = item_width;
+                if (idea.affiliation != null && idea.affiliation.ToLower() == configurations.affiliation_aces.ToLower())
+                {
+                    i.affiliation_icon_small.Source = configurations.img_affiliation_icon;
+                    i.affiliation_icon_small.Visibility = Visibility.Visible;
+                }
+                if (idea.design_idea.status != null && idea.design_idea.status.ToLower() == configurations.status_implemented.ToLower())
+                {
+                    //i.pre_title.Text = configurations.implemented_text;
+                    //i.pre_title.FontWeight = FontWeights.Bold;
+                    i.affiliation_icon.Height = 15;
+                    i.affiliation_icon.Source = configurations.img_implemented_icon;
+                    i.affiliation_icon.Visibility = Visibility.Visible;
+                    if (item_width != 0) i.title.MaxWidth = configurations.idea_text_scale_factor * item_width;
+                }
                 i.right_panel.Width = configurations.design_idea_right_panel_width;
                 //i.left_panel.VerticalAlignment = VerticalAlignment.Center; DockPanel.SetDock(i.number, Dock.Left); DockPanel.SetDock(i.txt_level1, Dock.Left);
                 i.top_value = idea.num_like;
@@ -922,8 +993,9 @@ namespace nature_net.user_controls
                 {
                     var n1 = from m in db.Collection_Contribution_Mappings
                              where m.Collection.user_id == u.id
-                             orderby m.Contribution.date descending
-                             select m.Contribution.date;
+                             && (m.Contribution.status != configurations.status_deleted)
+                             orderby m.Contribution.modified_date descending
+                             select m.Contribution.modified_date;
                     //var n2 = from f in db.Feedbacks
                     //         where f.user_id == u.id
                     //         orderby f.date descending
@@ -945,8 +1017,11 @@ namespace nature_net.user_controls
                     {
                         if (n1.Count() > 0)
                         {
-                            i.last_date = n1.First();
-                            i.has_date = true;
+                            if (n1.First().HasValue)
+                            {
+                                i.last_date = n1.First().Value;
+                                i.has_date = true;
+                            }
                         }
                     }
                     if (n2 != null)
@@ -998,6 +1073,11 @@ namespace nature_net.user_controls
                 i.avatar.Width = configurations.user_item_avatar_width; i.avatar.Height = configurations.user_item_avatar_width;
                 i.user_info.Visibility = Visibility.Collapsed; i.user_info_date.Text = i.txt_level2.Text;
                 i.top_value = u.count;
+                if (u.user.affiliation != null && u.user.affiliation.ToLower() == configurations.affiliation_aces.ToLower())
+                {
+                    i.affiliation_icon.Source = configurations.img_affiliation_icon;
+                    i.affiliation_icon.Visibility = Visibility.Visible;
+                }
                 i.drag_icon_vertical.Source = configurations.img_drag_vertical_icon;
                 if (configurations.show_vertical_drag) i.drag_icon_vertical_panel.Visibility = Visibility.Visible;
                 this._list.Items.Add(i);
@@ -1038,7 +1118,7 @@ namespace nature_net.user_controls
                         Feedback f = comments[counter];
                         int level = 0;
                         List<comment_item_generic> tmp_list = new List<comment_item_generic>();
-                        tmp_list.Add(create_comment_item(f, level));
+                        tmp_list.Add(create_comment_item(f, level, db));
                         add_comment_items_for(f, ref level, tmp_list, db);
                         add_children_to_list(tmp_list, children_items);
                     }
@@ -1092,7 +1172,7 @@ namespace nature_net.user_controls
                 {
                     List<comment_item_generic> tmp_list = new List<comment_item_generic>();
                     int new_level = level;
-                    tmp_list.Add(create_comment_item(f, new_level));
+                    tmp_list.Add(create_comment_item(f, new_level, db));
                     add_comment_items_for(f, ref new_level, tmp_list, db);
                     add_children_to_list(tmp_list, children_items);
                 }
@@ -1105,10 +1185,46 @@ namespace nature_net.user_controls
                 for (int counter2 = 0; counter2 < main_list[counter1].Count; counter2++)
                     return_list.Add(main_list[counter1][counter2]);
         }
-        public comment_item_generic create_comment_item(Feedback c, int level)
+        public comment_item_generic create_comment_item(Feedback c, int level, naturenet_dataclassDataContext db)
         {
             comment_item_generic cig = new comment_item_generic();
             cig.comment = c; cig.level = level;
+            cig.username = cig.comment.User.name;
+            cig.avatar = cig.comment.User.avatar;
+            cig.affiliation = cig.comment.User.affiliation;
+            if (cig.comment.User.name == "Default User")
+            {
+                cig.username = configurations.default_user_text;
+                //cig.avatar = configurations.default_user_avatar;
+                //cig.affiliation = configurations.default_user_affiliation;
+                if (cig.comment.web_username != null)
+                {
+                    var webusers = from w in db.WebUsers
+                                   where w.username == cig.comment.web_username
+                                   select w;
+                    if (webusers.Count() == 1)
+                    {
+                        WebUser webuser = webusers.Single<WebUser>();
+                        cig.username = webuser.username + configurations.default_user_desc;
+                        //cig.avatar = configurations.default_webuser_avatar;
+                        //cig.affiliation = configurations.default_webuser_affiliation;
+                        if (webuser.user_id.HasValue)
+                        {
+                            var users = from u in db.Users
+                                        where u.id == webuser.user_id.Value
+                                        select u;
+                            if (users.Count() == 1)
+                            {
+                                User the_user =users.Single<User>(); 
+                                cig.username = the_user.name + configurations.default_user_desc;
+                                cig.avatar = the_user.avatar;
+                                cig.affiliation = the_user.affiliation;
+                            }
+                        }
+                    }
+                }
+            }
+                
             return cig;
         }
         public void display_all_comments(object c_obj, RunWorkerCompletedEventArgs e)
@@ -1126,9 +1242,8 @@ namespace nature_net.user_controls
                    foreach (comment_item_generic cig in comments)
                    {
                        item_generic i = new item_generic();
-                       //i.username.Text = cig.comment.User.name + ":"; TextBlock.SetFontWeight(i.username, FontWeights.Bold);
                        i.username.Text = "";
-                       i.username.Inlines.Add(new Bold(new Run(cig.comment.User.name + ": ")));
+                       i.username.Inlines.Add(new Bold(new Run(cig.username + ": ")));
                        i.username.Inlines.Add(cig.comment.note);
                        i.user_desc.Visibility = Visibility.Collapsed; //i.user_desc.Content = configurations.GetDate_Formatted(cig.comment.date);
                        i.number.Text = configurations.GetDate_Formatted(cig.comment.date); //i.number.Visibility = System.Windows.Visibility.Collapsed;
@@ -1139,8 +1254,16 @@ namespace nature_net.user_controls
                        //i.content.Text = cig.comment.note;
                        i.content.Visibility = Visibility.Collapsed;
                        if (item_width != 0) i.Width = item_width + 2;
-                       i.avatar.Source = new BitmapImage(new Uri(configurations.GetAbsoluteAvatarPath() + cig.comment.User.avatar));
+                       try { i.avatar.Source = new BitmapImage(new Uri(configurations.GetAbsoluteAvatarPath() + cig.avatar)); }
+                       catch (Exception) { i.avatar.Visibility = Visibility.Collapsed; }
                        i.Tag = cig.comment.id;
+                       if (cig.affiliation != null && cig.affiliation.ToLower() == configurations.affiliation_aces.ToLower())
+                       {
+                           i.affiliation_icon_small.Source = configurations.img_affiliation_icon;
+                           i.affiliation_icon_small.Visibility = Visibility.Visible;
+                       }
+                       i.avatar.VerticalAlignment = VerticalAlignment.Top;
+                       i.affiliation_icon_small.VerticalAlignment = VerticalAlignment.Top;
                        if (configurations.use_avatar_drag) i.set_touchevent(this.avatar_drag);
                        i.Margin = new Thickness(0);
                        i.second_border.Margin = new Thickness(cig.level * 25, 0, 0, 0);
@@ -1185,6 +1308,7 @@ namespace nature_net.user_controls
                         DateTime last_time = a.creation_date;
                         var n1 = from m in db.Collection_Contribution_Mappings
                                  where m.Collection.activity_id == a.id
+                                 && (m.Contribution.status != configurations.status_deleted)
                                  orderby m.Contribution.date descending
                                  select new { m.Contribution.date, m.Collection.User.name };
                         int cnt = 0;
@@ -1264,6 +1388,8 @@ namespace nature_net.user_controls
         public DateTime last_date;
         public int num_like;
         public int num_dislike;
+        public string username;
+        public string affiliation;
     }
 
     public class user_item
@@ -1293,6 +1419,9 @@ namespace nature_net.user_controls
     {
         public Feedback comment;
         public int level;
+        public string username;
+        public string avatar;
+        public string affiliation;
     }
 
     public class touch_info

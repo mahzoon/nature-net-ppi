@@ -123,6 +123,11 @@ namespace nature_net.user_controls
                 keyboard_frame.Visibility = System.Windows.Visibility.Collapsed;
         }
 
+        protected override void OnManipulationBoundaryFeedback(ManipulationBoundaryFeedbackEventArgs e)
+        {
+            e.Handled = true;
+        }
+
         void comment_textbox_GotKeyboardFocus(object sender, RoutedEventArgs e)
         {
             virtual_keyboard.ShowKeyboard(this, ref keyboard);
@@ -137,6 +142,7 @@ namespace nature_net.user_controls
                     this.keyboard_frame.Content = keyboard;
                     //this.keyboard.Background = new SolidColorBrush(Colors.White);
                     this.keyboard_frame.Background = new SolidColorBrush(Colors.White);
+                    this.keyboard.window_frame = this.parent;
                     window_manager.main_canvas.Children.Add(keyboard_frame);
                 }
                 keyboard.MoveAlongWith(parent, center_keyboard);
@@ -191,17 +197,17 @@ namespace nature_net.user_controls
             if (auth_user.Count() == 1)
             {
                 if (is_reply)
-                    log.WriteInteractionLog(31, (hide_expander ? "Idea" : "Comment") + "; Reply id: " + reply_id + "; Text: " + this.GetActiveTextBox().Text + "; object_type: " + _object_type + "; object_id: " + _object_id.ToString(), ((TouchEventArgs)e).TouchDevice);
+                    log.WriteInteractionLog(31, (hide_expander ? "Idea" : "Comment") + "; Reply id: " + reply_id + "; Text: " + this.GetActiveTextBox().Text + "; object_type: " + _object_type + "; object_id: " + _object_id.ToString() + "; Username=" + this.selected_user.title.Text, ((TouchEventArgs)e).TouchDevice);
                 else
-                    log.WriteInteractionLog(31, (hide_expander ? "Idea" : "Comment") + "; Text: " + this.GetActiveTextBox().Text + "; object_type: " + _object_type + "; object_id: " + _object_id.ToString(), ((TouchEventArgs)e).TouchDevice);
+                    log.WriteInteractionLog(31, (hide_expander ? "Idea" : "Comment") + "; Text: " + this.GetActiveTextBox().Text + "; object_type: " + _object_type + "; object_id: " + _object_id.ToString() + "; Username=" + this.selected_user.title.Text, ((TouchEventArgs)e).TouchDevice);
                 submit_text(e);
             }
             else
             {
                 if (is_reply)
-                    log.WriteInteractionLog(30, (hide_expander?"Idea":"Comment") + "; Reply id: " + reply_id + "; Text: " + this.GetActiveTextBox().Text + "; object_type: " + _object_type + "; object_id: " + _object_id.ToString(), ((TouchEventArgs)e).TouchDevice);
+                    log.WriteInteractionLog(30, (hide_expander ? "Idea" : "Comment") + "; Reply id: " + reply_id + "; Text: " + this.GetActiveTextBox().Text + "; object_type: " + _object_type + "; object_id: " + _object_id.ToString() + "; Username=" + this.selected_user.title.Text, ((TouchEventArgs)e).TouchDevice);
                 else
-                    log.WriteInteractionLog(30, (hide_expander ? "Idea" : "Comment") + "; Text: " + this.GetActiveTextBox().Text + "; object_type: " + _object_type + "; object_id: " + _object_id.ToString(), ((TouchEventArgs)e).TouchDevice);
+                    log.WriteInteractionLog(30, (hide_expander ? "Idea" : "Comment") + "; Text: " + this.GetActiveTextBox().Text + "; object_type: " + _object_type + "; object_id: " + _object_id.ToString() + "; Username=" + this.selected_user.title.Text, ((TouchEventArgs)e).TouchDevice);
                 this.error_desc.Visibility = System.Windows.Visibility.Visible;
                 this.error_desc.Content = configurations.authentication_failed_text;
                 pin.Reset(true);
@@ -239,6 +245,7 @@ namespace nature_net.user_controls
                 idea.location_id = 0;
                 idea.note = this.GetActiveTextBox().Text;
                 idea.tags = "Design Idea";
+                idea.status = "to do";
                 database_manager.InsertDesignIdea(idea, this.comment_user_id);
                 int collection_id = configurations.get_or_create_collection(this.comment_user_id, 1, DateTime.Now);
                 Collection_Contribution_Mapping map = new Collection_Contribution_Mapping();
@@ -305,7 +312,7 @@ namespace nature_net.user_controls
 
         void item_dropped_on_leave_comment_area_auth(object sender, SurfaceDragDropEventArgs e)
         {
-            string[] data = ((string)e.Cursor.Data).Split(new Char[] { ';' });
+            string[] data = (e.Cursor.Data.ToString()).Split(new Char[] { ';' });
             if (data == null) return;
             if (data.Count() < 4) return;
             string context = data[0];
@@ -321,7 +328,7 @@ namespace nature_net.user_controls
                 if (keyboard_frame != null) keyboard_frame.Visibility = System.Windows.Visibility.Collapsed;
                 this.pin.Reset(true);
                 if (is_reply)
-                    log.WriteInteractionLog(29, (hide_expander ? "Idea" : "Comment") + "; user id: " + user_id + "reply id: " + reply_id + "; Text: " + this.GetActiveTextBox().Text + "; object_type: " + _object_type + "; object_id: " + _object_id.ToString(), e.Cursor.GetPosition(null).X, e.Cursor.GetPosition(null).Y);
+                    log.WriteInteractionLog(29, (hide_expander ? "Idea" : "Comment") + "; user id: " + user_id + "; reply id: " + reply_id + "; Text: " + this.GetActiveTextBox().Text + "; object_type: " + _object_type + "; object_id: " + _object_id.ToString(), e.Cursor.GetPosition(null).X, e.Cursor.GetPosition(null).Y);
                 else
                     log.WriteInteractionLog(29, (hide_expander ? "Idea" : "Comment") + "; user id: " + user_id + "; Text: " + this.GetActiveTextBox().Text + "; object_type: " + _object_type + "; object_id: " + _object_id.ToString(), e.Cursor.GetPosition(null).X, e.Cursor.GetPosition(null).Y);
             }
@@ -612,7 +619,9 @@ namespace nature_net.user_controls
             string text = configurations.GetTextBlockText2(i.username);
             string[] texts = text.Split(new char[] { ':' });
             reply_item.username.Inlines.Add(new Bold(new Run(texts[0] + ": ")));
-            reply_item.username.Inlines.Add(texts[1]);
+            reply_item.username.Inlines.Add(text.Substring(texts[0].Length + 1));
+            reply_item.affiliation_icon_small.Visibility = i.affiliation_icon_small.Visibility;
+            reply_item.affiliation_icon_small.Source = i.affiliation_icon_small.Source;
             reply_item.user_desc.Visibility = Visibility.Collapsed; //i.user_desc.Content = configurations.GetDate_Formatted(cig.comment.date);
             reply_item.number.Text = i.number.Text; //i.number.Visibility = System.Windows.Visibility.Collapsed;
             reply_item.number.FontSize = configurations.design_idea_item_user_info_font_size;

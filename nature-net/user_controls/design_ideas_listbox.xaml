@@ -13,7 +13,8 @@
                          HorizontalContentAlignment="Center" VerticalContentAlignment="Center" Margin="0,0,0,0"
                          FontFamily="Segoe UI" FontSize="14" FontWeight="SemiBold"  Padding="0,0,0,25">
             Submit Design Idea</Button>-->
-		<Border DockPanel.Dock="Top" BorderThickness="1" BorderBrush="Gray">
+
+        <Border DockPanel.Dock="Top" BorderThickness="1" BorderBrush="Gray">
             <uc:list_header x:Name="header"></uc:list_header>
         </Border>
         <StackPanel Name="submit_idea_panel" DockPanel.Dock="Top"></StackPanel>

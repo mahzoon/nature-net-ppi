@@ -34,7 +34,7 @@
     <StackPanel Name="whole" Background="LightGreen">
         <Label Name="title" HorizontalAlignment="Center" VerticalAlignment="Center"
                FontSize="20">Title</Label>
-        <Grid Name="the_grid" Margin="7,5,8,15">
+        <Grid Name="the_grid" Margin="7,5,7,15">
             <Grid.RowDefinitions>
                 <RowDefinition Height="30" />
             </Grid.RowDefinitions>
@@ -43,9 +43,23 @@
                 <ColumnDefinition Width="*" />
                 <ColumnDefinition Width="*" />
             </Grid.ColumnDefinitions>
-            <RadioButton Grid.Column="0" Style="{DynamicResource {x:Type ToggleButton}}" Name="atoz" DockPanel.Dock="Left" Background="White" BorderBrush="DarkGreen" BorderThickness="2,2,1,2" Height="30" IsChecked="True" Checked="atoz_Checked">A - Z</RadioButton>
-            <RadioButton Grid.Column="1" Style="{DynamicResource {x:Type ToggleButton}}" Name="top" DockPanel.Dock="Right" Background="White" BorderBrush="DarkGreen" BorderThickness="1,2,2,2" Height="30" Checked="top_Checked">Top</RadioButton>
-            <RadioButton Grid.Column="2" Style="{StaticResource {x:Type ToggleButton}}" Name="recent" Background="White" BorderBrush="DarkGreen" BorderThickness="1,2,1,2" Height="30" Checked="recent_Checked">Recent</RadioButton>
+            <RadioButton Grid.Row="0" Grid.Column="0" Style="{DynamicResource {x:Type ToggleButton}}" Name="atoz" DockPanel.Dock="Left" Background="White" BorderBrush="DarkGreen" BorderThickness="2,2,1,2" Height="30" IsChecked="True" Checked="atoz_Checked">A - Z</RadioButton>
+            <RadioButton Grid.Row="0" Grid.Column="1" Style="{DynamicResource {x:Type ToggleButton}}" Name="top" DockPanel.Dock="Right" Background="White" BorderBrush="DarkGreen" BorderThickness="1,2,2,2" Height="30" Checked="top_Checked">Top</RadioButton>
+            <RadioButton Grid.Row="0" Grid.Column="2" Style="{StaticResource {x:Type ToggleButton}}" Name="recent" Background="White" BorderBrush="DarkGreen" BorderThickness="1,2,1,2" Height="30" Checked="recent_Checked">Recent</RadioButton>
         </Grid>
+
+        <Grid Name="filter_grid" Margin="7,-15,7,0" Visibility="Collapsed">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="30" />
+            </Grid.RowDefinitions>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="*" />
+            </Grid.ColumnDefinitions>
+
+            <CheckBox Grid.Row="0" Grid.Column="0" Name="done" Background="White" BorderBrush="DarkGreen" BorderThickness="2" Height="30" IsChecked="True" VerticalContentAlignment="Center" HorizontalAlignment="Center" HorizontalContentAlignment="Center" Checked="done_Checked_Changed" Unchecked="done_Checked_Changed">Show done</CheckBox>
+            <CheckBox Grid.Row="0" Grid.Column="1" Name="not_done" Background="White" BorderBrush="DarkGreen" BorderThickness="2" Height="30" IsChecked="True" VerticalContentAlignment="Center" HorizontalAlignment="Center" HorizontalContentAlignment="Center" Checked="not_done_Checked_Changed" Unchecked="not_done_Checked_Changed">Show not done</CheckBox>
+        </Grid>
+        
     </StackPanel>
 </UserControl>

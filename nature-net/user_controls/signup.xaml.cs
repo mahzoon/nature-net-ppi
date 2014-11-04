@@ -25,7 +25,7 @@ namespace nature_net.user_controls
         Control focused_textbox;
         public UserControl parent;
         ContentControl avatar_frame;
-        avatar_list avatar_list_control;
+        public avatar_list avatar_list_control;
 
         private string valid_email_string = "qwertyuiopasdfghjklmnbvcxz1234567890@_-.+!#$%&'*/=?^`{|}~";
         private string valid_name_string = "qwertyuiopasdfghjklmnbvcxz1234567890";
@@ -381,7 +381,7 @@ namespace nature_net.user_controls
                 consent_checkboxes = consent_checkboxes + configurations.GetTextBlockText((TextBlock)(checkbox_agreement4.Content));
 
             u.technical_info = textbox_name.Text + " signed the consent form on " + DateTime.Now.ToString() + "; " + consent_checkboxes;
-
+            u.affiliation = "";
             try
             {
                 database_manager.InsertUser(u);

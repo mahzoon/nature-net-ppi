@@ -12,6 +12,7 @@ namespace nature_net
 {
     public class configurations
     {
+        public static string application_name = "";
         static string config_file = "config.ini";
         public static string line_break = "\r\n";
         static string log_file = "log.txt";
@@ -30,6 +31,14 @@ namespace nature_net
         public static string activities_num_desc = "Contributions";
         public static string authentication_failed_text = "Whoops! That PIN was incorrect. Please try again.";
         public static string frame_title = "Observations";
+        public static string affiliation_aces = "ACES";
+        public static string status_implemented = "implemented";
+        public static string status_deleted = "deleted";
+        public static string implemented_text = "[Implemented] ";
+        public static string still_uploading_text = "Still Uploading (Tap to retry)";
+        public static string status_initial_string = "";
+        public static string default_user_text = "Anonymous";
+        public static string default_user_desc = " (via web)";
 
         public static string signup_item_title = "Sign up";
         public static string submit_idea_item_title = "Submit Idea";
@@ -63,8 +72,10 @@ namespace nature_net
         public static TimeSpan thumbnail_video_span = new TimeSpan(0, 0, 2);
         public static bool use_existing_thumbnails = true;
         public static double drag_dy_dx_factor = 2.1;
+        public static double idea_text_scale_factor = 0.68;
         //public static double drag_dx_dy_factor = 1.0;
         public static int max_thread_reply = 3;
+        public static int kill_window_millisec = 5000;
 
         public static double drag_collection_theta = 5;
         public static double scroll_scale_factor = 5;
@@ -148,6 +159,8 @@ namespace nature_net
         static string drag_vertical_icon = "drag_vertical.png";
         static string comment_icon = "comment.png";
         static string reply_icon = "reply.png";
+        static string affiliation_icon = "affiliation.png";
+        static string implemented_icon = "implemented.png";
 
         public static string keyboard_click_wav = "click.wav";
 
@@ -176,6 +189,8 @@ namespace nature_net
         public static ImageSource img_drag_vertical_icon;
         public static ImageSource img_comment_icon;
         public static ImageSource img_reply_icon;
+        public static ImageSource img_affiliation_icon;
+        public static ImageSource img_implemented_icon;
 
         public static int frame_width = 300;
         public static int frame_title_bar_height = 40;
@@ -287,6 +302,8 @@ namespace nature_net
             img_drag_vertical_icon = new BitmapImage(new Uri(configurations.GetAbsoluteImagePath() + drag_vertical_icon));
             img_comment_icon = new BitmapImage(new Uri(configurations.GetAbsoluteImagePath() + comment_icon));
             img_reply_icon = new BitmapImage(new Uri(configurations.GetAbsoluteImagePath() + reply_icon));
+            img_affiliation_icon = new BitmapImage(new Uri(configurations.GetAbsoluteImagePath() + affiliation_icon));
+            img_implemented_icon = new BitmapImage(new Uri(configurations.GetAbsoluteImagePath() + implemented_icon));
         }
 
         public static string GetDate_Formatted(DateTime dt)
@@ -374,10 +391,10 @@ namespace nature_net
                 bi.EndInit();
                 bi.Freeze();
             }
-            catch (Exception)
+            catch (Exception exc)
             {
                 // could not create thumbnail -- reason: filenotfound or currupt download or ...
-                // write log
+                log.WriteErrorLog(exc);
                 return null;
             }
             return bi;
@@ -653,6 +670,7 @@ namespace nature_net
 
             // General variables
             //line_break = parser.GetValue("General", "line_break", "\r\n");
+            application_name = parser.GetValue("General", "name", "");
             site_name = parser.GetValue("General", "site_name", "aces");
             write_interaction_log = parser.GetValue("General", "write_interaction_log", false);
             log_file = parser.GetValue("General", "log_file", "log.txt");
@@ -667,6 +685,14 @@ namespace nature_net
             activities_date_desc = parser.GetValue("General", "activities_date_desc", "Last Update: ");
             activities_num_desc = parser.GetValue("General", "activities_num_desc", "Contributions");
             frame_title = parser.GetValue("General", "frame_title", "Observations");
+            affiliation_aces = parser.GetValue("General", "affiliation_aces", "ACES");
+            status_implemented = parser.GetValue("General", "status_implemented", "implemented");
+            status_deleted = parser.GetValue("General", "status_deleted", "deleted");
+            implemented_text = parser.GetValue("General", "implemented_text", "[Implemented] ");
+            still_uploading_text = parser.GetValue("General", "still_uploading_text", "Still Uploading (Tap to retry)");
+            status_initial_string = parser.GetValue("General", "status_initial_string", "");
+            default_user_text = parser.GetValue("General", "default_user_text", "Anonymous");
+            default_user_desc = parser.GetValue("General", "default_user_desc", default_user_desc);
 
             // Parameters
             high_contrast = parser.GetValue("Parameters", "high_contrast", false);
@@ -687,6 +713,7 @@ namespace nature_net
             thumbnail_video_span = new TimeSpan(0, 0, parser.GetValue("Parameters", "thumbnail_video_span_seconds", 2));
             use_existing_thumbnails = parser.GetValue("Parameters", "use_existing_thumbnails", true);
             drag_dy_dx_factor = parser.GetValue("Parameters", "drag_dy_dx_factor", 2.1);
+            idea_text_scale_factor = parser.GetValue("Parameters", "idea_text_scale_factor", 0.68);
             //drag_dx_dy_factor = parser.GetValue("Parameters", "drag_dx_dy_factor",1.0);
             drag_collection_theta = parser.GetValue("Parameters", "drag_collection_theta", 5);
             scroll_scale_factor = parser.GetValue("Parameters", "scroll_scale_factor", 5);
@@ -709,6 +736,7 @@ namespace nature_net
             update_period_ms = parser.GetValue("Parameters", "update_period_ms", 20000);
             scaling_mode = parser.GetValue("Parameters", "scaling_mode", BitmapScalingMode.Fant);
             click_opacity_on_collection_item = parser.GetValue("Parameters", "click_opacity_on_collection_item", 0.8);
+            kill_window_millisec = parser.GetValue("Parameters", "kill_window_millisec", 5000);
 
             // Google Drive
             googledrive_directory_id = parser.GetValue("GoogleDrive", "googledrive_directory_id", "0B9mU-w_CpbztUUxtaXVIeE9SbWM");
@@ -755,6 +783,8 @@ namespace nature_net
             drag_vertical_icon = parser.GetValue("Files", "drag_vertical_icon", "drag_vertical.png");
             comment_icon = parser.GetValue("Files", "comment_icon", "comment.png");
             reply_icon = parser.GetValue("Files", "reply_icon", "reply.png");
+            affiliation_icon = parser.GetValue("Files", "affiliation_icon", "affiliation.png");
+            implemented_icon = parser.GetValue("Files", "implemented_icon", "implemented.png");
             keyboard_click_wav = parser.GetValue("Files", "keyboard_click_wav", "click.wav");
 
             // Frame
@@ -876,6 +906,7 @@ namespace nature_net
             parser.SetValue("Files", "drag_vertical_icon", drag_vertical_icon);
             parser.SetValue("Files", "comment_icon", comment_icon);
             parser.SetValue("Files", "reply_icon", reply_icon);
+            parser.SetValue("Files", "affiliation_icon", affiliation_icon);
 
             // Frame
             parser.SetValue("Frame", "frame_width", frame_width);

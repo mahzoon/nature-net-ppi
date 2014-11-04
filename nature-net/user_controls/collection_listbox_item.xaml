@@ -22,6 +22,7 @@
             <ColumnDefinition Width="*" />
         </Grid.ColumnDefinitions>
         <Image Grid.Row="0" Grid.RowSpan="2" x:Name="img" Margin="0,0,7,0"></Image>
+        <TextBlock Name="upload_failed_count"  Grid.Row="0" HorizontalAlignment="Center" TextAlignment="Center" VerticalAlignment="Bottom" Margin="-5,0,0,-40" FontFamily="Calibri" FontSize="18"></TextBlock>
         <Border Name="drag_panel_border" Grid.Row="1">
             <DockPanel Name="drag_panel">
                 <Image x:Name="drag" Height="13" DockPanel.Dock="Bottom" VerticalAlignment="Bottom"></Image>

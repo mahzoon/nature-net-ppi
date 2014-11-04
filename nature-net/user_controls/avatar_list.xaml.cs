@@ -21,6 +21,7 @@ namespace nature_net.user_controls
     {
         public Image return_value;
         public ContentControl parent_frame;
+        public UserControl parent_window;
 
         public avatar_list()
         {
@@ -39,6 +40,20 @@ namespace nature_net.user_controls
             this.UpdateLayout();
 
             this.listbox_avatars.SelectionChanged += new SelectionChangedEventHandler(listbox_avatars_SelectionChanged);
+
+            this.PreviewTouchDown += new EventHandler<TouchEventArgs>(avatar_list_PreviewTouchDown);
+        }
+
+        void avatar_list_PreviewTouchDown(object sender, TouchEventArgs e)
+        {
+            if (parent_window != null)
+            {
+                try { ((window_frame)parent_window).postpone_killer_timer(true); }
+                catch (Exception) { }
+                try { ((image_frame)parent_window).postpone_killer_timer(true); }
+                catch (Exception) { }
+            }
+            e.Handled = false;
         }
 
         void listbox_avatars_SelectionChanged(object sender, SelectionChangedEventArgs e)

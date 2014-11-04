@@ -177,8 +177,8 @@ namespace nature_net
             {
                 if (data.Count() < 7) return;
                 log.WriteInteractionLog(16, "design idea opened by dragging; contribution id: " + data[1], e.Cursor.GetPosition(null).X, e.Cursor.GetPosition(null).Y);
-                window_manager.open_design_idea_window(data, e.Cursor.GetPosition(sender as IInputElement).X,
-                    e.Cursor.GetPosition(sender as IInputElement).Y);
+                //window_manager.open_design_idea_window(data, e.Cursor.GetPosition(sender as IInputElement).X, e.Cursor.GetPosition(sender as IInputElement).Y);
+                window_manager.open_design_idea_window((item_generic_v2)e.Cursor.Data, e.Cursor.GetPosition(sender as IInputElement).X, e.Cursor.GetPosition(sender as IInputElement).Y);
                 e.Handled = true;
             }
             if (context == "Image" || context == "Audio" || context == "Video" || context == "Media")
@@ -191,10 +191,10 @@ namespace nature_net
             }
             if (context == "comment")
             {
-                if (data.Count() < 7) return;
-                //log.WriteInteractionLog(43, context, e.Cursor.GetPosition(null).X, e.Cursor.GetPosition(null).Y);
-                window_manager.open_design_idea_window(data, e.Cursor.GetPosition(sender as IInputElement).X,
-                    e.Cursor.GetPosition(sender as IInputElement).Y, "Comment");
+                //if (data.Count() < 7) return;
+                ////log.WriteInteractionLog(43, context, e.Cursor.GetPosition(null).X, e.Cursor.GetPosition(null).Y);
+                //window_manager.open_design_idea_window(data, e.Cursor.GetPosition(sender as IInputElement).X,
+                //    e.Cursor.GetPosition(sender as IInputElement).Y, "Comment");
                 e.Handled = true;
             }
             if (context == "activity")
@@ -214,6 +214,12 @@ namespace nature_net
             e.Mode = ManipulationModes.All;
             FrameworkElement element = (FrameworkElement)e.Source;
             if (element == null) return;
+            try
+            {
+                image_frame iframe = (image_frame)element;
+                if (iframe.the_image == null) return;
+            }
+            catch (Exception) { }
 
             if (configurations.enable_single_rotation)
             {
@@ -249,31 +255,41 @@ namespace nature_net
             System.Windows.Point center = new System.Windows.Point(element.ActualWidth / 2, element.ActualHeight / 2);
             center = matrix.Transform(center);
             image_frame iframe = null;
+            window_frame wframe = null;
             Matrix matrix2 = ((MatrixTransform)element.LayoutTransform).Matrix;
-            try
-            {
-                iframe = (image_frame)element;
-                matrix2.ScaleAt(deltaManipulation.Scale.X, deltaManipulation.Scale.Y, e.ManipulationOrigin.X, e.ManipulationOrigin.Y);
-            }
+            try { wframe = (window_frame)element; wframe.postpone_killer_timer(true); }
+            catch (Exception) { }
+            try { iframe = (image_frame)element; iframe.postpone_killer_timer(true); }
             catch (Exception) { }
 
-            matrix.RotateAt(e.DeltaManipulation.Rotation, e.ManipulationOrigin.X, e.ManipulationOrigin.Y);// center.X, center.Y);
-            //if (element.PointToScreen(new System.Windows.Point(0, 0)).X > 300 && e.DeltaManipulation.Translation.X > 0)
-                matrix.Translate(e.DeltaManipulation.Translation.X, e.DeltaManipulation.Translation.Y);
-            element.RenderTransform = new MatrixTransform(matrix);
-            if (iframe != null)
+            double x = 0;
+            double y = 0;
+            if (iframe != null && iframe.the_image != null)
             {
-                //iframe.Width = iframe.Width * deltaManipulation.Scale.X;
-                //iframe.Height = iframe.Height * deltaManipulation.Scale.X;
+                UIElement o = (UIElement)e.ManipulationContainer;
+                System.Windows.Point new_point = o.TranslatePoint(e.ManipulationOrigin, iframe.the_item);
+                double old_width = iframe.the_item.Width;
+                double old_height = iframe.the_item.Height;
+
                 iframe.the_item.Width = iframe.the_item.Width * deltaManipulation.Scale.X;
                 iframe.the_item.Height = iframe.the_item.Height * deltaManipulation.Scale.X;
-                //iframe.whole.Height = iframe.whole.Height * deltaManipulation.Scale.X;
+
+                x = (new_point.X / old_width) * (iframe.the_item.Width - old_width);
+                y = (new_point.Y / old_height) * (iframe.the_item.Height - old_height);
 
                 iframe.title_bar.Height = configurations.frame_title_bar_height;
                 iframe.close.Height = 33;
                 iframe.close.Width = 33;
                 iframe.UpdateLayout();
             }
+
+            matrix.RotateAt(e.DeltaManipulation.Rotation, e.ManipulationOrigin.X, e.ManipulationOrigin.Y);// center.X, center.Y);
+            //if (element.PointToScreen(new System.Windows.Point(0, 0)).X > 300 && e.DeltaManipulation.Translation.X > 0)
+                matrix.Translate(e.DeltaManipulation.Translation.X - x, e.DeltaManipulation.Translation.Y - y);
+
+            element.RenderTransform = new MatrixTransform(matrix);
+                
+
             num_updates++;
             if (num_updates > configurations.max_num_content_update)
             {
@@ -344,6 +360,14 @@ namespace nature_net
             }
             Canvas.SetLeft(this.label_update, max_x - this.label_update.Width);
             Canvas.SetTop(this.label_update, 0);
+
+            if (configurations.application_name != "")
+            {
+                AddAppNameToScreen(80, 30);
+                AddAppNameToScreen(max_x - 150 , 30);
+                AddAppNameToScreen(80, this.workspace.ActualHeight - 80);
+                AddAppNameToScreen(max_x - 150, this.workspace.ActualHeight - 80);
+            }
         }
 
         void tb_PreviewTouchDown(object sender, TouchEventArgs e)
@@ -391,6 +415,22 @@ namespace nature_net
             window_manager.main_canvas.Children.Add(debug_canvas);
 
             this.load_locations_on_map(screen_x);
+        }
+
+        void AddAppNameToScreen(double x, double y)
+        {
+            System.Windows.Shapes.Rectangle app_name_rect = new System.Windows.Shapes.Rectangle();
+            TextBlock app_name_text = new TextBlock(); app_name_text.Text = configurations.application_name;
+            app_name_rect.Width = 100; app_name_rect.Height = 50;
+            app_name_text.Width = 100; app_name_text.Height = 50; app_name_text.TextAlignment = TextAlignment.Center;
+            app_name_text.FontFamily = new System.Windows.Media.FontFamily("Calibri"); app_name_text.FontSize = 18;
+            app_name_rect.Fill = System.Windows.Media.Brushes.Khaki;
+            Canvas.SetLeft(app_name_rect, x);
+            Canvas.SetTop(app_name_rect, y);
+            Canvas.SetLeft(app_name_text, x);
+            Canvas.SetTop(app_name_text, y + 15);
+            workspace.Children.Add(app_name_rect);
+            workspace.Children.Add(app_name_text);
         }
     }
     public delegate void UpdateStatus(bool status);

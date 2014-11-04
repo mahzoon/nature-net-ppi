@@ -25,7 +25,10 @@ namespace nature_net.user_controls
         public collection_item item;
 
         public ImageSource the_image;
+        public int contribution_id;
         //public window_content win_content;
+
+        private System.Threading.Timer window_killer_timer;
 
         public image_frame()
         {
@@ -51,6 +54,14 @@ namespace nature_net.user_controls
             this.close.PreviewTouchDown += new EventHandler<TouchEventArgs>(close_Click);
 
             RenderOptions.SetBitmapScalingMode(the_item, configurations.scaling_mode);
+
+            this.PreviewTouchDown += new EventHandler<TouchEventArgs>(image_frame_PreviewTouchDown);
+        }
+
+        void image_frame_PreviewTouchDown(object sender, TouchEventArgs e)
+        {
+            this.postpone_killer_timer(true);
+            e.Handled = false;
         }
 
         public void view_contribution(collection_item i)
@@ -59,6 +70,7 @@ namespace nature_net.user_controls
             //window_manager.contributions.Add(contribution_id, src);
             //the_image.Source = src;
             this.item = i;
+            this.contribution_id = i._contribution.id;
             //the_media.Visibility = System.Windows.Visibility.Collapsed;
             //the_image.Visibility = System.Windows.Visibility.Visible;
             if (i.is_image || i.is_audio)
@@ -121,6 +133,7 @@ namespace nature_net.user_controls
                     //bool result = file_manager.download_file_from_googledirve(contrib.media_url, contribution_id);
                     bool result = file_manager.download_file(contrib.media_url, contribution_id);
                     if (result) window_manager.downloaded_contributions.Add(contribution_id);
+                    else e.Result = -1;
                 }
             }
             try
@@ -131,10 +144,11 @@ namespace nature_net.user_controls
                 //window_manager.contributions.Add(contribution_id, src);
                 e.Result = (object)contribution_id;
             }
-            catch (Exception)
+            catch (Exception ex)
             {
                 /// write log
                 e.Result = -1;
+                log.WriteErrorLog(ex);
             }
         }
 
@@ -144,13 +158,19 @@ namespace nature_net.user_controls
                 new System.Action(() =>
                 {
                     if ((int)e.Result == -1)
-                        the_item.Background = new ImageBrush(configurations.img_not_found_image_pic);
+                    {
+                        the_item.Height = 40;
+                        title_bar.Background = Brushes.LightGray;
+                        title_text.Text = "The file is not downloaded yet. Please try again later.";
+                        if (window_manager.downloaded_contributions.Contains(this.contribution_id))
+                            window_manager.downloaded_contributions.Remove(this.contribution_id);
+                    }
                     else
                     {
+                        the_item.Background = new ImageBrush(the_image);//window_manager.contributions[(int)e.Result]);
                         double h = the_image.Height;//window_manager.contributions[(int)e.Result].Height;
                         double w = the_image.Width;//window_manager.contributions[(int)e.Result].Width;
                         the_item.Height = (h / w) * the_item.Width;
-                        the_item.Background = new ImageBrush(the_image);//window_manager.contributions[(int)e.Result]);
                     }
                     the_item.UpdateLayout();
                 }));
@@ -172,8 +192,30 @@ namespace nature_net.user_controls
         //    the_media.Play();
         //}
 
+        public void set_kill_timer()
+        {
+            window_killer_timer = new System.Threading.Timer(new System.Threading.TimerCallback(kill_this_window), null, configurations.kill_window_millisec, System.Threading.Timeout.Infinite);
+        }
+
+        public void kill_this_window(Object stateInfo)
+        {
+            log.WriteInteractionLog(19, "[Auto] image frame closed.", null);
+            this.Dispatcher.BeginInvoke(System.Windows.Threading.DispatcherPriority.Normal, new System.Action(() => { window_manager.close_window(this); }));
+        }
+
+        public void postpone_killer_timer(bool same_thread)
+        {
+            if (same_thread)
+                window_killer_timer.Change(configurations.kill_window_millisec, System.Threading.Timeout.Infinite);
+            else
+                this.Dispatcher.BeginInvoke(System.Windows.Threading.DispatcherPriority.Normal, new System.Action(() => { window_killer_timer.Change(configurations.kill_window_millisec, System.Threading.Timeout.Infinite); }));
+        }
+
         void close_Click(object sender, RoutedEventArgs e)
         {
+            log.WriteInteractionLog(19, "image frame closed.", ((TouchEventArgs)e).TouchDevice);
+            this.window_killer_timer.Change(System.Threading.Timeout.Infinite, System.Threading.Timeout.Infinite);
+            this.window_killer_timer.Dispose();
             window_manager.close_window(this);
         }
 

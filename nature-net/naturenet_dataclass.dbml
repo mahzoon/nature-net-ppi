@@ -1,5 +1,5 @@
-﻿<?xml version="1.0" encoding="utf-8"?><Database Name="nature-net-test" Class="naturenet_dataclassDataContext" xmlns="http://schemas.microsoft.com/linqtosql/dbml/2007">
-  <Connection Mode="AppSettings" ConnectionString="Data Source=CCIF46KWS1308WS\SQLEXPRESS;Initial Catalog=nature-net-test;Integrated Security=True" SettingsObjectName="nature_net.Properties.Settings" SettingsPropertyName="nature_netConnectionString" Provider="System.Data.SqlClient" />
+﻿<?xml version="1.0" encoding="utf-8"?><Database Name="naturenet-dev" Class="naturenet_dataclassDataContext" xmlns="http://schemas.microsoft.com/linqtosql/dbml/2007">
+  <Connection Mode="AppSettings" ConnectionString="Data Source=(local)\SQLEXPRESS;Initial Catalog=naturenet-dev;Integrated Security=True" SettingsObjectName="nature_net.Properties.Settings" SettingsPropertyName="nature_netConnectionString_dev" Provider="System.Data.SqlClient" />
   <Table Name="dbo.Action_Type" Member="Action_Types">
     <Type Name="Action_Type">
       <Column Name="id" Type="System.Int32" DbType="Int NOT NULL IDENTITY" IsPrimaryKey="true" IsDbGenerated="true" CanBeNull="false" />
@@ -22,21 +22,8 @@
       <Column Name="id" Type="System.Int32" DbType="Int NOT NULL IDENTITY" IsPrimaryKey="true" IsDbGenerated="true" CanBeNull="false" />
       <Column Name="name" Type="System.String" DbType="NVarChar(64) NOT NULL" CanBeNull="false" />
       <Column Name="description" Type="System.String" DbType="NVarChar(MAX)" CanBeNull="true" />
-      <Association Name="Location_Contribution" Member="Contributions" ThisKey="id" OtherKey="location_id" Type="Contribution" />
       <Association Name="Location_Activity" Member="Activities" ThisKey="id" OtherKey="location_id" Type="Activity" />
-    </Type>
-  </Table>
-  <Table Name="dbo.Contribution" Member="Contributions">
-    <Type Name="Contribution">
-      <Column Name="id" Type="System.Int32" DbType="Int NOT NULL IDENTITY" IsPrimaryKey="true" IsDbGenerated="true" CanBeNull="false" />
-      <Column Name="note" Type="System.String" DbType="NVarChar(MAX)" CanBeNull="true" />
-      <Column Name="media_url" Type="System.String" DbType="NVarChar(MAX)" CanBeNull="true" />
-      <Column Name="tags" Type="System.String" DbType="NVarChar(MAX)" CanBeNull="true" />
-      <Column Name="date" Type="System.DateTime" DbType="DateTime NOT NULL" CanBeNull="false" />
-      <Column Name="location_id" Type="System.Int32" DbType="Int NOT NULL" CanBeNull="false" />
-      <Column Name="technical_info" Type="System.String" DbType="NVarChar(MAX)" CanBeNull="true" />
-      <Association Name="Contribution_Collection_Contribution_Mapping" Member="Collection_Contribution_Mappings" ThisKey="id" OtherKey="contribution_id" Type="Collection_Contribution_Mapping" />
-      <Association Name="Location_Contribution" Member="Location" ThisKey="location_id" OtherKey="id" Type="Location" IsForeignKey="true" />
+      <Association Name="Location_Contribution" Member="Contributions" ThisKey="id" OtherKey="location_id" Type="Contribution" />
     </Type>
   </Table>
   <Table Name="dbo.Collection_Contribution_Mapping" Member="Collection_Contribution_Mappings">
@@ -46,8 +33,8 @@
       <Column Name="contribution_id" Type="System.Int32" DbType="Int NOT NULL" CanBeNull="false" />
       <Column Name="collection_id" Type="System.Int32" DbType="Int NOT NULL" CanBeNull="false" />
       <Column Name="technical_info" Type="System.String" DbType="NVarChar(MAX)" CanBeNull="true" />
-      <Association Name="Contribution_Collection_Contribution_Mapping" Member="Contribution" ThisKey="contribution_id" OtherKey="id" Type="Contribution" IsForeignKey="true" />
       <Association Name="Collection_Collection_Contribution_Mapping" Member="Collection" ThisKey="collection_id" OtherKey="id" Type="Collection" IsForeignKey="true" />
+      <Association Name="Contribution_Collection_Contribution_Mapping" Member="Contribution" ThisKey="contribution_id" OtherKey="id" Type="Contribution" IsForeignKey="true" />
     </Type>
   </Table>
   <Table Name="dbo.Collection" Member="Collections">
@@ -60,52 +47,8 @@
       <Column Name="date" Type="System.DateTime" DbType="DateTime NOT NULL" CanBeNull="false" />
       <Column Name="technical_info" Type="System.String" DbType="NVarChar(MAX)" CanBeNull="true" />
       <Association Name="Collection_Collection_Contribution_Mapping" Member="Collection_Contribution_Mappings" ThisKey="id" OtherKey="collection_id" Type="Collection_Contribution_Mapping" />
-      <Association Name="User_Collection" Member="User" ThisKey="user_id" OtherKey="id" Type="User" IsForeignKey="true" />
       <Association Name="Activity_Collection" Member="Activity" ThisKey="activity_id" OtherKey="id" Type="Activity" IsForeignKey="true" />
-    </Type>
-  </Table>
-  <Table Name="dbo.[User]" Member="Users">
-    <Type Name="User">
-      <Column Name="id" Type="System.Int32" DbType="Int NOT NULL IDENTITY" IsPrimaryKey="true" IsDbGenerated="true" CanBeNull="false" />
-      <Column Name="name" Type="System.String" DbType="NVarChar(64) NOT NULL" CanBeNull="false" />
-      <Column Name="email" Type="System.String" DbType="NVarChar(64)" CanBeNull="true" />
-      <Column Name="password" Type="System.String" DbType="NChar(128)" CanBeNull="true" />
-      <Column Name="avatar" Type="System.String" DbType="NVarChar(64)" CanBeNull="true" />
-      <Column Name="technical_info" Type="System.String" DbType="NVarChar(MAX)" CanBeNull="true" />
-      <Association Name="User_Collection" Member="Collections" ThisKey="id" OtherKey="user_id" Type="Collection" />
-      <Association Name="User_Feedback" Member="Feedbacks" ThisKey="id" OtherKey="user_id" Type="Feedback" />
-      <Association Name="User_Action" Member="Actions" ThisKey="id" OtherKey="user_id" Type="Action" />
-    </Type>
-  </Table>
-  <Table Name="dbo.Design_Ideas" Member="Design_Ideas">
-    <Type Name="Design_Idea">
-      <Column Name="id" Type="System.Int32" DbType="Int NOT NULL" CanBeNull="false" />
-      <Column Name="note" Type="System.String" DbType="NVarChar(MAX)" CanBeNull="true" />
-      <Column Name="media_url" Type="System.String" DbType="NVarChar(MAX)" CanBeNull="true" />
-      <Column Name="tags" Type="System.String" DbType="NVarChar(MAX)" CanBeNull="true" />
-      <Column Name="date" Type="System.DateTime" DbType="DateTime NOT NULL" CanBeNull="false" />
-      <Column Name="location_id" Type="System.Int32" DbType="Int NOT NULL" CanBeNull="false" />
-      <Column Name="technical_info" Type="System.String" DbType="NVarChar(MAX)" CanBeNull="true" />
-      <Column Name="name" Type="System.String" DbType="NVarChar(64) NOT NULL" CanBeNull="false" />
-      <Column Name="avatar" Type="System.String" DbType="NVarChar(64)" CanBeNull="true" />
-    </Type>
-  </Table>
-  <Table Name="dbo.Feedback" Member="Feedbacks">
-    <Type Name="Feedback">
-      <Column Name="id" Type="System.Int32" DbType="Int NOT NULL IDENTITY" IsPrimaryKey="true" IsDbGenerated="true" CanBeNull="false" />
-      <Column Name="note" Type="System.String" DbType="NVarChar(MAX) NOT NULL" CanBeNull="false" />
-      <Column Name="date" Type="System.DateTime" DbType="DateTime NOT NULL" CanBeNull="false" />
-      <Column Name="type_id" Type="System.Int32" DbType="Int NOT NULL" CanBeNull="false" />
-      <Column Name="user_id" Type="System.Int32" DbType="Int NOT NULL" CanBeNull="false" />
-      <Column Name="parent_id" Type="System.Int32" DbType="Int NOT NULL" CanBeNull="false" />
-      <Column Name="object_type" Type="System.String" DbType="NVarChar(64) NOT NULL" CanBeNull="false" />
-      <Column Name="object" Type="System.Data.Linq.Binary" DbType="Binary(1)" CanBeNull="true" UpdateCheck="Never" />
-      <Column Name="technical_info" Type="System.String" DbType="NVarChar(MAX)" CanBeNull="true" />
-      <Column Name="object_id" Type="System.Int32" DbType="Int" CanBeNull="true" />
-      <Association Name="Feedback_Feedback" Member="Feedbacks" ThisKey="id" OtherKey="parent_id" Type="Feedback" />
-      <Association Name="Feedback_Feedback" Member="Feedback1" ThisKey="parent_id" OtherKey="id" Type="Feedback" IsForeignKey="true" />
-      <Association Name="Feedback_Type_Feedback" Member="Feedback_Type" ThisKey="type_id" OtherKey="id" Type="Feedback_Type" IsForeignKey="true" />
-      <Association Name="User_Feedback" Member="User" ThisKey="user_id" OtherKey="id" Type="User" IsForeignKey="true" />
+      <Association Name="User_Collection" Member="User" ThisKey="user_id" OtherKey="id" Type="User" IsForeignKey="true" />
     </Type>
   </Table>
   <Table Name="dbo.Activity" Member="Activities">
@@ -151,7 +94,87 @@
       <Column Name="touch_x" Type="System.Double" DbType="Float NOT NULL" CanBeNull="false" />
       <Column Name="touch_y" Type="System.Double" DbType="Float NOT NULL" CanBeNull="false" />
       <Column Name="details" Type="System.String" DbType="NVarChar(MAX)" CanBeNull="true" />
+      <Column Name="technical_info" Type="System.String" DbType="NVarChar(MAX)" CanBeNull="true" />
       <Association Name="Interaction_Type_Interaction_Log" Member="Interaction_Type" ThisKey="type" OtherKey="id" Type="Interaction_Type" IsForeignKey="true" />
+    </Type>
+  </Table>
+  <Table Name="dbo.[User]" Member="Users">
+    <Type Name="User">
+      <Column Name="id" Type="System.Int32" DbType="Int NOT NULL IDENTITY" IsPrimaryKey="true" IsDbGenerated="true" CanBeNull="false" />
+      <Column Name="name" Type="System.String" DbType="NVarChar(64) NOT NULL" CanBeNull="false" />
+      <Column Name="email" Type="System.String" DbType="NVarChar(64)" CanBeNull="true" />
+      <Column Name="password" Type="System.String" DbType="NChar(128)" CanBeNull="true" />
+      <Column Name="avatar" Type="System.String" DbType="NVarChar(64)" CanBeNull="true" />
+      <Column Name="technical_info" Type="System.String" DbType="NVarChar(MAX)" CanBeNull="true" />
+      <Column Name="affiliation" Type="System.String" DbType="NVarChar(64)" CanBeNull="true" />
+      <Association Name="User_Collection" Member="Collections" ThisKey="id" OtherKey="user_id" Type="Collection" />
+      <Association Name="User_Action" Member="Actions" ThisKey="id" OtherKey="user_id" Type="Action" />
+      <Association Name="User_Feedback" Member="Feedbacks" ThisKey="id" OtherKey="user_id" Type="Feedback" />
+    </Type>
+  </Table>
+  <Table Name="dbo.WebUser" Member="WebUsers">
+    <Type Name="WebUser">
+      <Column Name="id" Type="System.Int32" DbType="Int NOT NULL IDENTITY" IsPrimaryKey="true" IsDbGenerated="true" CanBeNull="false" />
+      <Column Name="username" Type="System.String" DbType="NVarChar(64) NOT NULL" CanBeNull="false" />
+      <Column Name="fullname" Type="System.String" DbType="NVarChar(64) NOT NULL" CanBeNull="false" />
+      <Column Name="email" Type="System.String" DbType="NVarChar(64)" CanBeNull="true" />
+      <Column Name="password" Type="System.String" DbType="NVarChar(64)" CanBeNull="true" />
+      <Column Name="avatar" Type="System.String" DbType="NVarChar(64)" CanBeNull="true" />
+      <Column Name="affiliation" Type="System.String" DbType="NVarChar(64)" CanBeNull="true" />
+      <Column Name="user_id" Type="System.Int32" DbType="Int" CanBeNull="true" />
+      <Column Name="technical_info" Type="System.String" DbType="NVarChar(MAX)" CanBeNull="true" />
+    </Type>
+  </Table>
+  <Table Name="dbo.Contribution" Member="Contributions">
+    <Type Name="Contribution">
+      <Column Name="id" Type="System.Int32" DbType="Int NOT NULL IDENTITY" IsPrimaryKey="true" IsDbGenerated="true" CanBeNull="false" />
+      <Column Name="note" Type="System.String" DbType="NVarChar(MAX)" CanBeNull="true" />
+      <Column Name="media_url" Type="System.String" DbType="NVarChar(MAX)" CanBeNull="true" />
+      <Column Name="tags" Type="System.String" DbType="NVarChar(MAX)" CanBeNull="true" />
+      <Column Name="date" Type="System.DateTime" DbType="DateTime NOT NULL" CanBeNull="false" />
+      <Column Name="location_id" Type="System.Int32" DbType="Int NOT NULL" CanBeNull="false" />
+      <Column Name="technical_info" Type="System.String" DbType="NVarChar(MAX)" CanBeNull="true" />
+      <Column Name="status" Type="System.String" DbType="NVarChar(64)" CanBeNull="true" />
+      <Column Name="modified_date" Type="System.DateTime" DbType="DateTime" CanBeNull="true" />
+      <Column Name="web_username" Type="System.String" DbType="NVarChar(64)" CanBeNull="true" />
+      <Association Name="Contribution_Collection_Contribution_Mapping" Member="Collection_Contribution_Mappings" ThisKey="id" OtherKey="contribution_id" Type="Collection_Contribution_Mapping" />
+      <Association Name="Location_Contribution" Member="Location" ThisKey="location_id" OtherKey="id" Type="Location" IsForeignKey="true" />
+    </Type>
+  </Table>
+  <Table Name="dbo.Feedback" Member="Feedbacks">
+    <Type Name="Feedback">
+      <Column Name="id" Type="System.Int32" DbType="Int NOT NULL IDENTITY" IsPrimaryKey="true" IsDbGenerated="true" CanBeNull="false" />
+      <Column Name="note" Type="System.String" DbType="NVarChar(MAX) NOT NULL" CanBeNull="false" />
+      <Column Name="date" Type="System.DateTime" DbType="DateTime NOT NULL" CanBeNull="false" />
+      <Column Name="type_id" Type="System.Int32" DbType="Int NOT NULL" CanBeNull="false" />
+      <Column Name="user_id" Type="System.Int32" DbType="Int NOT NULL" CanBeNull="false" />
+      <Column Name="parent_id" Type="System.Int32" DbType="Int NOT NULL" CanBeNull="false" />
+      <Column Name="object_type" Type="System.String" DbType="NVarChar(64) NOT NULL" CanBeNull="false" />
+      <Column Name="object" Type="System.Data.Linq.Binary" DbType="Binary(1)" CanBeNull="true" UpdateCheck="Never" />
+      <Column Name="object_id" Type="System.Int32" DbType="Int" CanBeNull="true" />
+      <Column Name="technical_info" Type="System.String" DbType="NVarChar(MAX)" CanBeNull="true" />
+      <Column Name="web_username" Type="System.String" DbType="NVarChar(64)" CanBeNull="true" />
+      <Association Name="Feedback_Feedback" Member="Feedbacks" ThisKey="id" OtherKey="parent_id" Type="Feedback" />
+      <Association Name="Feedback_Feedback" Member="Feedback1" ThisKey="parent_id" OtherKey="id" Type="Feedback" IsForeignKey="true" />
+      <Association Name="Feedback_Type_Feedback" Member="Feedback_Type" ThisKey="type_id" OtherKey="id" Type="Feedback_Type" IsForeignKey="true" />
+      <Association Name="User_Feedback" Member="User" ThisKey="user_id" OtherKey="id" Type="User" IsForeignKey="true" />
+    </Type>
+  </Table>
+  <Table Name="dbo.Design_Ideas" Member="Design_Ideas">
+    <Type Name="Design_Idea">
+      <Column Name="id" Type="System.Int32" DbType="Int NOT NULL" CanBeNull="false" />
+      <Column Name="note" Type="System.String" DbType="NVarChar(MAX)" CanBeNull="true" />
+      <Column Name="media_url" Type="System.String" DbType="NVarChar(MAX)" CanBeNull="true" />
+      <Column Name="tags" Type="System.String" DbType="NVarChar(MAX)" CanBeNull="true" />
+      <Column Name="date" Type="System.DateTime" DbType="DateTime NOT NULL" CanBeNull="false" />
+      <Column Name="location_id" Type="System.Int32" DbType="Int NOT NULL" CanBeNull="false" />
+      <Column Name="technical_info" Type="System.String" DbType="NVarChar(MAX)" CanBeNull="true" />
+      <Column Name="status" Type="System.String" DbType="NVarChar(64)" CanBeNull="true" />
+      <Column Name="name" Type="System.String" DbType="NVarChar(64) NOT NULL" CanBeNull="false" />
+      <Column Name="avatar" Type="System.String" DbType="NVarChar(64)" CanBeNull="true" />
+      <Column Name="affiliation" Type="System.String" DbType="NVarChar(64)" CanBeNull="true" />
+      <Column Name="modified_date" Type="System.DateTime" DbType="DateTime" CanBeNull="true" />
+      <Column Name="web_username" Type="System.String" DbType="NVarChar(64)" CanBeNull="true" />
     </Type>
   </Table>
 </Database>

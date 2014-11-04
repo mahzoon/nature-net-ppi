@@ -190,6 +190,7 @@ namespace nature_net.user_controls
             numpad.backspace_hit_handler = new backspace_hit(backspace);
             this.numpad_frame.Content = numpad;
             numpad.parent_frame = numpad_frame;
+            numpad.window_frame = this.parent;
             this.numpad_frame.Background = new SolidColorBrush(Colors.White);
             window_manager.main_canvas.Children.Add(numpad_frame);
             this.UpdateLayout();

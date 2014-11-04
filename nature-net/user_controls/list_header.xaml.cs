@@ -22,6 +22,8 @@ namespace nature_net.user_controls
         public AToZOrder atoz_order;
         public TopOrder top_order;
         public RecentOrder recent_order;
+        public DoneCheckChanged done_checked_changed;
+        public NotDoneCheckChanged not_done_checked_changed;
 
         public list_header()
         {
@@ -64,9 +66,34 @@ namespace nature_net.user_controls
             log.WriteInteractionLog(8, (string)(this.title.Content), td);
             if (atoz_order != null) atoz_order();
         }
+
+        private void done_Checked_Changed(object sender, RoutedEventArgs e)
+        {
+            if (!done.IsChecked.Value && !not_done.IsChecked.Value)
+                not_done.IsChecked = true;
+            if (done_checked_changed != null) done_checked_changed();
+        }
+
+        private void not_done_Checked_Changed(object sender, RoutedEventArgs e)
+        {
+            if (!done.IsChecked.Value && !not_done.IsChecked.Value)
+                done.IsChecked = true;
+            if (not_done_checked_changed != null) not_done_checked_changed();
+        }
+
+        public bool is_done_checked()
+        {
+            return done.IsChecked.Value;
+        }
+        public bool is_not_done_checked()
+        {
+            return not_done.IsChecked.Value;
+        }
     }
 
     public delegate void AToZOrder();
     public delegate void TopOrder();
     public delegate void RecentOrder();
+    public delegate void DoneCheckChanged();
+    public delegate void NotDoneCheckChanged();
 }

@@ -19,6 +19,8 @@ namespace nature_net.user_controls
     /// </summary>
     public partial class window_frame : UserControl
     {
+        private System.Threading.Timer window_killer_timer;
+
         public window_frame()
         {
             InitializeComponent();
@@ -41,6 +43,14 @@ namespace nature_net.user_controls
                 this.close.Click += new RoutedEventHandler(close_Click);
             //this.change_view.Click += new RoutedEventHandler(change_view_Click);
             this.close.PreviewTouchDown += new EventHandler<TouchEventArgs>(close_Click);
+
+            this.PreviewTouchDown += new EventHandler<TouchEventArgs>(window_frame_PreviewTouchDown);
+        }
+
+        void window_frame_PreviewTouchDown(object sender, TouchEventArgs e)
+        {
+            this.postpone_killer_timer(true);
+            e.Handled = false;
         }
 
         public void set_title(string t)
@@ -51,6 +61,11 @@ namespace nature_net.user_controls
         public string get_title()
         {
             return this.title.Text;
+        }
+
+        public void set_kill_timer()
+        {
+            window_killer_timer = new System.Threading.Timer(new System.Threading.TimerCallback(kill_this_window), this.title.Text, configurations.kill_window_millisec, System.Threading.Timeout.Infinite);
         }
 
         public void set_icon(ImageSource ico)
@@ -67,10 +82,26 @@ namespace nature_net.user_controls
         {
             
         }
-        
+
+        public void kill_this_window(Object stateInfo)
+        {
+            log.WriteInteractionLog(19, "[Auto] frame closed with title: " + (string)stateInfo, null);
+            this.Dispatcher.BeginInvoke(System.Windows.Threading.DispatcherPriority.Normal, new System.Action(() => { window_manager.close_window(this); }));
+        }
+
+        public void postpone_killer_timer(bool same_thread)
+        {
+            if (same_thread)
+                window_killer_timer.Change(configurations.kill_window_millisec, System.Threading.Timeout.Infinite);
+            else
+                this.Dispatcher.BeginInvoke(System.Windows.Threading.DispatcherPriority.Normal, new System.Action(() => { window_killer_timer.Change(configurations.kill_window_millisec, System.Threading.Timeout.Infinite); }));
+        }
+
         void close_Click(object sender, RoutedEventArgs e)
         {
             log.WriteInteractionLog(19, "frame closed with title: " + this.title.Text, ((TouchEventArgs)e).TouchDevice);
+            this.window_killer_timer.Change(System.Threading.Timeout.Infinite, System.Threading.Timeout.Infinite);
+            this.window_killer_timer.Dispose();
             window_manager.close_window(this);
         }
 

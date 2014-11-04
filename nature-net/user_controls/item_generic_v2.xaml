@@ -10,12 +10,12 @@
         <DockPanel Name="item_panel" DockPanel.Dock="Top" LastChildFill="True">
             <StackPanel Name="left_panel" VerticalAlignment="Center">
                 <Image Name="avatar" Width="75" Height="75"></Image>
-                <Label Name="num_likes" HorizontalAlignment="Center" FontWeight="Bold">17</Label>
+                <Label Name="num_likes" HorizontalAlignment="Center" FontWeight="Bold" Margin="0,-5,0,0">17</Label>
             </StackPanel>
             <Border Name="right_panel_border" DockPanel.Dock="Right">
                 <DockPanel Name="right_panel" LastChildFill="True">
                     <StackPanel Name="drag_icon_vertical_panel" DockPanel.Dock="Right" VerticalAlignment="Center" Visibility="Visible">
-                        <Image Name="drag_icon_vertical" Margin="-5,0,0,0" Width="10" Height="30" ></Image>
+                        <Image Name="drag_icon_vertical" Margin="-3,0,0,0" Width="10" Height="30" ></Image>
                     </StackPanel>
                     <StackPanel Name="info_panel" DockPanel.Dock="Bottom" VerticalAlignment="Bottom" HorizontalAlignment="Center">
                         <TextBlock Name="txt_level2" TextWrapping="Wrap" HorizontalAlignment="Center">25 Nov 2013</TextBlock>
@@ -30,13 +30,18 @@
                     </StackPanel>
                 </DockPanel>
             </Border>
-            <StackPanel Name="center_panel" DockPanel.Dock="Left">
-                <TextBlock Name="title" HorizontalAlignment="Left" TextWrapping="Wrap" FontWeight="Bold">I'd like to see rubber hand effect.</TextBlock>
-                <TextBlock Name="description" HorizontalAlignment="Left" TextWrapping="Wrap">Description</TextBlock>
-                <DockPanel Name="user_info">
-                    <Image Name="user_info_icon" Width="20" Height="20" DockPanel.Dock="Left" VerticalAlignment="Center"></Image>
-                    <TextBlock Name="user_info_name" DockPanel.Dock="Left" TextWrapping="Wrap" VerticalAlignment="Center">Steph</TextBlock>
-                    <TextBlock Name="user_info_date" DockPanel.Dock="Right" TextWrapping="Wrap" VerticalAlignment="Center" HorizontalAlignment="Right">25 Nov 2013</TextBlock>
+            <StackPanel Name="center_panel" VerticalAlignment="Center">
+                <DockPanel>
+                    <TextBlock Name="pre_title" DockPanel.Dock="Left" VerticalAlignment="Center"></TextBlock>
+                    <TextBlock Name="title" HorizontalAlignment="Left" TextWrapping="Wrap" FontWeight="Bold" DockPanel.Dock="Left" VerticalAlignment="Center">I'd like to see rubber hand effect </TextBlock>
+                    <Image Name="affiliation_icon" HorizontalAlignment="Right" Margin="8,5,5,5" Visibility="Collapsed" Height="40" DockPanel.Dock="Right" VerticalAlignment="Center"></Image>
+                </DockPanel>
+                <TextBlock Name="description" HorizontalAlignment="Left" TextWrapping="Wrap"> </TextBlock>
+                <DockPanel Name="user_info" VerticalAlignment="Bottom">
+                    <Image Name="user_info_icon" Width="20" Height="20" DockPanel.Dock="Left" VerticalAlignment="Center" Margin="0,0,5,0"></Image>
+                    <Image Name="affiliation_icon_small" HorizontalAlignment="Left"  Width="20" Height="20" DockPanel.Dock="Left" VerticalAlignment="Center" Visibility="Collapsed"></Image>
+                    <TextBlock Name="user_info_name" DockPanel.Dock="Left" TextWrapping="Wrap" VerticalAlignment="Center" Margin="5,0,0,0"> </TextBlock>
+                    <TextBlock Name="user_info_date" DockPanel.Dock="Right" TextWrapping="Wrap" VerticalAlignment="Center" HorizontalAlignment="Right"> </TextBlock>
                 </DockPanel>
             </StackPanel>
         </DockPanel>

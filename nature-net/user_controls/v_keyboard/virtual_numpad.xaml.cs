@@ -47,6 +47,7 @@ namespace nature_net.user_controls.v_keyboard
         public submit_hit submit_hit_handler;
 
         public ContentControl parent_frame;
+        public UserControl window_frame;
 
         public virtual_numpad()
         {
@@ -92,7 +93,16 @@ namespace nature_net.user_controls.v_keyboard
             else
                 this.Inject(((char)key_code.UnshiftedCodePoint).ToString());
             if (parent_frame != null)
+            {
                 window_manager.UpdateZOrder(parent_frame, true);
+            }
+            if (window_frame != null)
+            {
+                try { ((window_frame)window_frame).postpone_killer_timer(true); }
+                catch (Exception) { }
+                try { ((image_frame)window_frame).postpone_killer_timer(true); }
+                catch (Exception) { }
+            }
         }
 
         private KeyAssignment get_key(double x, double y, TouchDevice td)

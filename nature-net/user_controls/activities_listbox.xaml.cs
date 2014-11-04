@@ -75,7 +75,7 @@ namespace nature_net.user_controls
             item_generic_v2 item = (item_generic_v2)i;
             string[] activity_item = ("activity;" + item.ToString()).Split(new Char[] { ';' });
             log.WriteInteractionLog(15, "tapped the listbox item: " + item.ToString(), e.TouchDevice);
-            window_manager.open_activity_window(activity_item[3], Convert.ToInt32(activity_item[1]), 65, item.PointToScreen(new Point(0, 0)).Y);
+            window_manager.open_activity_window(item.title.Text, Convert.ToInt32(item.Tag), 65, item.PointToScreen(new Point(0, 0)).Y);
             return true;
         }
 

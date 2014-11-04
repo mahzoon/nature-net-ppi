@@ -20,6 +20,7 @@ namespace nature_net.user_controls
     public partial class item_generic_v2 : UserControl
     {
         public int top_value;// it is used for sorting
+        public string drag_prefix = "";
 
         public item_generic_v2()
         {
@@ -57,13 +58,21 @@ namespace nature_net.user_controls
             if (this.description.Text != null)
                 c = this.description.Text;
             string source = "";
+            bool has_source = true;
             if (this.user_info_icon.Source != null)
                 source = this.user_info_icon.Source.ToString();
             else
+            {
+                has_source = false;
                 if (this.avatar.Source != null)
                     source = this.avatar.Source.ToString();
+            }
             string result = id + ";" + source + ";" + this.title.Text +
-                ";" + this.txt_level2.Text + ";" + this.user_info_name.Text + ";" + c + ";" + this.number.Text + ";" + this.num_likes.Content.ToString();
+                ";" + this.txt_level2.Text + ";" + this.user_info_name.Text + ";" + c + ";" + this.number.Text
+                + ";" + this.num_likes.Content.ToString() + ";" + user_info_date.Text + ";" + this.affiliation_icon_small.Visibility.ToString()
+                + ";" + this.affiliation_icon.Visibility.ToString() + ";" + has_source;
+
+            result = drag_prefix + ";" + result;
             return result;
         }
 
@@ -71,6 +80,7 @@ namespace nature_net.user_controls
         {
             item_generic_v2 i = new item_generic_v2();
             i.avatar.Source = this.avatar.Source; i.avatar.Visibility = this.avatar.Visibility; i.avatar.Width = this.avatar.Width; i.avatar.Height = this.avatar.Height; i.avatar.Tag = this.avatar.Tag;
+            i.avatar.Margin = this.avatar.Margin;
             i.title.Text = this.title.Text; i.description.Text = this.description.Text; i.description.Visibility = this.description.Visibility;
             i.title.FontFamily = this.title.FontFamily; i.title.FontSize = this.title.FontSize; i.FontWeight = this.FontWeight;
             i.number.Text = this.number.Text; i.number.Visibility = this.number.Visibility;
@@ -89,9 +99,16 @@ namespace nature_net.user_controls
             i.user_info.Visibility = this.user_info.Visibility;
             i.user_info_date.Text = this.user_info_date.Text; i.user_info_date.Margin = this.user_info_date.Margin;
             i.user_info_icon.Source = this.user_info_icon.Source; i.user_info_icon.Margin = this.user_info_icon.Margin;
+            i.user_info_icon.Visibility = this.user_info_icon.Visibility;
             i.user_info_name.Text = this.user_info_name.Text;i.user_info_name.Margin = this.user_info_name.Margin;
             i.num_likes.Content = this.num_likes.Content; i.num_likes.Tag = this.num_likes.Tag;
             i.top_value = this.top_value;
+            i.affiliation_icon_small.Source = this.affiliation_icon_small.Source;
+            i.affiliation_icon_small.Visibility = this.affiliation_icon_small.Visibility;
+            i.affiliation_icon.Source = this.affiliation_icon.Source;
+            i.affiliation_icon.Visibility = this.affiliation_icon.Visibility;
+            i.affiliation_icon.Height = this.affiliation_icon.Height;
+            i.set_like_handler();
             return i;
         }
 

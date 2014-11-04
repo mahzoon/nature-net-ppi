@@ -66,5 +66,16 @@ namespace nature_net.Properties {
                 return ((string)(this["nature_netConnectionString"]));
             }
         }
+        
+        [global::System.Configuration.ApplicationScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.SpecialSettingAttribute(global::System.Configuration.SpecialSetting.ConnectionString)]
+        [global::System.Configuration.DefaultSettingValueAttribute("Data Source=(local)\\SQLEXPRESS;Initial Catalog=naturenet-dev;Integrated Security=" +
+            "True")]
+        public string nature_netConnectionString_dev {
+            get {
+                return ((string)(this["nature_netConnectionString_dev"]));
+            }
+        }
     }
 }

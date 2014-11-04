@@ -19,6 +19,8 @@ namespace nature_net.user_controls
     /// </summary>
     public partial class collection_listbox_item : UserControl
     {
+        public object collection_item = null;
+
         public collection_listbox_item()
         {
             InitializeComponent();

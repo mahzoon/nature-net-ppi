@@ -52,6 +52,7 @@ namespace nature_net
             window_manager.collection_frames.Add(frame);
             open_window(frame, pos_x - (frame.Width / 2), pos_y - (c_listbox.Height));
             frame.set_title(configurations.frame_title + " in " + location_id.ToString() + ": " + location);
+            frame.set_kill_timer();
         }
 
         public static void open_collection_window(string username, int userid, double pos_x, double pos_y)
@@ -71,6 +72,7 @@ namespace nature_net
             window_manager.collection_frames.Add(frame);
             open_window(frame, pos_x, pos_y);
             frame.set_title(username + "'s " + configurations.frame_title.ToLower());
+            frame.set_kill_timer();
         }
 
         public static void open_contribution_window(collection_item citem, double pos_x, double pos_y, string ctype)
@@ -113,43 +115,88 @@ namespace nature_net
             Matrix matrix = m.Value;
             iframe.RenderTransform = new MatrixTransform(matrix);
             UpdateZOrder(iframe, true);
+            iframe.set_kill_timer();
         }
 
-        public static void open_design_idea_window(string[] idea_item, double pos_x, double pos_y, string title = "Design Idea")
+        public static void open_design_idea_window(item_generic_v2 idea_item, double pos_x, double pos_y, string title = "Design Idea")
         {
             if (window_manager.design_ideas_frames.Count + 1 > configurations.max_design_ideas_frame)
                 return;
 
             window_frame frame = new window_frame();
             window_content content = new window_content();
+            item_generic_v2 idea = idea_item.get_clone();
 
-            item_generic_v2 i = new item_generic_v2();
-            i.title.Text = idea_item[3]; i.description.Visibility = Visibility.Collapsed;
-            i.title.FontSize = 17;
-            i.user_info.Margin = new Thickness(5);
-            i.user_info_name.Text = idea_item[5]; i.user_info_date.Text = idea_item[4];
-            i.user_info_name.Margin = new Thickness(2, 0, 0, 0); i.user_info_date.Margin = new Thickness(2, 0, 2, 0);
-            i.user_info_name.FontSize = 10; i.user_info_date.FontSize = 10;
-            i.user_info_icon.Source = new BitmapImage(new Uri(idea_item[2])); i.number.Text = idea_item[7]; i.number_icon.Visibility = Visibility.Collapsed;
-            i.txt_level1.Text = configurations.designidea_num_desc;
-            i.txt_level2.Visibility = Visibility.Collapsed; i.txt_level3.Visibility = Visibility.Collapsed;
-            i.avatar.Source = configurations.img_thumbs_up_icon; i.num_likes.Content = idea_item[8]; i.avatar.Tag = i;
-            i.avatar.Width = 45; i.avatar.Height = 45; i.avatar.Margin = new Thickness(5);
-            i.right_panel.Width = configurations.design_idea_right_panel_width;
-            i.set_like_handler();
-            i.Tag = idea_item[1]; i.top_value = Convert.ToInt32(idea_item[8]);
+            idea.Background = new SolidColorBrush(Colors.White);
+            idea.description.Visibility = Visibility.Collapsed;
+            idea.title.FontSize = 17;
+            idea.user_info.Margin = new Thickness(5); 
+            idea.user_info_name.Margin = new Thickness(2, 0, 0, 0); idea.user_info_date.Margin = new Thickness(2, 0, 2, 0);
+            idea.user_info_name.FontSize = 10; idea.user_info_date.FontSize = 10;
+            idea.Width = frame.Width;
+            if (idea.affiliation_icon.Visibility == Visibility.Visible)
+                idea.title.MaxWidth = 0.6 * frame.Width;
 
-            i.Background = new SolidColorBrush(Colors.White);
-            i.Width = frame.Width;
-            content.initialize_contents(i, Type.GetType("nature_net.Contribution"), Convert.ToInt32(idea_item[1]), frame, idea_item[5] + "'s " + title);
-
+            content.initialize_contents(idea, Type.GetType("nature_net.Contribution"), Convert.ToInt32(idea_item.Tag), frame, idea_item.user_info_name.Text + "'s " + title);
             frame.window_content.Content = content;
 
             window_manager.design_ideas_frames.Add(frame);
             open_window(frame, pos_x, pos_y);
             frame.hide_change_view();
-            frame.set_title(idea_item[5] + "'s " + title);
+            frame.set_title(idea_item.user_info_name.Text + "'s " + title);
+            frame.set_kill_timer();
         }
+        //public static void open_design_idea_window(string[] idea_item, double pos_x, double pos_y, string title = "Design Idea")
+        //{
+        //    if (window_manager.design_ideas_frames.Count + 1 > configurations.max_design_ideas_frame)
+        //        return;
+
+        //    window_frame frame = new window_frame();
+        //    window_content content = new window_content();
+
+        //    item_generic_v2 i = new item_generic_v2();
+        //    i.title.Text = idea_item[3]; i.description.Visibility = Visibility.Collapsed;
+        //    i.title.FontSize = 17;
+        //    i.user_info.Margin = new Thickness(5);
+        //    i.user_info_name.Text = idea_item[5]; i.user_info_date.Text = idea_item[9];
+        //    i.user_info_name.Margin = new Thickness(2, 0, 0, 0); i.user_info_date.Margin = new Thickness(2, 0, 2, 0);
+        //    i.user_info_name.FontSize = 10; i.user_info_date.FontSize = 10;
+        //    try { i.user_info_icon.Source = new BitmapImage(new Uri(idea_item[2])); }
+        //    catch (Exception) { i.user_info_icon.Visibility = Visibility.Collapsed; }
+        //    if (idea_item[12] == "False")
+        //        i.user_info_icon.Visibility = Visibility.Collapsed;
+        //    i.number.Text = idea_item[7]; i.number_icon.Visibility = Visibility.Collapsed;
+        //    i.txt_level1.Text = configurations.designidea_num_desc;
+        //    i.txt_level2.Visibility = Visibility.Collapsed; i.txt_level3.Visibility = Visibility.Collapsed;
+        //    i.avatar.Source = configurations.img_thumbs_up_icon; i.num_likes.Content = idea_item[8]; i.avatar.Tag = i;
+        //    i.avatar.Width = 45; i.avatar.Height = 45; i.avatar.Margin = new Thickness(5);
+        //    i.right_panel.Width = configurations.design_idea_right_panel_width;
+        //    i.set_like_handler();
+        //    i.Tag = idea_item[1]; i.top_value = Convert.ToInt32(idea_item[8]);
+        //    if (idea_item[10] == "Visible")
+        //    {
+        //        i.affiliation_icon_small.Source = configurations.img_affiliation_icon;
+        //        i.affiliation_icon_small.Visibility = Visibility.Visible;
+        //    }
+        //    if (idea_item[11] == "Visible")
+        //    {
+        //        i.affiliation_icon.Height = 15;
+        //        i.affiliation_icon.Source = configurations.img_implemented_icon;
+        //        i.affiliation_icon.Visibility = Visibility.Visible;
+        //        i.title.MaxWidth = 230;
+        //    }
+            
+        //    i.Background = new SolidColorBrush(Colors.White);
+        //    i.Width = frame.Width;
+        //    content.initialize_contents(i, Type.GetType("nature_net.Contribution"), Convert.ToInt32(idea_item[1]), frame, idea_item[5] + "'s " + title);
+
+        //    frame.window_content.Content = content;
+
+        //    window_manager.design_ideas_frames.Add(frame);
+        //    open_window(frame, pos_x, pos_y);
+        //    frame.hide_change_view();
+        //    frame.set_title(idea_item[5] + "'s " + title);
+        //}
 
         public static void open_design_idea_window_ext(design_ideas_listbox parent, double pos_x, double pos_y)
         {
@@ -167,6 +214,7 @@ namespace nature_net
             open_window(frame, pos_x, pos_y);
             frame.hide_change_view();
             frame.set_title("Submit Design Idea");
+            frame.set_kill_timer();
         }
 
         public static void open_signup_window(double pos_x, double pos_y)
@@ -178,6 +226,7 @@ namespace nature_net
             signup s = new signup();
             s.parent = frame;
             s.user_pin.parent = frame;
+            s.avatar_list_control.parent_window = frame;
             s.load_window();
             frame.window_content.Content = s;
             
@@ -186,6 +235,7 @@ namespace nature_net
             frame.hide_change_view();
             frame.set_title("Sign up");
             frame.set_icon(configurations.img_signup_window_icon);
+            frame.set_kill_timer();
         }
 
         public static void open_activity_window(string activity_name, int activity_id, double pos_x, double pos_y)
@@ -208,6 +258,7 @@ namespace nature_net
             //if (activity_name.Length > configurations.max_activity_frame_title_chars)
             //    title = activity_name.Substring(0, 10) + "...";
             frame.set_title(title + "'s " + configurations.frame_title.ToLower());
+            frame.set_kill_timer();
         }
 
         private static void open_window(window_frame frame, double pos_x, double pos_y)
@@ -252,7 +303,8 @@ namespace nature_net
             collection_frames.Remove(frame);
             activity_frames.Remove(frame);
             image_display_frames.Remove(frame);
-            design_ideas_frames.Remove(frame); 
+            design_ideas_frames.Remove(frame);
+            signup_frames.Remove(frame);
             main_canvas.Children.Remove(frame);
         }
 
@@ -311,9 +363,13 @@ namespace nature_net
             window_manager.avatars.Clear();
             foreach (FileInfo f in files)
             {
-                ImageSource img = new BitmapImage(new Uri(f.FullName));
-                //avatars.Add(f.Name.Split(new char[] { '.' })[0], img);
-                avatars.Add(f.Name, img);
+                try
+                {
+                    ImageSource img = new BitmapImage(new Uri(f.FullName));
+                    //avatars.Add(f.Name.Split(new char[] { '.' })[0], img);
+                    avatars.Add(f.Name, img);
+                }
+                catch (Exception ex) { log.WriteErrorLog(ex); }
             }
         }
 

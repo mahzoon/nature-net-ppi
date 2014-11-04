@@ -75,6 +75,8 @@ namespace nature_net
                 return new naturenet_dataclassDataContext(nature_net.Properties.Settings.Default.nature_netConnectionString_umd);
             if (configurations.site_name == "uncc")
                 return new naturenet_dataclassDataContext(nature_net.Properties.Settings.Default.nature_netConnectionString_uncc);
+            if (configurations.site_name == "dev")
+                return new naturenet_dataclassDataContext(nature_net.Properties.Settings.Default.nature_netConnectionString_dev);
             return new naturenet_dataclassDataContext();
         }
     }

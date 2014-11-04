@@ -22,7 +22,7 @@ namespace nature_net
 	using System;
 	
 	
-	[global::System.Data.Linq.Mapping.DatabaseAttribute(Name="nature-net-test")]
+	[global::System.Data.Linq.Mapping.DatabaseAttribute(Name="naturenet-dev")]
 	public partial class naturenet_dataclassDataContext : System.Data.Linq.DataContext
 	{
 		
@@ -39,21 +39,12 @@ namespace nature_net
     partial void InsertLocation(Location instance);
     partial void UpdateLocation(Location instance);
     partial void DeleteLocation(Location instance);
-    partial void InsertContribution(Contribution instance);
-    partial void UpdateContribution(Contribution instance);
-    partial void DeleteContribution(Contribution instance);
     partial void InsertCollection_Contribution_Mapping(Collection_Contribution_Mapping instance);
     partial void UpdateCollection_Contribution_Mapping(Collection_Contribution_Mapping instance);
     partial void DeleteCollection_Contribution_Mapping(Collection_Contribution_Mapping instance);
     partial void InsertCollection(Collection instance);
     partial void UpdateCollection(Collection instance);
     partial void DeleteCollection(Collection instance);
-    partial void InsertUser(User instance);
-    partial void UpdateUser(User instance);
-    partial void DeleteUser(User instance);
-    partial void InsertFeedback(Feedback instance);
-    partial void UpdateFeedback(Feedback instance);
-    partial void DeleteFeedback(Feedback instance);
     partial void InsertActivity(Activity instance);
     partial void UpdateActivity(Activity instance);
     partial void DeleteActivity(Activity instance);
@@ -66,10 +57,22 @@ namespace nature_net
     partial void InsertInteraction_Log(Interaction_Log instance);
     partial void UpdateInteraction_Log(Interaction_Log instance);
     partial void DeleteInteraction_Log(Interaction_Log instance);
+    partial void InsertUser(User instance);
+    partial void UpdateUser(User instance);
+    partial void DeleteUser(User instance);
+    partial void InsertWebUser(WebUser instance);
+    partial void UpdateWebUser(WebUser instance);
+    partial void DeleteWebUser(WebUser instance);
+    partial void InsertContribution(Contribution instance);
+    partial void UpdateContribution(Contribution instance);
+    partial void DeleteContribution(Contribution instance);
+    partial void InsertFeedback(Feedback instance);
+    partial void UpdateFeedback(Feedback instance);
+    partial void DeleteFeedback(Feedback instance);
     #endregion
 		
 		public naturenet_dataclassDataContext() : 
-				base(global::nature_net.Properties.Settings.Default.nature_netConnectionString, mappingSource)
+				base(global::nature_net.Properties.Settings.Default.nature_netConnectionString_dev, mappingSource)
 		{
 			OnCreated();
 		}
@@ -122,14 +125,6 @@ namespace nature_net
 			}
 		}
 		
-		public System.Data.Linq.Table<Contribution> Contributions
-		{
-			get
-			{
-				return this.GetTable<Contribution>();
-			}
-		}
-		
 		public System.Data.Linq.Table<Collection_Contribution_Mapping> Collection_Contribution_Mappings
 		{
 			get
@@ -143,30 +138,6 @@ namespace nature_net
 			get
 			{
 				return this.GetTable<Collection>();
-			}
-		}
-		
-		public System.Data.Linq.Table<User> Users
-		{
-			get
-			{
-				return this.GetTable<User>();
-			}
-		}
-		
-		public System.Data.Linq.Table<Design_Idea> Design_Ideas
-		{
-			get
-			{
-				return this.GetTable<Design_Idea>();
-			}
-		}
-		
-		public System.Data.Linq.Table<Feedback> Feedbacks
-		{
-			get
-			{
-				return this.GetTable<Feedback>();
 			}
 		}
 		
@@ -199,6 +170,46 @@ namespace nature_net
 			get
 			{
 				return this.GetTable<Interaction_Log>();
+			}
+		}
+		
+		public System.Data.Linq.Table<User> Users
+		{
+			get
+			{
+				return this.GetTable<User>();
+			}
+		}
+		
+		public System.Data.Linq.Table<WebUser> WebUsers
+		{
+			get
+			{
+				return this.GetTable<WebUser>();
+			}
+		}
+		
+		public System.Data.Linq.Table<Contribution> Contributions
+		{
+			get
+			{
+				return this.GetTable<Contribution>();
+			}
+		}
+		
+		public System.Data.Linq.Table<Feedback> Feedbacks
+		{
+			get
+			{
+				return this.GetTable<Feedback>();
+			}
+		}
+		
+		public System.Data.Linq.Table<Design_Idea> Design_Ideas
+		{
+			get
+			{
+				return this.GetTable<Design_Idea>();
 			}
 		}
 	}
@@ -515,9 +526,9 @@ namespace nature_net
 		
 		private string _description;
 		
-		private EntitySet<Contribution> _Contributions;
-		
 		private EntitySet<Activity> _Activities;
+		
+		private EntitySet<Contribution> _Contributions;
 		
     #region Extensibility Method Definitions
     partial void OnLoaded();
@@ -533,8 +544,8 @@ namespace nature_net
 		
 		public Location()
 		{
-			this._Contributions = new EntitySet<Contribution>(new Action<Contribution>(this.attach_Contributions), new Action<Contribution>(this.detach_Contributions));
 			this._Activities = new EntitySet<Activity>(new Action<Activity>(this.attach_Activities), new Action<Activity>(this.detach_Activities));
+			this._Contributions = new EntitySet<Contribution>(new Action<Contribution>(this.attach_Contributions), new Action<Contribution>(this.detach_Contributions));
 			OnCreated();
 		}
 		
@@ -598,19 +609,6 @@ namespace nature_net
 			}
 		}
 		
-		[global::System.Data.Linq.Mapping.AssociationAttribute(Name="Location_Contribution", Storage="_Contributions", ThisKey="id", OtherKey="location_id")]
-		public EntitySet<Contribution> Contributions
-		{
-			get
-			{
-				return this._Contributions;
-			}
-			set
-			{
-				this._Contributions.Assign(value);
-			}
-		}
-		
 		[global::System.Data.Linq.Mapping.AssociationAttribute(Name="Location_Activity", Storage="_Activities", ThisKey="id", OtherKey="location_id")]
 		public EntitySet<Activity> Activities
 		{
@@ -624,6 +622,19 @@ namespace nature_net
 			}
 		}
 		
+		[global::System.Data.Linq.Mapping.AssociationAttribute(Name="Location_Contribution", Storage="_Contributions", ThisKey="id", OtherKey="location_id")]
+		public EntitySet<Contribution> Contributions
+		{
+			get
+			{
+				return this._Contributions;
+			}
+			set
+			{
+				this._Contributions.Assign(value);
+			}
+		}
+		
 		public event PropertyChangingEventHandler PropertyChanging;
 		
 		public event PropertyChangedEventHandler PropertyChanged;
@@ -642,18 +653,6 @@ namespace nature_net
 			{
 				this.PropertyChanged(this, new PropertyChangedEventArgs(propertyName));
 			}
-		}
-		
-		private void attach_Contributions(Contribution entity)
-		{
-			this.SendPropertyChanging();
-			entity.Location = this;
-		}
-		
-		private void detach_Contributions(Contribution entity)
-		{
-			this.SendPropertyChanging();
-			entity.Location = null;
 		}
 		
 		private void attach_Activities(Activity entity)
@@ -667,280 +666,17 @@ namespace nature_net
 			this.SendPropertyChanging();
 			entity.Location = null;
 		}
-	}
-	
-	[global::System.Data.Linq.Mapping.TableAttribute(Name="dbo.Contribution")]
-	public partial class Contribution : INotifyPropertyChanging, INotifyPropertyChanged
-	{
 		
-		private static PropertyChangingEventArgs emptyChangingEventArgs = new PropertyChangingEventArgs(String.Empty);
-		
-		private int _id;
-		
-		private string _note;
-		
-		private string _media_url;
-		
-		private string _tags;
-		
-		private System.DateTime _date;
-		
-		private int _location_id;
-		
-		private string _technical_info;
-		
-		private EntitySet<Collection_Contribution_Mapping> _Collection_Contribution_Mappings;
-		
-		private EntityRef<Location> _Location;
-		
-    #region Extensibility Method Definitions
-    partial void OnLoaded();
-    partial void OnValidate(System.Data.Linq.ChangeAction action);
-    partial void OnCreated();
-    partial void OnidChanging(int value);
-    partial void OnidChanged();
-    partial void OnnoteChanging(string value);
-    partial void OnnoteChanged();
-    partial void Onmedia_urlChanging(string value);
-    partial void Onmedia_urlChanged();
-    partial void OntagsChanging(string value);
-    partial void OntagsChanged();
-    partial void OndateChanging(System.DateTime value);
-    partial void OndateChanged();
-    partial void Onlocation_idChanging(int value);
-    partial void Onlocation_idChanged();
-    partial void Ontechnical_infoChanging(string value);
-    partial void Ontechnical_infoChanged();
-    #endregion
-		
-		public Contribution()
-		{
-			this._Collection_Contribution_Mappings = new EntitySet<Collection_Contribution_Mapping>(new Action<Collection_Contribution_Mapping>(this.attach_Collection_Contribution_Mappings), new Action<Collection_Contribution_Mapping>(this.detach_Collection_Contribution_Mappings));
-			this._Location = default(EntityRef<Location>);
-			OnCreated();
-		}
-		
-		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_id", AutoSync=AutoSync.OnInsert, DbType="Int NOT NULL IDENTITY", IsPrimaryKey=true, IsDbGenerated=true)]
-		public int id
-		{
-			get
-			{
-				return this._id;
-			}
-			set
-			{
-				if ((this._id != value))
-				{
-					this.OnidChanging(value);
-					this.SendPropertyChanging();
-					this._id = value;
-					this.SendPropertyChanged("id");
-					this.OnidChanged();
-				}
-			}
-		}
-		
-		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_note", DbType="NVarChar(MAX)")]
-		public string note
-		{
-			get
-			{
-				return this._note;
-			}
-			set
-			{
-				if ((this._note != value))
-				{
-					this.OnnoteChanging(value);
-					this.SendPropertyChanging();
-					this._note = value;
-					this.SendPropertyChanged("note");
-					this.OnnoteChanged();
-				}
-			}
-		}
-		
-		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_media_url", DbType="NVarChar(MAX)")]
-		public string media_url
-		{
-			get
-			{
-				return this._media_url;
-			}
-			set
-			{
-				if ((this._media_url != value))
-				{
-					this.Onmedia_urlChanging(value);
-					this.SendPropertyChanging();
-					this._media_url = value;
-					this.SendPropertyChanged("media_url");
-					this.Onmedia_urlChanged();
-				}
-			}
-		}
-		
-		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_tags", DbType="NVarChar(MAX)")]
-		public string tags
-		{
-			get
-			{
-				return this._tags;
-			}
-			set
-			{
-				if ((this._tags != value))
-				{
-					this.OntagsChanging(value);
-					this.SendPropertyChanging();
-					this._tags = value;
-					this.SendPropertyChanged("tags");
-					this.OntagsChanged();
-				}
-			}
-		}
-		
-		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_date", DbType="DateTime NOT NULL")]
-		public System.DateTime date
-		{
-			get
-			{
-				return this._date;
-			}
-			set
-			{
-				if ((this._date != value))
-				{
-					this.OndateChanging(value);
-					this.SendPropertyChanging();
-					this._date = value;
-					this.SendPropertyChanged("date");
-					this.OndateChanged();
-				}
-			}
-		}
-		
-		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_location_id", DbType="Int NOT NULL")]
-		public int location_id
-		{
-			get
-			{
-				return this._location_id;
-			}
-			set
-			{
-				if ((this._location_id != value))
-				{
-					if (this._Location.HasLoadedOrAssignedValue)
-					{
-						throw new System.Data.Linq.ForeignKeyReferenceAlreadyHasValueException();
-					}
-					this.Onlocation_idChanging(value);
-					this.SendPropertyChanging();
-					this._location_id = value;
-					this.SendPropertyChanged("location_id");
-					this.Onlocation_idChanged();
-				}
-			}
-		}
-		
-		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_technical_info", DbType="NVarChar(MAX)")]
-		public string technical_info
-		{
-			get
-			{
-				return this._technical_info;
-			}
-			set
-			{
-				if ((this._technical_info != value))
-				{
-					this.Ontechnical_infoChanging(value);
-					this.SendPropertyChanging();
-					this._technical_info = value;
-					this.SendPropertyChanged("technical_info");
-					this.Ontechnical_infoChanged();
-				}
-			}
-		}
-		
-		[global::System.Data.Linq.Mapping.AssociationAttribute(Name="Contribution_Collection_Contribution_Mapping", Storage="_Collection_Contribution_Mappings", ThisKey="id", OtherKey="contribution_id")]
-		public EntitySet<Collection_Contribution_Mapping> Collection_Contribution_Mappings
-		{
-			get
-			{
-				return this._Collection_Contribution_Mappings;
-			}
-			set
-			{
-				this._Collection_Contribution_Mappings.Assign(value);
-			}
-		}
-		
-		[global::System.Data.Linq.Mapping.AssociationAttribute(Name="Location_Contribution", Storage="_Location", ThisKey="location_id", OtherKey="id", IsForeignKey=true)]
-		public Location Location
-		{
-			get
-			{
-				return this._Location.Entity;
-			}
-			set
-			{
-				Location previousValue = this._Location.Entity;
-				if (((previousValue != value) 
-							|| (this._Location.HasLoadedOrAssignedValue == false)))
-				{
-					this.SendPropertyChanging();
-					if ((previousValue != null))
-					{
-						this._Location.Entity = null;
-						previousValue.Contributions.Remove(this);
-					}
-					this._Location.Entity = value;
-					if ((value != null))
-					{
-						value.Contributions.Add(this);
-						this._location_id = value.id;
-					}
-					else
-					{
-						this._location_id = default(int);
-					}
-					this.SendPropertyChanged("Location");
-				}
-			}
-		}
-		
-		public event PropertyChangingEventHandler PropertyChanging;
-		
-		public event PropertyChangedEventHandler PropertyChanged;
-		
-		protected virtual void SendPropertyChanging()
-		{
-			if ((this.PropertyChanging != null))
-			{
-				this.PropertyChanging(this, emptyChangingEventArgs);
-			}
-		}
-		
-		protected virtual void SendPropertyChanged(String propertyName)
-		{
-			if ((this.PropertyChanged != null))
-			{
-				this.PropertyChanged(this, new PropertyChangedEventArgs(propertyName));
-			}
-		}
-		
-		private void attach_Collection_Contribution_Mappings(Collection_Contribution_Mapping entity)
+		private void attach_Contributions(Contribution entity)
 		{
 			this.SendPropertyChanging();
-			entity.Contribution = this;
+			entity.Location = this;
 		}
 		
-		private void detach_Collection_Contribution_Mappings(Collection_Contribution_Mapping entity)
+		private void detach_Contributions(Contribution entity)
 		{
 			this.SendPropertyChanging();
-			entity.Contribution = null;
+			entity.Location = null;
 		}
 	}
 	
@@ -960,9 +696,9 @@ namespace nature_net
 		
 		private string _technical_info;
 		
-		private EntityRef<Contribution> _Contribution;
-		
 		private EntityRef<Collection> _Collection;
+		
+		private EntityRef<Contribution> _Contribution;
 		
     #region Extensibility Method Definitions
     partial void OnLoaded();
@@ -982,8 +718,8 @@ namespace nature_net
 		
 		public Collection_Contribution_Mapping()
 		{
-			this._Contribution = default(EntityRef<Contribution>);
 			this._Collection = default(EntityRef<Collection>);
+			this._Contribution = default(EntityRef<Contribution>);
 			OnCreated();
 		}
 		
@@ -1095,40 +831,6 @@ namespace nature_net
 			}
 		}
 		
-		[global::System.Data.Linq.Mapping.AssociationAttribute(Name="Contribution_Collection_Contribution_Mapping", Storage="_Contribution", ThisKey="contribution_id", OtherKey="id", IsForeignKey=true)]
-		public Contribution Contribution
-		{
-			get
-			{
-				return this._Contribution.Entity;
-			}
-			set
-			{
-				Contribution previousValue = this._Contribution.Entity;
-				if (((previousValue != value) 
-							|| (this._Contribution.HasLoadedOrAssignedValue == false)))
-				{
-					this.SendPropertyChanging();
-					if ((previousValue != null))
-					{
-						this._Contribution.Entity = null;
-						previousValue.Collection_Contribution_Mappings.Remove(this);
-					}
-					this._Contribution.Entity = value;
-					if ((value != null))
-					{
-						value.Collection_Contribution_Mappings.Add(this);
-						this._contribution_id = value.id;
-					}
-					else
-					{
-						this._contribution_id = default(int);
-					}
-					this.SendPropertyChanged("Contribution");
-				}
-			}
-		}
-		
 		[global::System.Data.Linq.Mapping.AssociationAttribute(Name="Collection_Collection_Contribution_Mapping", Storage="_Collection", ThisKey="collection_id", OtherKey="id", IsForeignKey=true)]
 		public Collection Collection
 		{
@@ -1159,6 +861,40 @@ namespace nature_net
 						this._collection_id = default(int);
 					}
 					this.SendPropertyChanged("Collection");
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.AssociationAttribute(Name="Contribution_Collection_Contribution_Mapping", Storage="_Contribution", ThisKey="contribution_id", OtherKey="id", IsForeignKey=true)]
+		public Contribution Contribution
+		{
+			get
+			{
+				return this._Contribution.Entity;
+			}
+			set
+			{
+				Contribution previousValue = this._Contribution.Entity;
+				if (((previousValue != value) 
+							|| (this._Contribution.HasLoadedOrAssignedValue == false)))
+				{
+					this.SendPropertyChanging();
+					if ((previousValue != null))
+					{
+						this._Contribution.Entity = null;
+						previousValue.Collection_Contribution_Mappings.Remove(this);
+					}
+					this._Contribution.Entity = value;
+					if ((value != null))
+					{
+						value.Collection_Contribution_Mappings.Add(this);
+						this._contribution_id = value.id;
+					}
+					else
+					{
+						this._contribution_id = default(int);
+					}
+					this.SendPropertyChanged("Contribution");
 				}
 			}
 		}
@@ -1206,9 +942,9 @@ namespace nature_net
 		
 		private EntitySet<Collection_Contribution_Mapping> _Collection_Contribution_Mappings;
 		
-		private EntityRef<User> _User;
-		
 		private EntityRef<Activity> _Activity;
+		
+		private EntityRef<User> _User;
 		
     #region Extensibility Method Definitions
     partial void OnLoaded();
@@ -1233,8 +969,8 @@ namespace nature_net
 		public Collection()
 		{
 			this._Collection_Contribution_Mappings = new EntitySet<Collection_Contribution_Mapping>(new Action<Collection_Contribution_Mapping>(this.attach_Collection_Contribution_Mappings), new Action<Collection_Contribution_Mapping>(this.detach_Collection_Contribution_Mappings));
-			this._User = default(EntityRef<User>);
 			this._Activity = default(EntityRef<Activity>);
+			this._User = default(EntityRef<User>);
 			OnCreated();
 		}
 		
@@ -1399,40 +1135,6 @@ namespace nature_net
 			}
 		}
 		
-		[global::System.Data.Linq.Mapping.AssociationAttribute(Name="User_Collection", Storage="_User", ThisKey="user_id", OtherKey="id", IsForeignKey=true)]
-		public User User
-		{
-			get
-			{
-				return this._User.Entity;
-			}
-			set
-			{
-				User previousValue = this._User.Entity;
-				if (((previousValue != value) 
-							|| (this._User.HasLoadedOrAssignedValue == false)))
-				{
-					this.SendPropertyChanging();
-					if ((previousValue != null))
-					{
-						this._User.Entity = null;
-						previousValue.Collections.Remove(this);
-					}
-					this._User.Entity = value;
-					if ((value != null))
-					{
-						value.Collections.Add(this);
-						this._user_id = value.id;
-					}
-					else
-					{
-						this._user_id = default(int);
-					}
-					this.SendPropertyChanged("User");
-				}
-			}
-		}
-		
 		[global::System.Data.Linq.Mapping.AssociationAttribute(Name="Activity_Collection", Storage="_Activity", ThisKey="activity_id", OtherKey="id", IsForeignKey=true)]
 		public Activity Activity
 		{
@@ -1467,839 +1169,7 @@ namespace nature_net
 			}
 		}
 		
-		public event PropertyChangingEventHandler PropertyChanging;
-		
-		public event PropertyChangedEventHandler PropertyChanged;
-		
-		protected virtual void SendPropertyChanging()
-		{
-			if ((this.PropertyChanging != null))
-			{
-				this.PropertyChanging(this, emptyChangingEventArgs);
-			}
-		}
-		
-		protected virtual void SendPropertyChanged(String propertyName)
-		{
-			if ((this.PropertyChanged != null))
-			{
-				this.PropertyChanged(this, new PropertyChangedEventArgs(propertyName));
-			}
-		}
-		
-		private void attach_Collection_Contribution_Mappings(Collection_Contribution_Mapping entity)
-		{
-			this.SendPropertyChanging();
-			entity.Collection = this;
-		}
-		
-		private void detach_Collection_Contribution_Mappings(Collection_Contribution_Mapping entity)
-		{
-			this.SendPropertyChanging();
-			entity.Collection = null;
-		}
-	}
-	
-	[global::System.Data.Linq.Mapping.TableAttribute(Name="dbo.[User]")]
-	public partial class User : INotifyPropertyChanging, INotifyPropertyChanged
-	{
-		
-		private static PropertyChangingEventArgs emptyChangingEventArgs = new PropertyChangingEventArgs(String.Empty);
-		
-		private int _id;
-		
-		private string _name;
-		
-		private string _email;
-		
-		private string _password;
-		
-		private string _avatar;
-		
-		private string _technical_info;
-		
-		private EntitySet<Collection> _Collections;
-		
-		private EntitySet<Feedback> _Feedbacks;
-		
-		private EntitySet<Action> _Actions;
-		
-    #region Extensibility Method Definitions
-    partial void OnLoaded();
-    partial void OnValidate(System.Data.Linq.ChangeAction action);
-    partial void OnCreated();
-    partial void OnidChanging(int value);
-    partial void OnidChanged();
-    partial void OnnameChanging(string value);
-    partial void OnnameChanged();
-    partial void OnemailChanging(string value);
-    partial void OnemailChanged();
-    partial void OnpasswordChanging(string value);
-    partial void OnpasswordChanged();
-    partial void OnavatarChanging(string value);
-    partial void OnavatarChanged();
-    partial void Ontechnical_infoChanging(string value);
-    partial void Ontechnical_infoChanged();
-    #endregion
-		
-		public User()
-		{
-			this._Collections = new EntitySet<Collection>(new Action<Collection>(this.attach_Collections), new Action<Collection>(this.detach_Collections));
-			this._Feedbacks = new EntitySet<Feedback>(new Action<Feedback>(this.attach_Feedbacks), new Action<Feedback>(this.detach_Feedbacks));
-			this._Actions = new EntitySet<Action>(new Action<Action>(this.attach_Actions), new Action<Action>(this.detach_Actions));
-			OnCreated();
-		}
-		
-		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_id", AutoSync=AutoSync.OnInsert, DbType="Int NOT NULL IDENTITY", IsPrimaryKey=true, IsDbGenerated=true)]
-		public int id
-		{
-			get
-			{
-				return this._id;
-			}
-			set
-			{
-				if ((this._id != value))
-				{
-					this.OnidChanging(value);
-					this.SendPropertyChanging();
-					this._id = value;
-					this.SendPropertyChanged("id");
-					this.OnidChanged();
-				}
-			}
-		}
-		
-		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_name", DbType="NVarChar(64) NOT NULL", CanBeNull=false)]
-		public string name
-		{
-			get
-			{
-				return this._name;
-			}
-			set
-			{
-				if ((this._name != value))
-				{
-					this.OnnameChanging(value);
-					this.SendPropertyChanging();
-					this._name = value;
-					this.SendPropertyChanged("name");
-					this.OnnameChanged();
-				}
-			}
-		}
-		
-		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_email", DbType="NVarChar(64)")]
-		public string email
-		{
-			get
-			{
-				return this._email;
-			}
-			set
-			{
-				if ((this._email != value))
-				{
-					this.OnemailChanging(value);
-					this.SendPropertyChanging();
-					this._email = value;
-					this.SendPropertyChanged("email");
-					this.OnemailChanged();
-				}
-			}
-		}
-		
-		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_password", DbType="NChar(128)")]
-		public string password
-		{
-			get
-			{
-				return this._password;
-			}
-			set
-			{
-				if ((this._password != value))
-				{
-					this.OnpasswordChanging(value);
-					this.SendPropertyChanging();
-					this._password = value;
-					this.SendPropertyChanged("password");
-					this.OnpasswordChanged();
-				}
-			}
-		}
-		
-		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_avatar", DbType="NVarChar(64)")]
-		public string avatar
-		{
-			get
-			{
-				return this._avatar;
-			}
-			set
-			{
-				if ((this._avatar != value))
-				{
-					this.OnavatarChanging(value);
-					this.SendPropertyChanging();
-					this._avatar = value;
-					this.SendPropertyChanged("avatar");
-					this.OnavatarChanged();
-				}
-			}
-		}
-		
-		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_technical_info", DbType="NVarChar(MAX)")]
-		public string technical_info
-		{
-			get
-			{
-				return this._technical_info;
-			}
-			set
-			{
-				if ((this._technical_info != value))
-				{
-					this.Ontechnical_infoChanging(value);
-					this.SendPropertyChanging();
-					this._technical_info = value;
-					this.SendPropertyChanged("technical_info");
-					this.Ontechnical_infoChanged();
-				}
-			}
-		}
-		
-		[global::System.Data.Linq.Mapping.AssociationAttribute(Name="User_Collection", Storage="_Collections", ThisKey="id", OtherKey="user_id")]
-		public EntitySet<Collection> Collections
-		{
-			get
-			{
-				return this._Collections;
-			}
-			set
-			{
-				this._Collections.Assign(value);
-			}
-		}
-		
-		[global::System.Data.Linq.Mapping.AssociationAttribute(Name="User_Feedback", Storage="_Feedbacks", ThisKey="id", OtherKey="user_id")]
-		public EntitySet<Feedback> Feedbacks
-		{
-			get
-			{
-				return this._Feedbacks;
-			}
-			set
-			{
-				this._Feedbacks.Assign(value);
-			}
-		}
-		
-		[global::System.Data.Linq.Mapping.AssociationAttribute(Name="User_Action", Storage="_Actions", ThisKey="id", OtherKey="user_id")]
-		public EntitySet<Action> Actions
-		{
-			get
-			{
-				return this._Actions;
-			}
-			set
-			{
-				this._Actions.Assign(value);
-			}
-		}
-		
-		public event PropertyChangingEventHandler PropertyChanging;
-		
-		public event PropertyChangedEventHandler PropertyChanged;
-		
-		protected virtual void SendPropertyChanging()
-		{
-			if ((this.PropertyChanging != null))
-			{
-				this.PropertyChanging(this, emptyChangingEventArgs);
-			}
-		}
-		
-		protected virtual void SendPropertyChanged(String propertyName)
-		{
-			if ((this.PropertyChanged != null))
-			{
-				this.PropertyChanged(this, new PropertyChangedEventArgs(propertyName));
-			}
-		}
-		
-		private void attach_Collections(Collection entity)
-		{
-			this.SendPropertyChanging();
-			entity.User = this;
-		}
-		
-		private void detach_Collections(Collection entity)
-		{
-			this.SendPropertyChanging();
-			entity.User = null;
-		}
-		
-		private void attach_Feedbacks(Feedback entity)
-		{
-			this.SendPropertyChanging();
-			entity.User = this;
-		}
-		
-		private void detach_Feedbacks(Feedback entity)
-		{
-			this.SendPropertyChanging();
-			entity.User = null;
-		}
-		
-		private void attach_Actions(Action entity)
-		{
-			this.SendPropertyChanging();
-			entity.User = this;
-		}
-		
-		private void detach_Actions(Action entity)
-		{
-			this.SendPropertyChanging();
-			entity.User = null;
-		}
-	}
-	
-	[global::System.Data.Linq.Mapping.TableAttribute(Name="dbo.Design_Ideas")]
-	public partial class Design_Idea
-	{
-		
-		private int _id;
-		
-		private string _note;
-		
-		private string _media_url;
-		
-		private string _tags;
-		
-		private System.DateTime _date;
-		
-		private int _location_id;
-		
-		private string _technical_info;
-		
-		private string _name;
-		
-		private string _avatar;
-		
-		public Design_Idea()
-		{
-		}
-		
-		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_id", DbType="Int NOT NULL")]
-		public int id
-		{
-			get
-			{
-				return this._id;
-			}
-			set
-			{
-				if ((this._id != value))
-				{
-					this._id = value;
-				}
-			}
-		}
-		
-		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_note", DbType="NVarChar(MAX)")]
-		public string note
-		{
-			get
-			{
-				return this._note;
-			}
-			set
-			{
-				if ((this._note != value))
-				{
-					this._note = value;
-				}
-			}
-		}
-		
-		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_media_url", DbType="NVarChar(MAX)")]
-		public string media_url
-		{
-			get
-			{
-				return this._media_url;
-			}
-			set
-			{
-				if ((this._media_url != value))
-				{
-					this._media_url = value;
-				}
-			}
-		}
-		
-		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_tags", DbType="NVarChar(MAX)")]
-		public string tags
-		{
-			get
-			{
-				return this._tags;
-			}
-			set
-			{
-				if ((this._tags != value))
-				{
-					this._tags = value;
-				}
-			}
-		}
-		
-		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_date", DbType="DateTime NOT NULL")]
-		public System.DateTime date
-		{
-			get
-			{
-				return this._date;
-			}
-			set
-			{
-				if ((this._date != value))
-				{
-					this._date = value;
-				}
-			}
-		}
-		
-		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_location_id", DbType="Int NOT NULL")]
-		public int location_id
-		{
-			get
-			{
-				return this._location_id;
-			}
-			set
-			{
-				if ((this._location_id != value))
-				{
-					this._location_id = value;
-				}
-			}
-		}
-		
-		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_technical_info", DbType="NVarChar(MAX)")]
-		public string technical_info
-		{
-			get
-			{
-				return this._technical_info;
-			}
-			set
-			{
-				if ((this._technical_info != value))
-				{
-					this._technical_info = value;
-				}
-			}
-		}
-		
-		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_name", DbType="NVarChar(64) NOT NULL", CanBeNull=false)]
-		public string name
-		{
-			get
-			{
-				return this._name;
-			}
-			set
-			{
-				if ((this._name != value))
-				{
-					this._name = value;
-				}
-			}
-		}
-		
-		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_avatar", DbType="NVarChar(64)")]
-		public string avatar
-		{
-			get
-			{
-				return this._avatar;
-			}
-			set
-			{
-				if ((this._avatar != value))
-				{
-					this._avatar = value;
-				}
-			}
-		}
-	}
-	
-	[global::System.Data.Linq.Mapping.TableAttribute(Name="dbo.Feedback")]
-	public partial class Feedback : INotifyPropertyChanging, INotifyPropertyChanged
-	{
-		
-		private static PropertyChangingEventArgs emptyChangingEventArgs = new PropertyChangingEventArgs(String.Empty);
-		
-		private int _id;
-		
-		private string _note;
-		
-		private System.DateTime _date;
-		
-		private int _type_id;
-		
-		private int _user_id;
-		
-		private int _parent_id;
-		
-		private string _object_type;
-		
-		private System.Data.Linq.Binary _object;
-		
-		private string _technical_info;
-		
-		private System.Nullable<int> _object_id;
-		
-		private EntitySet<Feedback> _Feedbacks;
-		
-		private EntityRef<Feedback> _Feedback1;
-		
-		private EntityRef<Feedback_Type> _Feedback_Type;
-		
-		private EntityRef<User> _User;
-		
-    #region Extensibility Method Definitions
-    partial void OnLoaded();
-    partial void OnValidate(System.Data.Linq.ChangeAction action);
-    partial void OnCreated();
-    partial void OnidChanging(int value);
-    partial void OnidChanged();
-    partial void OnnoteChanging(string value);
-    partial void OnnoteChanged();
-    partial void OndateChanging(System.DateTime value);
-    partial void OndateChanged();
-    partial void Ontype_idChanging(int value);
-    partial void Ontype_idChanged();
-    partial void Onuser_idChanging(int value);
-    partial void Onuser_idChanged();
-    partial void Onparent_idChanging(int value);
-    partial void Onparent_idChanged();
-    partial void Onobject_typeChanging(string value);
-    partial void Onobject_typeChanged();
-    partial void OnobjectChanging(System.Data.Linq.Binary value);
-    partial void OnobjectChanged();
-    partial void Ontechnical_infoChanging(string value);
-    partial void Ontechnical_infoChanged();
-    partial void Onobject_idChanging(System.Nullable<int> value);
-    partial void Onobject_idChanged();
-    #endregion
-		
-		public Feedback()
-		{
-			this._Feedbacks = new EntitySet<Feedback>(new Action<Feedback>(this.attach_Feedbacks), new Action<Feedback>(this.detach_Feedbacks));
-			this._Feedback1 = default(EntityRef<Feedback>);
-			this._Feedback_Type = default(EntityRef<Feedback_Type>);
-			this._User = default(EntityRef<User>);
-			OnCreated();
-		}
-		
-		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_id", AutoSync=AutoSync.OnInsert, DbType="Int NOT NULL IDENTITY", IsPrimaryKey=true, IsDbGenerated=true)]
-		public int id
-		{
-			get
-			{
-				return this._id;
-			}
-			set
-			{
-				if ((this._id != value))
-				{
-					this.OnidChanging(value);
-					this.SendPropertyChanging();
-					this._id = value;
-					this.SendPropertyChanged("id");
-					this.OnidChanged();
-				}
-			}
-		}
-		
-		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_note", DbType="NVarChar(MAX) NOT NULL", CanBeNull=false)]
-		public string note
-		{
-			get
-			{
-				return this._note;
-			}
-			set
-			{
-				if ((this._note != value))
-				{
-					this.OnnoteChanging(value);
-					this.SendPropertyChanging();
-					this._note = value;
-					this.SendPropertyChanged("note");
-					this.OnnoteChanged();
-				}
-			}
-		}
-		
-		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_date", DbType="DateTime NOT NULL")]
-		public System.DateTime date
-		{
-			get
-			{
-				return this._date;
-			}
-			set
-			{
-				if ((this._date != value))
-				{
-					this.OndateChanging(value);
-					this.SendPropertyChanging();
-					this._date = value;
-					this.SendPropertyChanged("date");
-					this.OndateChanged();
-				}
-			}
-		}
-		
-		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_type_id", DbType="Int NOT NULL")]
-		public int type_id
-		{
-			get
-			{
-				return this._type_id;
-			}
-			set
-			{
-				if ((this._type_id != value))
-				{
-					if (this._Feedback_Type.HasLoadedOrAssignedValue)
-					{
-						throw new System.Data.Linq.ForeignKeyReferenceAlreadyHasValueException();
-					}
-					this.Ontype_idChanging(value);
-					this.SendPropertyChanging();
-					this._type_id = value;
-					this.SendPropertyChanged("type_id");
-					this.Ontype_idChanged();
-				}
-			}
-		}
-		
-		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_user_id", DbType="Int NOT NULL")]
-		public int user_id
-		{
-			get
-			{
-				return this._user_id;
-			}
-			set
-			{
-				if ((this._user_id != value))
-				{
-					if (this._User.HasLoadedOrAssignedValue)
-					{
-						throw new System.Data.Linq.ForeignKeyReferenceAlreadyHasValueException();
-					}
-					this.Onuser_idChanging(value);
-					this.SendPropertyChanging();
-					this._user_id = value;
-					this.SendPropertyChanged("user_id");
-					this.Onuser_idChanged();
-				}
-			}
-		}
-		
-		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_parent_id", DbType="Int NOT NULL")]
-		public int parent_id
-		{
-			get
-			{
-				return this._parent_id;
-			}
-			set
-			{
-				if ((this._parent_id != value))
-				{
-					if (this._Feedback1.HasLoadedOrAssignedValue)
-					{
-						throw new System.Data.Linq.ForeignKeyReferenceAlreadyHasValueException();
-					}
-					this.Onparent_idChanging(value);
-					this.SendPropertyChanging();
-					this._parent_id = value;
-					this.SendPropertyChanged("parent_id");
-					this.Onparent_idChanged();
-				}
-			}
-		}
-		
-		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_object_type", DbType="NVarChar(64) NOT NULL", CanBeNull=false)]
-		public string object_type
-		{
-			get
-			{
-				return this._object_type;
-			}
-			set
-			{
-				if ((this._object_type != value))
-				{
-					this.Onobject_typeChanging(value);
-					this.SendPropertyChanging();
-					this._object_type = value;
-					this.SendPropertyChanged("object_type");
-					this.Onobject_typeChanged();
-				}
-			}
-		}
-		
-		[global::System.Data.Linq.Mapping.ColumnAttribute(Name="object", Storage="_object", DbType="Binary(1)", UpdateCheck=UpdateCheck.Never)]
-		public System.Data.Linq.Binary @object
-		{
-			get
-			{
-				return this._object;
-			}
-			set
-			{
-				if ((this._object != value))
-				{
-					this.OnobjectChanging(value);
-					this.SendPropertyChanging();
-					this._object = value;
-					this.SendPropertyChanged("@object");
-					this.OnobjectChanged();
-				}
-			}
-		}
-		
-		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_technical_info", DbType="NVarChar(MAX)")]
-		public string technical_info
-		{
-			get
-			{
-				return this._technical_info;
-			}
-			set
-			{
-				if ((this._technical_info != value))
-				{
-					this.Ontechnical_infoChanging(value);
-					this.SendPropertyChanging();
-					this._technical_info = value;
-					this.SendPropertyChanged("technical_info");
-					this.Ontechnical_infoChanged();
-				}
-			}
-		}
-		
-		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_object_id", DbType="Int")]
-		public System.Nullable<int> object_id
-		{
-			get
-			{
-				return this._object_id;
-			}
-			set
-			{
-				if ((this._object_id != value))
-				{
-					this.Onobject_idChanging(value);
-					this.SendPropertyChanging();
-					this._object_id = value;
-					this.SendPropertyChanged("object_id");
-					this.Onobject_idChanged();
-				}
-			}
-		}
-		
-		[global::System.Data.Linq.Mapping.AssociationAttribute(Name="Feedback_Feedback", Storage="_Feedbacks", ThisKey="id", OtherKey="parent_id")]
-		public EntitySet<Feedback> Feedbacks
-		{
-			get
-			{
-				return this._Feedbacks;
-			}
-			set
-			{
-				this._Feedbacks.Assign(value);
-			}
-		}
-		
-		[global::System.Data.Linq.Mapping.AssociationAttribute(Name="Feedback_Feedback", Storage="_Feedback1", ThisKey="parent_id", OtherKey="id", IsForeignKey=true)]
-		public Feedback Feedback1
-		{
-			get
-			{
-				return this._Feedback1.Entity;
-			}
-			set
-			{
-				Feedback previousValue = this._Feedback1.Entity;
-				if (((previousValue != value) 
-							|| (this._Feedback1.HasLoadedOrAssignedValue == false)))
-				{
-					this.SendPropertyChanging();
-					if ((previousValue != null))
-					{
-						this._Feedback1.Entity = null;
-						previousValue.Feedbacks.Remove(this);
-					}
-					this._Feedback1.Entity = value;
-					if ((value != null))
-					{
-						value.Feedbacks.Add(this);
-						this._parent_id = value.id;
-					}
-					else
-					{
-						this._parent_id = default(int);
-					}
-					this.SendPropertyChanged("Feedback1");
-				}
-			}
-		}
-		
-		[global::System.Data.Linq.Mapping.AssociationAttribute(Name="Feedback_Type_Feedback", Storage="_Feedback_Type", ThisKey="type_id", OtherKey="id", IsForeignKey=true)]
-		public Feedback_Type Feedback_Type
-		{
-			get
-			{
-				return this._Feedback_Type.Entity;
-			}
-			set
-			{
-				Feedback_Type previousValue = this._Feedback_Type.Entity;
-				if (((previousValue != value) 
-							|| (this._Feedback_Type.HasLoadedOrAssignedValue == false)))
-				{
-					this.SendPropertyChanging();
-					if ((previousValue != null))
-					{
-						this._Feedback_Type.Entity = null;
-						previousValue.Feedbacks.Remove(this);
-					}
-					this._Feedback_Type.Entity = value;
-					if ((value != null))
-					{
-						value.Feedbacks.Add(this);
-						this._type_id = value.id;
-					}
-					else
-					{
-						this._type_id = default(int);
-					}
-					this.SendPropertyChanged("Feedback_Type");
-				}
-			}
-		}
-		
-		[global::System.Data.Linq.Mapping.AssociationAttribute(Name="User_Feedback", Storage="_User", ThisKey="user_id", OtherKey="id", IsForeignKey=true)]
+		[global::System.Data.Linq.Mapping.AssociationAttribute(Name="User_Collection", Storage="_User", ThisKey="user_id", OtherKey="id", IsForeignKey=true)]
 		public User User
 		{
 			get
@@ -2316,12 +1186,12 @@ namespace nature_net
 					if ((previousValue != null))
 					{
 						this._User.Entity = null;
-						previousValue.Feedbacks.Remove(this);
+						previousValue.Collections.Remove(this);
 					}
 					this._User.Entity = value;
 					if ((value != null))
 					{
-						value.Feedbacks.Add(this);
+						value.Collections.Add(this);
 						this._user_id = value.id;
 					}
 					else
@@ -2353,16 +1223,16 @@ namespace nature_net
 			}
 		}
 		
-		private void attach_Feedbacks(Feedback entity)
+		private void attach_Collection_Contribution_Mappings(Collection_Contribution_Mapping entity)
 		{
 			this.SendPropertyChanging();
-			entity.Feedback1 = this;
+			entity.Collection = this;
 		}
 		
-		private void detach_Feedbacks(Feedback entity)
+		private void detach_Collection_Contribution_Mappings(Collection_Contribution_Mapping entity)
 		{
 			this.SendPropertyChanging();
-			entity.Feedback1 = null;
+			entity.Collection = null;
 		}
 	}
 	
@@ -3087,6 +1957,8 @@ namespace nature_net
 		
 		private string _details;
 		
+		private string _technical_info;
+		
 		private EntityRef<Interaction_Type> _Interaction_Type;
 		
     #region Extensibility Method Definitions
@@ -3107,6 +1979,8 @@ namespace nature_net
     partial void Ontouch_yChanged();
     partial void OndetailsChanging(string value);
     partial void OndetailsChanged();
+    partial void Ontechnical_infoChanging(string value);
+    partial void Ontechnical_infoChanged();
     #endregion
 		
 		public Interaction_Log()
@@ -3259,6 +2133,26 @@ namespace nature_net
 			}
 		}
 		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_technical_info", DbType="NVarChar(MAX)")]
+		public string technical_info
+		{
+			get
+			{
+				return this._technical_info;
+			}
+			set
+			{
+				if ((this._technical_info != value))
+				{
+					this.Ontechnical_infoChanging(value);
+					this.SendPropertyChanging();
+					this._technical_info = value;
+					this.SendPropertyChanged("technical_info");
+					this.Ontechnical_infoChanged();
+				}
+			}
+		}
+		
 		[global::System.Data.Linq.Mapping.AssociationAttribute(Name="Interaction_Type_Interaction_Log", Storage="_Interaction_Type", ThisKey="type", OtherKey="id", IsForeignKey=true)]
 		public Interaction_Type Interaction_Type
 		{
@@ -3310,6 +2204,1593 @@ namespace nature_net
 			if ((this.PropertyChanged != null))
 			{
 				this.PropertyChanged(this, new PropertyChangedEventArgs(propertyName));
+			}
+		}
+	}
+	
+	[global::System.Data.Linq.Mapping.TableAttribute(Name="dbo.[User]")]
+	public partial class User : INotifyPropertyChanging, INotifyPropertyChanged
+	{
+		
+		private static PropertyChangingEventArgs emptyChangingEventArgs = new PropertyChangingEventArgs(String.Empty);
+		
+		private int _id;
+		
+		private string _name;
+		
+		private string _email;
+		
+		private string _password;
+		
+		private string _avatar;
+		
+		private string _technical_info;
+		
+		private string _affiliation;
+		
+		private EntitySet<Collection> _Collections;
+		
+		private EntitySet<Action> _Actions;
+		
+		private EntitySet<Feedback> _Feedbacks;
+		
+    #region Extensibility Method Definitions
+    partial void OnLoaded();
+    partial void OnValidate(System.Data.Linq.ChangeAction action);
+    partial void OnCreated();
+    partial void OnidChanging(int value);
+    partial void OnidChanged();
+    partial void OnnameChanging(string value);
+    partial void OnnameChanged();
+    partial void OnemailChanging(string value);
+    partial void OnemailChanged();
+    partial void OnpasswordChanging(string value);
+    partial void OnpasswordChanged();
+    partial void OnavatarChanging(string value);
+    partial void OnavatarChanged();
+    partial void Ontechnical_infoChanging(string value);
+    partial void Ontechnical_infoChanged();
+    partial void OnaffiliationChanging(string value);
+    partial void OnaffiliationChanged();
+    #endregion
+		
+		public User()
+		{
+			this._Collections = new EntitySet<Collection>(new Action<Collection>(this.attach_Collections), new Action<Collection>(this.detach_Collections));
+			this._Actions = new EntitySet<Action>(new Action<Action>(this.attach_Actions), new Action<Action>(this.detach_Actions));
+			this._Feedbacks = new EntitySet<Feedback>(new Action<Feedback>(this.attach_Feedbacks), new Action<Feedback>(this.detach_Feedbacks));
+			OnCreated();
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_id", AutoSync=AutoSync.OnInsert, DbType="Int NOT NULL IDENTITY", IsPrimaryKey=true, IsDbGenerated=true)]
+		public int id
+		{
+			get
+			{
+				return this._id;
+			}
+			set
+			{
+				if ((this._id != value))
+				{
+					this.OnidChanging(value);
+					this.SendPropertyChanging();
+					this._id = value;
+					this.SendPropertyChanged("id");
+					this.OnidChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_name", DbType="NVarChar(64) NOT NULL", CanBeNull=false)]
+		public string name
+		{
+			get
+			{
+				return this._name;
+			}
+			set
+			{
+				if ((this._name != value))
+				{
+					this.OnnameChanging(value);
+					this.SendPropertyChanging();
+					this._name = value;
+					this.SendPropertyChanged("name");
+					this.OnnameChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_email", DbType="NVarChar(64)")]
+		public string email
+		{
+			get
+			{
+				return this._email;
+			}
+			set
+			{
+				if ((this._email != value))
+				{
+					this.OnemailChanging(value);
+					this.SendPropertyChanging();
+					this._email = value;
+					this.SendPropertyChanged("email");
+					this.OnemailChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_password", DbType="NChar(128)")]
+		public string password
+		{
+			get
+			{
+				return this._password;
+			}
+			set
+			{
+				if ((this._password != value))
+				{
+					this.OnpasswordChanging(value);
+					this.SendPropertyChanging();
+					this._password = value;
+					this.SendPropertyChanged("password");
+					this.OnpasswordChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_avatar", DbType="NVarChar(64)")]
+		public string avatar
+		{
+			get
+			{
+				return this._avatar;
+			}
+			set
+			{
+				if ((this._avatar != value))
+				{
+					this.OnavatarChanging(value);
+					this.SendPropertyChanging();
+					this._avatar = value;
+					this.SendPropertyChanged("avatar");
+					this.OnavatarChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_technical_info", DbType="NVarChar(MAX)")]
+		public string technical_info
+		{
+			get
+			{
+				return this._technical_info;
+			}
+			set
+			{
+				if ((this._technical_info != value))
+				{
+					this.Ontechnical_infoChanging(value);
+					this.SendPropertyChanging();
+					this._technical_info = value;
+					this.SendPropertyChanged("technical_info");
+					this.Ontechnical_infoChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_affiliation", DbType="NVarChar(64)")]
+		public string affiliation
+		{
+			get
+			{
+				return this._affiliation;
+			}
+			set
+			{
+				if ((this._affiliation != value))
+				{
+					this.OnaffiliationChanging(value);
+					this.SendPropertyChanging();
+					this._affiliation = value;
+					this.SendPropertyChanged("affiliation");
+					this.OnaffiliationChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.AssociationAttribute(Name="User_Collection", Storage="_Collections", ThisKey="id", OtherKey="user_id")]
+		public EntitySet<Collection> Collections
+		{
+			get
+			{
+				return this._Collections;
+			}
+			set
+			{
+				this._Collections.Assign(value);
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.AssociationAttribute(Name="User_Action", Storage="_Actions", ThisKey="id", OtherKey="user_id")]
+		public EntitySet<Action> Actions
+		{
+			get
+			{
+				return this._Actions;
+			}
+			set
+			{
+				this._Actions.Assign(value);
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.AssociationAttribute(Name="User_Feedback", Storage="_Feedbacks", ThisKey="id", OtherKey="user_id")]
+		public EntitySet<Feedback> Feedbacks
+		{
+			get
+			{
+				return this._Feedbacks;
+			}
+			set
+			{
+				this._Feedbacks.Assign(value);
+			}
+		}
+		
+		public event PropertyChangingEventHandler PropertyChanging;
+		
+		public event PropertyChangedEventHandler PropertyChanged;
+		
+		protected virtual void SendPropertyChanging()
+		{
+			if ((this.PropertyChanging != null))
+			{
+				this.PropertyChanging(this, emptyChangingEventArgs);
+			}
+		}
+		
+		protected virtual void SendPropertyChanged(String propertyName)
+		{
+			if ((this.PropertyChanged != null))
+			{
+				this.PropertyChanged(this, new PropertyChangedEventArgs(propertyName));
+			}
+		}
+		
+		private void attach_Collections(Collection entity)
+		{
+			this.SendPropertyChanging();
+			entity.User = this;
+		}
+		
+		private void detach_Collections(Collection entity)
+		{
+			this.SendPropertyChanging();
+			entity.User = null;
+		}
+		
+		private void attach_Actions(Action entity)
+		{
+			this.SendPropertyChanging();
+			entity.User = this;
+		}
+		
+		private void detach_Actions(Action entity)
+		{
+			this.SendPropertyChanging();
+			entity.User = null;
+		}
+		
+		private void attach_Feedbacks(Feedback entity)
+		{
+			this.SendPropertyChanging();
+			entity.User = this;
+		}
+		
+		private void detach_Feedbacks(Feedback entity)
+		{
+			this.SendPropertyChanging();
+			entity.User = null;
+		}
+	}
+	
+	[global::System.Data.Linq.Mapping.TableAttribute(Name="dbo.WebUser")]
+	public partial class WebUser : INotifyPropertyChanging, INotifyPropertyChanged
+	{
+		
+		private static PropertyChangingEventArgs emptyChangingEventArgs = new PropertyChangingEventArgs(String.Empty);
+		
+		private int _id;
+		
+		private string _username;
+		
+		private string _fullname;
+		
+		private string _email;
+		
+		private string _password;
+		
+		private string _avatar;
+		
+		private string _affiliation;
+		
+		private System.Nullable<int> _user_id;
+		
+		private string _technical_info;
+		
+    #region Extensibility Method Definitions
+    partial void OnLoaded();
+    partial void OnValidate(System.Data.Linq.ChangeAction action);
+    partial void OnCreated();
+    partial void OnidChanging(int value);
+    partial void OnidChanged();
+    partial void OnusernameChanging(string value);
+    partial void OnusernameChanged();
+    partial void OnfullnameChanging(string value);
+    partial void OnfullnameChanged();
+    partial void OnemailChanging(string value);
+    partial void OnemailChanged();
+    partial void OnpasswordChanging(string value);
+    partial void OnpasswordChanged();
+    partial void OnavatarChanging(string value);
+    partial void OnavatarChanged();
+    partial void OnaffiliationChanging(string value);
+    partial void OnaffiliationChanged();
+    partial void Onuser_idChanging(System.Nullable<int> value);
+    partial void Onuser_idChanged();
+    partial void Ontechnical_infoChanging(string value);
+    partial void Ontechnical_infoChanged();
+    #endregion
+		
+		public WebUser()
+		{
+			OnCreated();
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_id", AutoSync=AutoSync.OnInsert, DbType="Int NOT NULL IDENTITY", IsPrimaryKey=true, IsDbGenerated=true)]
+		public int id
+		{
+			get
+			{
+				return this._id;
+			}
+			set
+			{
+				if ((this._id != value))
+				{
+					this.OnidChanging(value);
+					this.SendPropertyChanging();
+					this._id = value;
+					this.SendPropertyChanged("id");
+					this.OnidChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_username", DbType="NVarChar(64) NOT NULL", CanBeNull=false)]
+		public string username
+		{
+			get
+			{
+				return this._username;
+			}
+			set
+			{
+				if ((this._username != value))
+				{
+					this.OnusernameChanging(value);
+					this.SendPropertyChanging();
+					this._username = value;
+					this.SendPropertyChanged("username");
+					this.OnusernameChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_fullname", DbType="NVarChar(64) NOT NULL", CanBeNull=false)]
+		public string fullname
+		{
+			get
+			{
+				return this._fullname;
+			}
+			set
+			{
+				if ((this._fullname != value))
+				{
+					this.OnfullnameChanging(value);
+					this.SendPropertyChanging();
+					this._fullname = value;
+					this.SendPropertyChanged("fullname");
+					this.OnfullnameChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_email", DbType="NVarChar(64)")]
+		public string email
+		{
+			get
+			{
+				return this._email;
+			}
+			set
+			{
+				if ((this._email != value))
+				{
+					this.OnemailChanging(value);
+					this.SendPropertyChanging();
+					this._email = value;
+					this.SendPropertyChanged("email");
+					this.OnemailChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_password", DbType="NVarChar(64)")]
+		public string password
+		{
+			get
+			{
+				return this._password;
+			}
+			set
+			{
+				if ((this._password != value))
+				{
+					this.OnpasswordChanging(value);
+					this.SendPropertyChanging();
+					this._password = value;
+					this.SendPropertyChanged("password");
+					this.OnpasswordChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_avatar", DbType="NVarChar(64)")]
+		public string avatar
+		{
+			get
+			{
+				return this._avatar;
+			}
+			set
+			{
+				if ((this._avatar != value))
+				{
+					this.OnavatarChanging(value);
+					this.SendPropertyChanging();
+					this._avatar = value;
+					this.SendPropertyChanged("avatar");
+					this.OnavatarChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_affiliation", DbType="NVarChar(64)")]
+		public string affiliation
+		{
+			get
+			{
+				return this._affiliation;
+			}
+			set
+			{
+				if ((this._affiliation != value))
+				{
+					this.OnaffiliationChanging(value);
+					this.SendPropertyChanging();
+					this._affiliation = value;
+					this.SendPropertyChanged("affiliation");
+					this.OnaffiliationChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_user_id", DbType="Int")]
+		public System.Nullable<int> user_id
+		{
+			get
+			{
+				return this._user_id;
+			}
+			set
+			{
+				if ((this._user_id != value))
+				{
+					this.Onuser_idChanging(value);
+					this.SendPropertyChanging();
+					this._user_id = value;
+					this.SendPropertyChanged("user_id");
+					this.Onuser_idChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_technical_info", DbType="NVarChar(MAX)")]
+		public string technical_info
+		{
+			get
+			{
+				return this._technical_info;
+			}
+			set
+			{
+				if ((this._technical_info != value))
+				{
+					this.Ontechnical_infoChanging(value);
+					this.SendPropertyChanging();
+					this._technical_info = value;
+					this.SendPropertyChanged("technical_info");
+					this.Ontechnical_infoChanged();
+				}
+			}
+		}
+		
+		public event PropertyChangingEventHandler PropertyChanging;
+		
+		public event PropertyChangedEventHandler PropertyChanged;
+		
+		protected virtual void SendPropertyChanging()
+		{
+			if ((this.PropertyChanging != null))
+			{
+				this.PropertyChanging(this, emptyChangingEventArgs);
+			}
+		}
+		
+		protected virtual void SendPropertyChanged(String propertyName)
+		{
+			if ((this.PropertyChanged != null))
+			{
+				this.PropertyChanged(this, new PropertyChangedEventArgs(propertyName));
+			}
+		}
+	}
+	
+	[global::System.Data.Linq.Mapping.TableAttribute(Name="dbo.Contribution")]
+	public partial class Contribution : INotifyPropertyChanging, INotifyPropertyChanged
+	{
+		
+		private static PropertyChangingEventArgs emptyChangingEventArgs = new PropertyChangingEventArgs(String.Empty);
+		
+		private int _id;
+		
+		private string _note;
+		
+		private string _media_url;
+		
+		private string _tags;
+		
+		private System.DateTime _date;
+		
+		private int _location_id;
+		
+		private string _technical_info;
+		
+		private string _status;
+		
+		private System.Nullable<System.DateTime> _modified_date;
+		
+		private string _web_username;
+		
+		private EntitySet<Collection_Contribution_Mapping> _Collection_Contribution_Mappings;
+		
+		private EntityRef<Location> _Location;
+		
+    #region Extensibility Method Definitions
+    partial void OnLoaded();
+    partial void OnValidate(System.Data.Linq.ChangeAction action);
+    partial void OnCreated();
+    partial void OnidChanging(int value);
+    partial void OnidChanged();
+    partial void OnnoteChanging(string value);
+    partial void OnnoteChanged();
+    partial void Onmedia_urlChanging(string value);
+    partial void Onmedia_urlChanged();
+    partial void OntagsChanging(string value);
+    partial void OntagsChanged();
+    partial void OndateChanging(System.DateTime value);
+    partial void OndateChanged();
+    partial void Onlocation_idChanging(int value);
+    partial void Onlocation_idChanged();
+    partial void Ontechnical_infoChanging(string value);
+    partial void Ontechnical_infoChanged();
+    partial void OnstatusChanging(string value);
+    partial void OnstatusChanged();
+    partial void Onmodified_dateChanging(System.Nullable<System.DateTime> value);
+    partial void Onmodified_dateChanged();
+    partial void Onweb_usernameChanging(string value);
+    partial void Onweb_usernameChanged();
+    #endregion
+		
+		public Contribution()
+		{
+			this._Collection_Contribution_Mappings = new EntitySet<Collection_Contribution_Mapping>(new Action<Collection_Contribution_Mapping>(this.attach_Collection_Contribution_Mappings), new Action<Collection_Contribution_Mapping>(this.detach_Collection_Contribution_Mappings));
+			this._Location = default(EntityRef<Location>);
+			OnCreated();
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_id", AutoSync=AutoSync.OnInsert, DbType="Int NOT NULL IDENTITY", IsPrimaryKey=true, IsDbGenerated=true)]
+		public int id
+		{
+			get
+			{
+				return this._id;
+			}
+			set
+			{
+				if ((this._id != value))
+				{
+					this.OnidChanging(value);
+					this.SendPropertyChanging();
+					this._id = value;
+					this.SendPropertyChanged("id");
+					this.OnidChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_note", DbType="NVarChar(MAX)")]
+		public string note
+		{
+			get
+			{
+				return this._note;
+			}
+			set
+			{
+				if ((this._note != value))
+				{
+					this.OnnoteChanging(value);
+					this.SendPropertyChanging();
+					this._note = value;
+					this.SendPropertyChanged("note");
+					this.OnnoteChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_media_url", DbType="NVarChar(MAX)")]
+		public string media_url
+		{
+			get
+			{
+				return this._media_url;
+			}
+			set
+			{
+				if ((this._media_url != value))
+				{
+					this.Onmedia_urlChanging(value);
+					this.SendPropertyChanging();
+					this._media_url = value;
+					this.SendPropertyChanged("media_url");
+					this.Onmedia_urlChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_tags", DbType="NVarChar(MAX)")]
+		public string tags
+		{
+			get
+			{
+				return this._tags;
+			}
+			set
+			{
+				if ((this._tags != value))
+				{
+					this.OntagsChanging(value);
+					this.SendPropertyChanging();
+					this._tags = value;
+					this.SendPropertyChanged("tags");
+					this.OntagsChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_date", DbType="DateTime NOT NULL")]
+		public System.DateTime date
+		{
+			get
+			{
+				return this._date;
+			}
+			set
+			{
+				if ((this._date != value))
+				{
+					this.OndateChanging(value);
+					this.SendPropertyChanging();
+					this._date = value;
+					this.SendPropertyChanged("date");
+					this.OndateChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_location_id", DbType="Int NOT NULL")]
+		public int location_id
+		{
+			get
+			{
+				return this._location_id;
+			}
+			set
+			{
+				if ((this._location_id != value))
+				{
+					if (this._Location.HasLoadedOrAssignedValue)
+					{
+						throw new System.Data.Linq.ForeignKeyReferenceAlreadyHasValueException();
+					}
+					this.Onlocation_idChanging(value);
+					this.SendPropertyChanging();
+					this._location_id = value;
+					this.SendPropertyChanged("location_id");
+					this.Onlocation_idChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_technical_info", DbType="NVarChar(MAX)")]
+		public string technical_info
+		{
+			get
+			{
+				return this._technical_info;
+			}
+			set
+			{
+				if ((this._technical_info != value))
+				{
+					this.Ontechnical_infoChanging(value);
+					this.SendPropertyChanging();
+					this._technical_info = value;
+					this.SendPropertyChanged("technical_info");
+					this.Ontechnical_infoChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_status", DbType="NVarChar(64)")]
+		public string status
+		{
+			get
+			{
+				return this._status;
+			}
+			set
+			{
+				if ((this._status != value))
+				{
+					this.OnstatusChanging(value);
+					this.SendPropertyChanging();
+					this._status = value;
+					this.SendPropertyChanged("status");
+					this.OnstatusChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_modified_date", DbType="DateTime")]
+		public System.Nullable<System.DateTime> modified_date
+		{
+			get
+			{
+				return this._modified_date;
+			}
+			set
+			{
+				if ((this._modified_date != value))
+				{
+					this.Onmodified_dateChanging(value);
+					this.SendPropertyChanging();
+					this._modified_date = value;
+					this.SendPropertyChanged("modified_date");
+					this.Onmodified_dateChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_web_username", DbType="NVarChar(64)")]
+		public string web_username
+		{
+			get
+			{
+				return this._web_username;
+			}
+			set
+			{
+				if ((this._web_username != value))
+				{
+					this.Onweb_usernameChanging(value);
+					this.SendPropertyChanging();
+					this._web_username = value;
+					this.SendPropertyChanged("web_username");
+					this.Onweb_usernameChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.AssociationAttribute(Name="Contribution_Collection_Contribution_Mapping", Storage="_Collection_Contribution_Mappings", ThisKey="id", OtherKey="contribution_id")]
+		public EntitySet<Collection_Contribution_Mapping> Collection_Contribution_Mappings
+		{
+			get
+			{
+				return this._Collection_Contribution_Mappings;
+			}
+			set
+			{
+				this._Collection_Contribution_Mappings.Assign(value);
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.AssociationAttribute(Name="Location_Contribution", Storage="_Location", ThisKey="location_id", OtherKey="id", IsForeignKey=true)]
+		public Location Location
+		{
+			get
+			{
+				return this._Location.Entity;
+			}
+			set
+			{
+				Location previousValue = this._Location.Entity;
+				if (((previousValue != value) 
+							|| (this._Location.HasLoadedOrAssignedValue == false)))
+				{
+					this.SendPropertyChanging();
+					if ((previousValue != null))
+					{
+						this._Location.Entity = null;
+						previousValue.Contributions.Remove(this);
+					}
+					this._Location.Entity = value;
+					if ((value != null))
+					{
+						value.Contributions.Add(this);
+						this._location_id = value.id;
+					}
+					else
+					{
+						this._location_id = default(int);
+					}
+					this.SendPropertyChanged("Location");
+				}
+			}
+		}
+		
+		public event PropertyChangingEventHandler PropertyChanging;
+		
+		public event PropertyChangedEventHandler PropertyChanged;
+		
+		protected virtual void SendPropertyChanging()
+		{
+			if ((this.PropertyChanging != null))
+			{
+				this.PropertyChanging(this, emptyChangingEventArgs);
+			}
+		}
+		
+		protected virtual void SendPropertyChanged(String propertyName)
+		{
+			if ((this.PropertyChanged != null))
+			{
+				this.PropertyChanged(this, new PropertyChangedEventArgs(propertyName));
+			}
+		}
+		
+		private void attach_Collection_Contribution_Mappings(Collection_Contribution_Mapping entity)
+		{
+			this.SendPropertyChanging();
+			entity.Contribution = this;
+		}
+		
+		private void detach_Collection_Contribution_Mappings(Collection_Contribution_Mapping entity)
+		{
+			this.SendPropertyChanging();
+			entity.Contribution = null;
+		}
+	}
+	
+	[global::System.Data.Linq.Mapping.TableAttribute(Name="dbo.Feedback")]
+	public partial class Feedback : INotifyPropertyChanging, INotifyPropertyChanged
+	{
+		
+		private static PropertyChangingEventArgs emptyChangingEventArgs = new PropertyChangingEventArgs(String.Empty);
+		
+		private int _id;
+		
+		private string _note;
+		
+		private System.DateTime _date;
+		
+		private int _type_id;
+		
+		private int _user_id;
+		
+		private int _parent_id;
+		
+		private string _object_type;
+		
+		private System.Data.Linq.Binary _object;
+		
+		private System.Nullable<int> _object_id;
+		
+		private string _technical_info;
+		
+		private string _web_username;
+		
+		private EntitySet<Feedback> _Feedbacks;
+		
+		private EntityRef<Feedback> _Feedback1;
+		
+		private EntityRef<Feedback_Type> _Feedback_Type;
+		
+		private EntityRef<User> _User;
+		
+    #region Extensibility Method Definitions
+    partial void OnLoaded();
+    partial void OnValidate(System.Data.Linq.ChangeAction action);
+    partial void OnCreated();
+    partial void OnidChanging(int value);
+    partial void OnidChanged();
+    partial void OnnoteChanging(string value);
+    partial void OnnoteChanged();
+    partial void OndateChanging(System.DateTime value);
+    partial void OndateChanged();
+    partial void Ontype_idChanging(int value);
+    partial void Ontype_idChanged();
+    partial void Onuser_idChanging(int value);
+    partial void Onuser_idChanged();
+    partial void Onparent_idChanging(int value);
+    partial void Onparent_idChanged();
+    partial void Onobject_typeChanging(string value);
+    partial void Onobject_typeChanged();
+    partial void OnobjectChanging(System.Data.Linq.Binary value);
+    partial void OnobjectChanged();
+    partial void Onobject_idChanging(System.Nullable<int> value);
+    partial void Onobject_idChanged();
+    partial void Ontechnical_infoChanging(string value);
+    partial void Ontechnical_infoChanged();
+    partial void Onweb_usernameChanging(string value);
+    partial void Onweb_usernameChanged();
+    #endregion
+		
+		public Feedback()
+		{
+			this._Feedbacks = new EntitySet<Feedback>(new Action<Feedback>(this.attach_Feedbacks), new Action<Feedback>(this.detach_Feedbacks));
+			this._Feedback1 = default(EntityRef<Feedback>);
+			this._Feedback_Type = default(EntityRef<Feedback_Type>);
+			this._User = default(EntityRef<User>);
+			OnCreated();
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_id", AutoSync=AutoSync.OnInsert, DbType="Int NOT NULL IDENTITY", IsPrimaryKey=true, IsDbGenerated=true)]
+		public int id
+		{
+			get
+			{
+				return this._id;
+			}
+			set
+			{
+				if ((this._id != value))
+				{
+					this.OnidChanging(value);
+					this.SendPropertyChanging();
+					this._id = value;
+					this.SendPropertyChanged("id");
+					this.OnidChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_note", DbType="NVarChar(MAX) NOT NULL", CanBeNull=false)]
+		public string note
+		{
+			get
+			{
+				return this._note;
+			}
+			set
+			{
+				if ((this._note != value))
+				{
+					this.OnnoteChanging(value);
+					this.SendPropertyChanging();
+					this._note = value;
+					this.SendPropertyChanged("note");
+					this.OnnoteChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_date", DbType="DateTime NOT NULL")]
+		public System.DateTime date
+		{
+			get
+			{
+				return this._date;
+			}
+			set
+			{
+				if ((this._date != value))
+				{
+					this.OndateChanging(value);
+					this.SendPropertyChanging();
+					this._date = value;
+					this.SendPropertyChanged("date");
+					this.OndateChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_type_id", DbType="Int NOT NULL")]
+		public int type_id
+		{
+			get
+			{
+				return this._type_id;
+			}
+			set
+			{
+				if ((this._type_id != value))
+				{
+					if (this._Feedback_Type.HasLoadedOrAssignedValue)
+					{
+						throw new System.Data.Linq.ForeignKeyReferenceAlreadyHasValueException();
+					}
+					this.Ontype_idChanging(value);
+					this.SendPropertyChanging();
+					this._type_id = value;
+					this.SendPropertyChanged("type_id");
+					this.Ontype_idChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_user_id", DbType="Int NOT NULL")]
+		public int user_id
+		{
+			get
+			{
+				return this._user_id;
+			}
+			set
+			{
+				if ((this._user_id != value))
+				{
+					if (this._User.HasLoadedOrAssignedValue)
+					{
+						throw new System.Data.Linq.ForeignKeyReferenceAlreadyHasValueException();
+					}
+					this.Onuser_idChanging(value);
+					this.SendPropertyChanging();
+					this._user_id = value;
+					this.SendPropertyChanged("user_id");
+					this.Onuser_idChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_parent_id", DbType="Int NOT NULL")]
+		public int parent_id
+		{
+			get
+			{
+				return this._parent_id;
+			}
+			set
+			{
+				if ((this._parent_id != value))
+				{
+					if (this._Feedback1.HasLoadedOrAssignedValue)
+					{
+						throw new System.Data.Linq.ForeignKeyReferenceAlreadyHasValueException();
+					}
+					this.Onparent_idChanging(value);
+					this.SendPropertyChanging();
+					this._parent_id = value;
+					this.SendPropertyChanged("parent_id");
+					this.Onparent_idChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_object_type", DbType="NVarChar(64) NOT NULL", CanBeNull=false)]
+		public string object_type
+		{
+			get
+			{
+				return this._object_type;
+			}
+			set
+			{
+				if ((this._object_type != value))
+				{
+					this.Onobject_typeChanging(value);
+					this.SendPropertyChanging();
+					this._object_type = value;
+					this.SendPropertyChanged("object_type");
+					this.Onobject_typeChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Name="object", Storage="_object", DbType="Binary(1)", UpdateCheck=UpdateCheck.Never)]
+		public System.Data.Linq.Binary @object
+		{
+			get
+			{
+				return this._object;
+			}
+			set
+			{
+				if ((this._object != value))
+				{
+					this.OnobjectChanging(value);
+					this.SendPropertyChanging();
+					this._object = value;
+					this.SendPropertyChanged("@object");
+					this.OnobjectChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_object_id", DbType="Int")]
+		public System.Nullable<int> object_id
+		{
+			get
+			{
+				return this._object_id;
+			}
+			set
+			{
+				if ((this._object_id != value))
+				{
+					this.Onobject_idChanging(value);
+					this.SendPropertyChanging();
+					this._object_id = value;
+					this.SendPropertyChanged("object_id");
+					this.Onobject_idChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_technical_info", DbType="NVarChar(MAX)")]
+		public string technical_info
+		{
+			get
+			{
+				return this._technical_info;
+			}
+			set
+			{
+				if ((this._technical_info != value))
+				{
+					this.Ontechnical_infoChanging(value);
+					this.SendPropertyChanging();
+					this._technical_info = value;
+					this.SendPropertyChanged("technical_info");
+					this.Ontechnical_infoChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_web_username", DbType="NVarChar(64)")]
+		public string web_username
+		{
+			get
+			{
+				return this._web_username;
+			}
+			set
+			{
+				if ((this._web_username != value))
+				{
+					this.Onweb_usernameChanging(value);
+					this.SendPropertyChanging();
+					this._web_username = value;
+					this.SendPropertyChanged("web_username");
+					this.Onweb_usernameChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.AssociationAttribute(Name="Feedback_Feedback", Storage="_Feedbacks", ThisKey="id", OtherKey="parent_id")]
+		public EntitySet<Feedback> Feedbacks
+		{
+			get
+			{
+				return this._Feedbacks;
+			}
+			set
+			{
+				this._Feedbacks.Assign(value);
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.AssociationAttribute(Name="Feedback_Feedback", Storage="_Feedback1", ThisKey="parent_id", OtherKey="id", IsForeignKey=true)]
+		public Feedback Feedback1
+		{
+			get
+			{
+				return this._Feedback1.Entity;
+			}
+			set
+			{
+				Feedback previousValue = this._Feedback1.Entity;
+				if (((previousValue != value) 
+							|| (this._Feedback1.HasLoadedOrAssignedValue == false)))
+				{
+					this.SendPropertyChanging();
+					if ((previousValue != null))
+					{
+						this._Feedback1.Entity = null;
+						previousValue.Feedbacks.Remove(this);
+					}
+					this._Feedback1.Entity = value;
+					if ((value != null))
+					{
+						value.Feedbacks.Add(this);
+						this._parent_id = value.id;
+					}
+					else
+					{
+						this._parent_id = default(int);
+					}
+					this.SendPropertyChanged("Feedback1");
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.AssociationAttribute(Name="Feedback_Type_Feedback", Storage="_Feedback_Type", ThisKey="type_id", OtherKey="id", IsForeignKey=true)]
+		public Feedback_Type Feedback_Type
+		{
+			get
+			{
+				return this._Feedback_Type.Entity;
+			}
+			set
+			{
+				Feedback_Type previousValue = this._Feedback_Type.Entity;
+				if (((previousValue != value) 
+							|| (this._Feedback_Type.HasLoadedOrAssignedValue == false)))
+				{
+					this.SendPropertyChanging();
+					if ((previousValue != null))
+					{
+						this._Feedback_Type.Entity = null;
+						previousValue.Feedbacks.Remove(this);
+					}
+					this._Feedback_Type.Entity = value;
+					if ((value != null))
+					{
+						value.Feedbacks.Add(this);
+						this._type_id = value.id;
+					}
+					else
+					{
+						this._type_id = default(int);
+					}
+					this.SendPropertyChanged("Feedback_Type");
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.AssociationAttribute(Name="User_Feedback", Storage="_User", ThisKey="user_id", OtherKey="id", IsForeignKey=true)]
+		public User User
+		{
+			get
+			{
+				return this._User.Entity;
+			}
+			set
+			{
+				User previousValue = this._User.Entity;
+				if (((previousValue != value) 
+							|| (this._User.HasLoadedOrAssignedValue == false)))
+				{
+					this.SendPropertyChanging();
+					if ((previousValue != null))
+					{
+						this._User.Entity = null;
+						previousValue.Feedbacks.Remove(this);
+					}
+					this._User.Entity = value;
+					if ((value != null))
+					{
+						value.Feedbacks.Add(this);
+						this._user_id = value.id;
+					}
+					else
+					{
+						this._user_id = default(int);
+					}
+					this.SendPropertyChanged("User");
+				}
+			}
+		}
+		
+		public event PropertyChangingEventHandler PropertyChanging;
+		
+		public event PropertyChangedEventHandler PropertyChanged;
+		
+		protected virtual void SendPropertyChanging()
+		{
+			if ((this.PropertyChanging != null))
+			{
+				this.PropertyChanging(this, emptyChangingEventArgs);
+			}
+		}
+		
+		protected virtual void SendPropertyChanged(String propertyName)
+		{
+			if ((this.PropertyChanged != null))
+			{
+				this.PropertyChanged(this, new PropertyChangedEventArgs(propertyName));
+			}
+		}
+		
+		private void attach_Feedbacks(Feedback entity)
+		{
+			this.SendPropertyChanging();
+			entity.Feedback1 = this;
+		}
+		
+		private void detach_Feedbacks(Feedback entity)
+		{
+			this.SendPropertyChanging();
+			entity.Feedback1 = null;
+		}
+	}
+	
+	[global::System.Data.Linq.Mapping.TableAttribute(Name="dbo.Design_Ideas")]
+	public partial class Design_Idea
+	{
+		
+		private int _id;
+		
+		private string _note;
+		
+		private string _media_url;
+		
+		private string _tags;
+		
+		private System.DateTime _date;
+		
+		private int _location_id;
+		
+		private string _technical_info;
+		
+		private string _status;
+		
+		private string _name;
+		
+		private string _avatar;
+		
+		private string _affiliation;
+		
+		private System.Nullable<System.DateTime> _modified_date;
+		
+		private string _web_username;
+		
+		public Design_Idea()
+		{
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_id", DbType="Int NOT NULL")]
+		public int id
+		{
+			get
+			{
+				return this._id;
+			}
+			set
+			{
+				if ((this._id != value))
+				{
+					this._id = value;
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_note", DbType="NVarChar(MAX)")]
+		public string note
+		{
+			get
+			{
+				return this._note;
+			}
+			set
+			{
+				if ((this._note != value))
+				{
+					this._note = value;
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_media_url", DbType="NVarChar(MAX)")]
+		public string media_url
+		{
+			get
+			{
+				return this._media_url;
+			}
+			set
+			{
+				if ((this._media_url != value))
+				{
+					this._media_url = value;
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_tags", DbType="NVarChar(MAX)")]
+		public string tags
+		{
+			get
+			{
+				return this._tags;
+			}
+			set
+			{
+				if ((this._tags != value))
+				{
+					this._tags = value;
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_date", DbType="DateTime NOT NULL")]
+		public System.DateTime date
+		{
+			get
+			{
+				return this._date;
+			}
+			set
+			{
+				if ((this._date != value))
+				{
+					this._date = value;
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_location_id", DbType="Int NOT NULL")]
+		public int location_id
+		{
+			get
+			{
+				return this._location_id;
+			}
+			set
+			{
+				if ((this._location_id != value))
+				{
+					this._location_id = value;
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_technical_info", DbType="NVarChar(MAX)")]
+		public string technical_info
+		{
+			get
+			{
+				return this._technical_info;
+			}
+			set
+			{
+				if ((this._technical_info != value))
+				{
+					this._technical_info = value;
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_status", DbType="NVarChar(64)")]
+		public string status
+		{
+			get
+			{
+				return this._status;
+			}
+			set
+			{
+				if ((this._status != value))
+				{
+					this._status = value;
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_name", DbType="NVarChar(64) NOT NULL", CanBeNull=false)]
+		public string name
+		{
+			get
+			{
+				return this._name;
+			}
+			set
+			{
+				if ((this._name != value))
+				{
+					this._name = value;
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_avatar", DbType="NVarChar(64)")]
+		public string avatar
+		{
+			get
+			{
+				return this._avatar;
+			}
+			set
+			{
+				if ((this._avatar != value))
+				{
+					this._avatar = value;
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_affiliation", DbType="NVarChar(64)")]
+		public string affiliation
+		{
+			get
+			{
+				return this._affiliation;
+			}
+			set
+			{
+				if ((this._affiliation != value))
+				{
+					this._affiliation = value;
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_modified_date", DbType="DateTime")]
+		public System.Nullable<System.DateTime> modified_date
+		{
+			get
+			{
+				return this._modified_date;
+			}
+			set
+			{
+				if ((this._modified_date != value))
+				{
+					this._modified_date = value;
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_web_username", DbType="NVarChar(64)")]
+		public string web_username
+		{
+			get
+			{
+				return this._web_username;
+			}
+			set
+			{
+				if ((this._web_username != value))
+				{
+					this._web_username = value;
+				}
 			}
 		}
 	}

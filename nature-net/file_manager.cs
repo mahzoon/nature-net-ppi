@@ -22,7 +22,7 @@ namespace nature_net
             try
             {
                 System.IO.FileStream file_stream = new System.IO.FileStream(
-                            configurations.GetAbsoluteContributionPath() + contribution_id.ToString(), System.IO.FileMode.CreateNew);
+                            configurations.GetAbsoluteContributionPath() + contribution_id.ToString(), System.IO.FileMode.OpenOrCreate);
                 file_stream.Close();
                 WebClient client = new WebClient();
                 client.Headers.Add("user-agent", "Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.2; .NET CLR 1.0.3705;)");

@@ -258,9 +258,9 @@ namespace nature_net.user_controls
         {
             if (list_design_ideas)
             {
-                string[] idea_item = ("design idea;" + item.ToString()).Split(new Char[] { ';' });
-                window_manager.open_design_idea_window(idea_item, 0, item.PointToScreen(new Point(0, 0)).Y);
-                _list.SelectedIndex = -1;
+                //string[] idea_item = ("design idea;" + item.ToString()).Split(new Char[] { ';' });
+                //window_manager.open_design_idea_window(idea_item, 0, item.PointToScreen(new Point(0, 0)).Y);
+                //_list.SelectedIndex = -1;
                 return;
             }
             if (list_users)

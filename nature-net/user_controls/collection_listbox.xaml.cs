@@ -27,6 +27,7 @@ namespace nature_net.user_controls
     public partial class collection_listbox : UserControl
     {
         private readonly BackgroundWorker worker = new BackgroundWorker();
+        private readonly BackgroundWorker worker_retry = new BackgroundWorker();
 
         private Point drag_direction1 = new Point(0, 1);
         private Point drag_direction2 = new Point(0, -1);
@@ -34,6 +35,9 @@ namespace nature_net.user_controls
         public window_frame parent;
         private double debug_var = 10;
         private Canvas debug_canvas = new Canvas();
+        
+        private List<collection_listbox_item> upload_failed_items = new List<collection_listbox_item>();
+        private collection_listbox_item upload_failed_cli = new collection_listbox_item();
 
         private List<System.Windows.Input.TouchPoint> touch_points = new List<System.Windows.Input.TouchPoint>();
         private int consecutive_drag_points = 0;
@@ -333,6 +337,7 @@ namespace nature_net.user_controls
             naturenet_dataclassDataContext db = database_manager.GetTableTopDB();
             var result1 = from c in db.Collection_Contribution_Mappings
                           where (c.Collection.User.name == (string)e.Argument) && (c.Collection.activity_id != 1)
+                          && (c.Contribution.status != configurations.status_deleted)
                           select c.Contribution;
             if (result1 == null)
             {
@@ -349,7 +354,7 @@ namespace nature_net.user_controls
             lp0.current_progress = 0; lp0.total = medias.Count;
             lp0.loaded_items = loaded_items;
             worker.ReportProgress(0, lp0);
-            // download the image if there is no image
+            // download the image if there is no image;
             // create thumbnail if there is no thumbnail
             List<collection_item> items = new List<collection_item>();
             
@@ -412,7 +417,11 @@ namespace nature_net.user_controls
                            {
                                cli2.img.Source = configurations.img_not_found_image_pic;
                                cli2.img.Tag = null;
+                               //cli2.Width = 0;
+                               cli2.Visibility = System.Windows.Visibility.Collapsed;
+                               upload_failed_items.Add(cli2);
                            }
+                           cli2.collection_item = i;
                            this.contributions._list.Items.RemoveAt(progress.current_progress - 1);
                            this.contributions._list.Items.Insert(progress.current_progress - 1, cli2);
                        }
@@ -434,8 +443,9 @@ namespace nature_net.user_controls
                        items = new List<collection_item>();
                    else
                        items = (List<collection_item>)e.Result;
-                   
-                   if (items.Count == 0)
+
+                   int item_count = items.Count + upload_failed_items.Count;
+                   if (item_count == 0)
                    {
                        this.contributions._list.Items.Clear();
                        Image img = new Image();
@@ -445,13 +455,27 @@ namespace nature_net.user_controls
 
                        string[] title = this.parent.get_title().Split(new string[] { " (" }, StringSplitOptions.RemoveEmptyEntries);
                        this.parent.set_title(title[0]);
-                       this.contributions.content_name = this.contributions.content_name + " ;" + title[0] + " (" + items.Count + ")";
+                       this.contributions.content_name = this.contributions.content_name + " ;" + title[0] + " (" + item_count + ")";
                    }
                    else
                    {
                        string[] title = this.parent.get_title().Split(new string[] { " (" }, StringSplitOptions.RemoveEmptyEntries);
-                       this.parent.set_title(title[0] + " (" + items.Count + ")");
-                       this.contributions.content_name = this.contributions.content_name + " ;" + title[0] + " (" + items.Count + ")";
+                       this.parent.set_title(title[0] + " (" + item_count + ")");
+                       this.contributions.content_name = this.contributions.content_name + " ;" + title[0] + " (" + item_count + ")";
+                   }
+                   if (upload_failed_items.Count != 0)
+                   {
+                       upload_failed_cli = new collection_listbox_item();
+                       upload_failed_cli.Width = 150;
+                       //upload_failed_cli.img.Source = configurations.img_not_found_image_pic;
+                       upload_failed_cli.upload_failed_count.FontFamily = new System.Windows.Media.FontFamily("Calibri");
+                       upload_failed_cli.upload_failed_count.FontSize = 24;
+                       upload_failed_cli.upload_failed_count.Foreground = Brushes.DarkSlateGray;
+                       upload_failed_cli.upload_failed_count.TextWrapping = TextWrapping.Wrap;
+                       upload_failed_cli.upload_failed_count.Text = configurations.still_uploading_text;
+                       upload_failed_cli.img.Tag = null;
+                       upload_failed_cli.upload_failed_count.Text += " (x" + this.upload_failed_items.Count + ")";
+                       this.contributions._list.Items.Add(upload_failed_cli);
                    }
                    this.contributions._list.Items.Refresh();
                    window_manager.contribution_collection_opened(this.collection_username);
@@ -463,6 +487,7 @@ namespace nature_net.user_controls
             naturenet_dataclassDataContext db = database_manager.GetTableTopDB();
             var result1 = from c in db.Collection_Contribution_Mappings
                           where (c.Contribution.location_id == (int)e.Argument) && (c.Collection.activity_id != 1)
+                          && (c.Contribution.status != configurations.status_deleted)
                           select c.Contribution;
             //var result1 = from c in db.Contributions
             //              where c.location_id == (int)e.Argument
@@ -499,6 +524,7 @@ namespace nature_net.user_controls
             naturenet_dataclassDataContext db = database_manager.GetTableTopDB();
             var result0 = from c0 in db.Collection_Contribution_Mappings
                           where c0.Collection.activity_id == (int)e.Argument
+                          && (c0.Contribution.status != configurations.status_deleted)
                           orderby c0.Contribution.date descending
                           select c0.Contribution;
             if (result0 == null)
@@ -532,18 +558,7 @@ namespace nature_net.user_controls
         {
             collection_item ci = new collection_item();
             ci._contribution = c;
-            int i = c.id;
 
-            if (c.media_url == null) return ci;
-            //string fname = c.media_url;
-            //string ext = fname.Substring(fname.Length - 4, 4);
-            //ext = ext.ToLower();
-            //if (ext == ".jpg" || ext == ".bmp" || ext == ".png")
-            //    ci.is_image = true;
-            //if (ext == ".wmv" || ext == ".mpg" || ext == "mpeg" || ext == ".avi" || ext == ".mp4" || ext == ".3gp" || ext == ".mov")
-            //    ci.is_video = true;
-            //if (ext == ".wav" || ext == ".mp3")
-            //    ci.is_audio = true;
             if (c.tags != null)
             {
                 if (c.tags.Contains("Photo"))
@@ -554,15 +569,33 @@ namespace nature_net.user_controls
                     ci.is_audio = true;
             }
 
-            if (!window_manager.thumbnails.ContainsKey(i))
-            {
-                if (!window_manager.downloaded_contributions.Contains(i))
-                {
-                    //bool result = file_manager.download_file_from_googledirve(c.media_url, i);
-                    bool result = file_manager.download_file(c.media_url, i);
-                    if (result) window_manager.downloaded_contributions.Add(i);
-                }
+            if (c.media_url == null || c.media_url == "") return ci;
+            //string fname = c.media_url;
+            //string ext = fname.Substring(fname.Length - 4, 4);
+            //ext = ext.ToLower();
+            //if (ext == ".jpg" || ext == ".bmp" || ext == ".png")
+            //    ci.is_image = true;
+            //if (ext == ".wmv" || ext == ".mpg" || ext == "mpeg" || ext == ".avi" || ext == ".mp4" || ext == ".3gp" || ext == ".mov")
+            //    ci.is_video = true;
+            //if (ext == ".wav" || ext == ".mp3")
+            //    ci.is_audio = true;
 
+            try_downloading_contribution(ci, false, false);
+            return ci;
+        }
+
+        private void try_downloading_contribution(collection_item ci, bool force_download, bool force_create_thumbnail)
+        {
+            int i = ci._contribution.id;
+            if (!window_manager.downloaded_contributions.Contains(i) || force_download)
+            {
+                //bool result = file_manager.download_file_from_googledirve(c.media_url, i);
+                bool result = file_manager.download_file(ci._contribution.media_url, i);
+                if (result) window_manager.downloaded_contributions.Add(i);
+            }
+
+            if (!window_manager.thumbnails.ContainsKey(i) || force_create_thumbnail)
+            {
                 ImageSource img = null;
                 if (ci.is_image)
                     img = configurations.GetThumbnailFromImage(i.ToString(), configurations.thumbnail_pixel_height);
@@ -571,27 +604,28 @@ namespace nature_net.user_controls
                 if (ci.is_audio)
                     img = configurations.img_sound_image_pic;
                 if (img == null)
-                    return ci;
+                    return;
 
-                if (!window_manager.thumbnails.ContainsKey(i))
+                //if (!window_manager.thumbnails.ContainsKey(i))
+                //{
+                // save the thumbnail
+                try
                 {
-                    // save the thumbnail
-                    try
+                    BitmapSource bs = img as BitmapSource;
+                    if (!ci.is_audio)
                     {
-                        BitmapSource bs = img as BitmapSource; 
-                        if (!ci.is_audio)
-                        {
-                            configurations.SaveThumbnail(bs, i.ToString());
-                        }
-                        img = new BitmapImage(new Uri(configurations.GetAbsoluteThumbnailPath() + i.ToString() + ".jpg"));
-                        img.Freeze();
-                        window_manager.thumbnails.Add(i, img);
+                        configurations.SaveThumbnail(bs, i.ToString());
                     }
-                    catch (Exception) { }   // not a problem
+                    img = new BitmapImage(new Uri(configurations.GetAbsoluteThumbnailPath() + i.ToString() + ".jpg"));
+                    img.Freeze();
+                    if (!window_manager.thumbnails.ContainsKey(i) || force_create_thumbnail)
+                        window_manager.thumbnails.Add(i, img);
+                    else
+                        window_manager.thumbnails[i] = img;
                 }
+                catch (Exception) { }   // not a problem
+                //}
             }
-
-            return ci;
         }
 
         bool item_selected(object i, System.Windows.Input.TouchEventArgs e)
@@ -605,7 +639,73 @@ namespace nature_net.user_controls
                     item.PointToScreen(new Point(0, 0)).X - window_manager.main_canvas.PointToScreen(new Point(0, 0)).X,
                     item.PointToScreen(new Point(0, 0)).Y, ci.ToString());
             }
+            else
+            {
+                log.WriteInteractionLog(17, "tapped the collection item (retry item)", e.TouchDevice);
+                worker_retry.DoWork += new DoWorkEventHandler(retry_downloading);
+                //worker.RunWorkerCompleted += new RunWorkerCompletedEventHandler(display_all_contributions);
+                if (!worker_retry.IsBusy)
+                    worker_retry.RunWorkerAsync();
+            }
             return true;
+        }
+
+        void retry_downloading(object sender, DoWorkEventArgs e)
+        {
+            if (upload_failed_items.Count == 0) return;
+            this.contributions._list.Items.Dispatcher.BeginInvoke(DispatcherPriority.Normal,
+                    new System.Action(() =>
+                    { upload_failed_cli.upload_failed_count.Text = "(retrying...)"; }));
+            naturenet_dataclassDataContext db = database_manager.GetTableTopDB();
+            List<collection_listbox_item> failed_items = new List<collection_listbox_item>();
+            foreach (collection_listbox_item cli in upload_failed_items)
+            {
+                collection_item ci = (collection_item)cli.collection_item;
+                if (ci == null) continue;
+                var contribs = from c in db.Contributions
+                               where ci._contribution.id == c.id
+                               select c;
+                if (contribs.Count() != 1) continue;
+                ci._contribution = contribs.Single<Contribution>();
+                try_downloading_contribution(ci, true, true);
+                if (!window_manager.thumbnails.ContainsKey(ci._contribution.id))
+                { failed_items.Add(cli); }           
+            }
+
+            this.contributions._list.Items.Dispatcher.BeginInvoke(DispatcherPriority.Normal,
+                new System.Action(() =>
+                {
+                    foreach (collection_listbox_item cli2 in upload_failed_items)
+                    {
+                        collection_item ci2 = (collection_item)cli2.collection_item;
+                        if (ci2 == null) continue;
+                        if (window_manager.thumbnails.ContainsKey(ci2._contribution.id))
+                        {
+                            cli2.img.Source = window_manager.thumbnails[ci2._contribution.id];
+                            cli2.img.Tag = ci2;
+                            cli2.drag.Source = configurations.img_drag_icon;
+                            cli2.Visibility = System.Windows.Visibility.Visible;
+                        }
+                        else
+                        {
+                            cli2.img.Source = configurations.img_not_found_image_pic;
+                            cli2.img.Tag = null;
+                            //cli2.Width = 0;
+                            cli2.Visibility = System.Windows.Visibility.Collapsed;
+                        }
+                    }
+                    if (failed_items.Count == 0)
+                        this.contributions._list.Items.Remove(upload_failed_cli);
+                    else
+                    {
+                        //upload_failed_cli.img.Source = configurations.img_not_found_image_pic;
+                        upload_failed_cli.upload_failed_count.Text = configurations.still_uploading_text;
+                        upload_failed_cli.upload_failed_count.Text += " (x" + failed_items.Count + ")";
+                        this.contributions._list.Items.Refresh();
+                        this.contributions._list.UpdateLayout();
+                    }
+                    upload_failed_items = failed_items;
+                }));
         }
 
         public bool start_drag(ListBoxItem item, collection_item contribution_item, TouchDevice touch_device, ImageSource i)

@@ -51,6 +51,7 @@ namespace nature_net.user_controls
         public CharacterValidation validation_checker;
 
         public ContentControl parent_frame;
+        public UserControl window_frame;
 
         public virtual_keyboard()
         {
@@ -133,21 +134,35 @@ namespace nature_net.user_controls
                 return;
             }
             if (key_code.UnshiftedCodePoint == 0x0008) { this.DoBackspace(); return; }
-            if (is_shifted)
-                this.Inject(((char)key_code.ShiftedCodePoint).ToString());
+            if (key_code.UnshiftedCodePoint == 0x0020 || key_code.UnshiftedCodePoint == 0x000A || key_code.UnshiftedCodePoint == 0x0009)
+            { this.Inject(((char)key_code.UnshiftedCodePoint).ToString()); }
             else
             {
-                if (is_first_shift)
-                {
+                if (is_shifted)
                     this.Inject(((char)key_code.ShiftedCodePoint).ToString());
-                    is_first_shift = false;
-                    this.keyboard.Source = configurations.img_keyboard_pic;
-                }
                 else
-                    this.Inject(((char)key_code.UnshiftedCodePoint).ToString());
+                {
+                    if (is_first_shift)
+                    {
+                        this.Inject(((char)key_code.ShiftedCodePoint).ToString());
+                        is_first_shift = false;
+                        this.keyboard.Source = configurations.img_keyboard_pic;
+                    }
+                    else
+                        this.Inject(((char)key_code.UnshiftedCodePoint).ToString());
+                }
             }
             if (parent_frame != null)
+            {
                 window_manager.UpdateZOrder(parent_frame, true);
+            }
+            if (window_frame != null)
+            {
+                try { ((window_frame)window_frame).postpone_killer_timer(true); }
+                catch (Exception) { }
+                try { ((image_frame)window_frame).postpone_killer_timer(true); }
+                catch (Exception) { }
+            }
         }
 
         private KeyAssignment get_key(double x, double y, TouchDevice td)
