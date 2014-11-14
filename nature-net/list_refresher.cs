@@ -150,7 +150,8 @@ namespace nature_net
             {
                 naturenet_dataclassDataContext db = database_manager.GetTableTopDB();
                 var r = from a in db.Activities
-                        where (a.name != "Free Observation") && (a.name != "Design Idea")
+                        //where (a.name != "Free Observation") && (a.name != "Design Idea")
+                        where (a.name != "Design Idea")
                         select a;
                 if (r != null)
                 {
@@ -202,7 +203,8 @@ namespace nature_net
         {
             naturenet_dataclassDataContext db = database_manager.GetTableTopDB();
             var r1 = from a in db.Activities
-                    where (a.name != "Free Observation") && (a.name != "Design Idea")
+                    //where (a.name != "Free Observation") && (a.name != "Design Idea")
+                     where (a.name != "Design Idea")
                     select a.id;
             var r2 = from c in db.Contributions
                      select c.id;

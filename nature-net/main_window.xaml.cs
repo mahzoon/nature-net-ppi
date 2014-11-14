@@ -264,6 +264,9 @@ namespace nature_net
 
             double x = 0;
             double y = 0;
+            
+            System.Windows.Point ps1 = element.PointToScreen(new System.Windows.Point(0, 0));
+            System.Windows.Point ps2 = element.PointToScreen(new System.Windows.Point(element.Width, 50));
             if (iframe != null && iframe.the_image != null)
             {
                 UIElement o = (UIElement)e.ManipulationContainer;
@@ -277,6 +280,9 @@ namespace nature_net
                 x = (new_point.X / old_width) * (iframe.the_item.Width - old_width);
                 y = (new_point.Y / old_height) * (iframe.the_item.Height - old_height);
 
+                ps1 = iframe.the_item.PointToScreen(new System.Windows.Point(0, 0));
+                ps2 = iframe.the_item.PointToScreen(new System.Windows.Point(iframe.the_item.Width, iframe.the_item.Height));
+
                 iframe.title_bar.Height = configurations.frame_title_bar_height;
                 iframe.close.Height = 33;
                 iframe.close.Width = 33;
@@ -285,7 +291,15 @@ namespace nature_net
 
             matrix.RotateAt(e.DeltaManipulation.Rotation, e.ManipulationOrigin.X, e.ManipulationOrigin.Y);// center.X, center.Y);
             //if (element.PointToScreen(new System.Windows.Point(0, 0)).X > 300 && e.DeltaManipulation.Translation.X > 0)
+
+            if (ps2.X > ps1.X && ps2.Y > ps1.Y)
                 matrix.Translate(e.DeltaManipulation.Translation.X - x, e.DeltaManipulation.Translation.Y - y);
+            else if (ps2.X < ps1.X && ps2.Y > ps1.Y)
+                matrix.Translate(e.DeltaManipulation.Translation.X + x, e.DeltaManipulation.Translation.Y - y);
+            else if (ps2.X > ps1.X && ps2.Y < ps1.Y)
+                matrix.Translate(e.DeltaManipulation.Translation.X - x, e.DeltaManipulation.Translation.Y + y);
+            else if (ps2.X < ps1.X && ps2.Y < ps1.Y)
+                matrix.Translate(e.DeltaManipulation.Translation.X + x, e.DeltaManipulation.Translation.Y + y);
 
             element.RenderTransform = new MatrixTransform(matrix);
                 

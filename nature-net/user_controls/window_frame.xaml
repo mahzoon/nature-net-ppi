@@ -10,7 +10,7 @@
     <DockPanel LastChildFill="True">
         <DockPanel Name="title_bar" DockPanel.Dock="Top" Background="#FF00AB00" Height="40">
             <StackPanel DockPanel.Dock="Right" Orientation="Horizontal">
-                <Button Name="change_view" Margin="2" Width="33" Height="33" Visibility="Collapsed">
+                <Button Name="pushpin" Margin="10,2,2,2" Width="33" Height="33">
                     <Button.Style><Style><Setter Property="Button.Template"><Setter.Value>
                         <ControlTemplate>
                             <Border Name="border" BorderThickness="{TemplateBinding BorderThickness}" Padding="{TemplateBinding Padding}" BorderBrush="{TemplateBinding BorderBrush}" CornerRadius="5" Background="{TemplateBinding Background}">
@@ -19,7 +19,7 @@
                         </ControlTemplate>
                     </Setter.Value></Setter></Style></Button.Style>
                 </Button>
-                <Button Name="close" Margin="10,2,2,2" Width="33" Height="33">
+                <Button Name="close" Margin="2,2,2,2" Width="33" Height="33">
                     <Button.Style>
                         <Style>
                             <Setter Property="Button.Template">

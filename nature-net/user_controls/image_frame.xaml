@@ -28,6 +28,21 @@
                         </Style>
                     </Button.Style>
                 </Button>
+                <Button Name="pushpin" Margin="3" Width="33" Height="33" DockPanel.Dock="Right">
+                    <Button.Style>
+                        <Style>
+                            <Setter Property="Button.Template">
+                                <Setter.Value>
+                                    <ControlTemplate>
+                                        <Border Name="border" BorderThickness="{TemplateBinding BorderThickness}" Padding="{TemplateBinding Padding}" BorderBrush="{TemplateBinding BorderBrush}" CornerRadius="5" Background="{TemplateBinding Background}">
+                                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center" />
+                                        </Border>
+                                    </ControlTemplate>
+                                </Setter.Value>
+                            </Setter>
+                        </Style>
+                    </Button.Style>
+                </Button>
             </DockPanel>
 
             <MediaElement x:Name="the_media" Visibility="Collapsed" LoadedBehavior="Manual" 

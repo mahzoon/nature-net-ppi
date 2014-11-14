@@ -142,7 +142,6 @@ namespace nature_net
 
             window_manager.design_ideas_frames.Add(frame);
             open_window(frame, pos_x, pos_y);
-            frame.hide_change_view();
             frame.set_title(idea_item.user_info_name.Text + "'s " + title);
             frame.set_kill_timer();
         }
@@ -212,7 +211,6 @@ namespace nature_net
 
             window_manager.design_ideas_frames.Add(frame);
             open_window(frame, pos_x, pos_y);
-            frame.hide_change_view();
             frame.set_title("Submit Design Idea");
             frame.set_kill_timer();
         }
@@ -232,7 +230,6 @@ namespace nature_net
             
             window_manager.signup_frames.Add(frame);
             open_window(frame, pos_x, pos_y);
-            frame.hide_change_view();
             frame.set_title("Sign up");
             frame.set_icon(configurations.img_signup_window_icon);
             frame.set_kill_timer();
@@ -352,8 +349,14 @@ namespace nature_net
             FileInfo[] files = d.GetFiles();
             window_manager.thumbnails.Clear();
             foreach (FileInfo f in files)
-                window_manager.thumbnails.Add(Convert.ToInt32(f.Name.Split(new char[] { '.' })[0]),
-                    new BitmapImage(new Uri(configurations.GetAbsoluteThumbnailPath() + f.Name)));
+            {
+                try
+                {
+                    window_manager.thumbnails.Add(Convert.ToInt32(f.Name.Split(new char[] { '.' })[0]),
+                        new BitmapImage(new Uri(configurations.GetAbsoluteThumbnailPath() + f.Name)));
+                }
+                catch (Exception) { }
+            }
         }
 
         public static void load_avatars()

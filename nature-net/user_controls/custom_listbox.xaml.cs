@@ -551,7 +551,8 @@ namespace nature_net.user_controls
             {
                 naturenet_dataclassDataContext db = database_manager.GetTableTopDB();
                 var r = from a in db.Activities
-                        where (a.name != "Free Observation") && (a.name != "Design Idea")
+                        //where (a.name != "Free Observation") && (a.name != "Design Idea")
+                        where (a.name != "Design Idea")
                         select a;
                 if (r != null)
                 {

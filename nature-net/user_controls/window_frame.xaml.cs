@@ -20,6 +20,9 @@ namespace nature_net.user_controls
     public partial class window_frame : UserControl
     {
         private System.Threading.Timer window_killer_timer;
+        private bool timer_enabled = true;
+        private ImageBrush pushpin_icon;
+        private ImageBrush pushpin_selected_icon;
 
         public window_frame()
         {
@@ -34,15 +37,20 @@ namespace nature_net.user_controls
             var b1 = new ImageBrush();
             b1.ImageSource = configurations.img_close_icon;
             this.close.Background = b1;
-            var b2 = new ImageBrush();
-            b2.ImageSource = configurations.img_change_view_stack_icon;
-            this.change_view.Background = b2;
+            pushpin_icon = new ImageBrush();
+            pushpin_icon.ImageSource = configurations.img_pushpin_icon;
+            pushpin_selected_icon = new ImageBrush();
+            pushpin_selected_icon.ImageSource = configurations.img_pushpin_selected_icon;
+            this.pushpin.Background = pushpin_icon;
             this.window_icon.Source = configurations.img_collection_window_icon;
 
             if (configurations.response_to_mouse_clicks)
+            {
                 this.close.Click += new RoutedEventHandler(close_Click);
-            //this.change_view.Click += new RoutedEventHandler(change_view_Click);
+                this.pushpin.Click += new RoutedEventHandler(pushpin_Click);
+            }
             this.close.PreviewTouchDown += new EventHandler<TouchEventArgs>(close_Click);
+            this.pushpin.PreviewTouchDown += new EventHandler<TouchEventArgs>(pushpin_Click);
 
             this.PreviewTouchDown += new EventHandler<TouchEventArgs>(window_frame_PreviewTouchDown);
         }
@@ -73,16 +81,6 @@ namespace nature_net.user_controls
             this.window_icon.Source = ico;
         }
 
-        public void hide_change_view()
-        {
-            this.change_view.Visibility = System.Windows.Visibility.Collapsed;
-        }
-
-        void change_view_Click(object sender, RoutedEventArgs e)
-        {
-            
-        }
-
         public void kill_this_window(Object stateInfo)
         {
             log.WriteInteractionLog(19, "[Auto] frame closed with title: " + (string)stateInfo, null);
@@ -92,9 +90,12 @@ namespace nature_net.user_controls
         public void postpone_killer_timer(bool same_thread)
         {
             if (same_thread)
-                window_killer_timer.Change(configurations.kill_window_millisec, System.Threading.Timeout.Infinite);
+            {
+                if (timer_enabled)
+                    window_killer_timer.Change(configurations.kill_window_millisec, System.Threading.Timeout.Infinite);
+            }
             else
-                this.Dispatcher.BeginInvoke(System.Windows.Threading.DispatcherPriority.Normal, new System.Action(() => { window_killer_timer.Change(configurations.kill_window_millisec, System.Threading.Timeout.Infinite); }));
+                this.Dispatcher.BeginInvoke(System.Windows.Threading.DispatcherPriority.Normal, new System.Action(() => { if (timer_enabled) window_killer_timer.Change(configurations.kill_window_millisec, System.Threading.Timeout.Infinite); }));
         }
 
         void close_Click(object sender, RoutedEventArgs e)
@@ -103,6 +104,42 @@ namespace nature_net.user_controls
             this.window_killer_timer.Change(System.Threading.Timeout.Infinite, System.Threading.Timeout.Infinite);
             this.window_killer_timer.Dispose();
             window_manager.close_window(this);
+        }
+
+        void pushpin_Click(object sender, RoutedEventArgs e)
+        {
+            bool s = toggle_timer();
+            if (s)
+                this.pushpin.Background = pushpin_icon;
+            else
+                this.pushpin.Background = pushpin_selected_icon;
+        }
+
+        public void disable_timer(bool same_thread)
+        {
+            if (same_thread)
+            {
+                window_killer_timer.Change(System.Threading.Timeout.Infinite, System.Threading.Timeout.Infinite);
+                timer_enabled = false;
+            }
+            else
+                this.Dispatcher.BeginInvoke(System.Windows.Threading.DispatcherPriority.Normal, new System.Action(() => { window_killer_timer.Change(System.Threading.Timeout.Infinite, System.Threading.Timeout.Infinite); timer_enabled = false; }));
+        }
+
+        public void enable_timer(bool same_thread)
+        {
+            timer_enabled = true;
+            postpone_killer_timer(same_thread);
+        }
+
+        // should be fired in the same thread
+        private bool toggle_timer()
+        {
+            if (timer_enabled)
+                disable_timer(true);
+            else
+                enable_timer(true);
+            return timer_enabled;
         }
 
         public void UpdateContents()

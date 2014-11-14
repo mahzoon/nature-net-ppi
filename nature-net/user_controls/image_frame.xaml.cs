@@ -29,6 +29,9 @@ namespace nature_net.user_controls
         //public window_content win_content;
 
         private System.Threading.Timer window_killer_timer;
+        private bool timer_enabled = true;
+        private ImageBrush pushpin_icon;
+        private ImageBrush pushpin_selected_icon;
 
         public image_frame()
         {
@@ -48,10 +51,19 @@ namespace nature_net.user_controls
             b1.ImageSource = configurations.img_close_icon;
             this.close.Background = b1;
 
+            pushpin_icon = new ImageBrush();
+            pushpin_icon.ImageSource = configurations.img_pushpin_icon;
+            pushpin_selected_icon = new ImageBrush();
+            pushpin_selected_icon.ImageSource = configurations.img_pushpin_selected_icon;
+            this.pushpin.Background = pushpin_icon;
+
             if (configurations.response_to_mouse_clicks)
+            {
                 this.close.Click += new RoutedEventHandler(close_Click);
-            //this.change_view.Click += new RoutedEventHandler(change_view_Click);
+                this.pushpin.Click += new RoutedEventHandler(pushpin_Click);
+            }
             this.close.PreviewTouchDown += new EventHandler<TouchEventArgs>(close_Click);
+            this.pushpin.PreviewTouchDown += new EventHandler<TouchEventArgs>(pushpin_Click);
 
             RenderOptions.SetBitmapScalingMode(the_item, configurations.scaling_mode);
 
@@ -206,9 +218,48 @@ namespace nature_net.user_controls
         public void postpone_killer_timer(bool same_thread)
         {
             if (same_thread)
-                window_killer_timer.Change(configurations.kill_window_millisec, System.Threading.Timeout.Infinite);
+            {
+                if (timer_enabled)
+                    window_killer_timer.Change(configurations.kill_window_millisec, System.Threading.Timeout.Infinite);
+            }
             else
-                this.Dispatcher.BeginInvoke(System.Windows.Threading.DispatcherPriority.Normal, new System.Action(() => { window_killer_timer.Change(configurations.kill_window_millisec, System.Threading.Timeout.Infinite); }));
+                this.Dispatcher.BeginInvoke(System.Windows.Threading.DispatcherPriority.Normal, new System.Action(() => { if (timer_enabled) window_killer_timer.Change(configurations.kill_window_millisec, System.Threading.Timeout.Infinite); }));
+        }
+
+        public void disable_timer(bool same_thread)
+        {
+            if (same_thread)
+            {
+                window_killer_timer.Change(System.Threading.Timeout.Infinite, System.Threading.Timeout.Infinite);
+                timer_enabled = false;
+            }
+            else
+                this.Dispatcher.BeginInvoke(System.Windows.Threading.DispatcherPriority.Normal, new System.Action(() => { window_killer_timer.Change(System.Threading.Timeout.Infinite, System.Threading.Timeout.Infinite); timer_enabled = false; }));
+        }
+
+        public void enable_timer(bool same_thread)
+        {
+            timer_enabled = true;
+            postpone_killer_timer(same_thread);
+        }
+
+        // should be fired in the same thread
+        private bool toggle_timer()
+        {
+            if (timer_enabled)
+                disable_timer(true);
+            else
+                enable_timer(true);
+            return timer_enabled;
+        }
+
+        void pushpin_Click(object sender, RoutedEventArgs e)
+        {
+            bool s = toggle_timer();
+            if (s)
+                this.pushpin.Background = pushpin_icon;
+            else
+                this.pushpin.Background = pushpin_selected_icon;
         }
 
         void close_Click(object sender, RoutedEventArgs e)

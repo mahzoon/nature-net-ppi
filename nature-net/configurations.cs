@@ -147,7 +147,8 @@ namespace nature_net
         static string keyboard_numpad_pic = "NN_Numpad.png";
         static string choose_avatar_pic = "avatar.png";
         static string close_icon = "close.png";
-        static string change_view_list_icon = "change_view_list.png";
+        static string pushpin_icon = "NN_PinButton.png";
+        static string pushpin_selected_icon = "NN_PinButton_selected.png";
         static string change_view_stack_icon = "change_view_stack.png";
         static string collection_window_icon = "collection_window_icon.png";
         static string signup_icon = "signup.png";
@@ -177,7 +178,8 @@ namespace nature_net
         public static ImageSource img_keyboard_numpad_pic;
         public static ImageSource img_choose_avatar_pic;
         public static ImageSource img_close_icon;
-        public static ImageSource img_change_view_list_icon;
+        public static ImageSource img_pushpin_icon;
+        public static ImageSource img_pushpin_selected_icon;
         public static ImageSource img_change_view_stack_icon;
         public static ImageSource img_collection_window_icon;
         public static ImageSource img_signup_window_icon;
@@ -291,7 +293,8 @@ namespace nature_net
             img_close_icon = new BitmapImage(new Uri(configurations.GetAbsoluteImagePath() + close_icon));
             img_collection_window_icon = new BitmapImage(new Uri(configurations.GetAbsoluteImagePath() + collection_window_icon));
             img_signup_window_icon = new BitmapImage(new Uri(configurations.GetAbsoluteImagePath() + signup_window_icon));
-            img_change_view_list_icon = new BitmapImage(new Uri(configurations.GetAbsoluteImagePath() + change_view_list_icon));
+            img_pushpin_icon = new BitmapImage(new Uri(configurations.GetAbsoluteImagePath() + pushpin_icon));
+            img_pushpin_selected_icon = new BitmapImage(new Uri(configurations.GetAbsoluteImagePath() + pushpin_selected_icon));
             img_change_view_stack_icon = new BitmapImage(new Uri(configurations.GetAbsoluteImagePath() + change_view_stack_icon));
             img_signup_icon = new BitmapImage(new Uri(configurations.GetAbsoluteImagePath() + signup_icon));
             img_submit_idea_icon = new BitmapImage(new Uri(configurations.GetAbsoluteImagePath() + submit_idea_icon));
@@ -771,7 +774,8 @@ namespace nature_net
             keyboard_caps_pic = parser.GetValue("Files", "keyboard_caps_pic", "NN_Keyboard_v2_caps.png");
             keyboard_numpad_pic = parser.GetValue("Files", "keyboard_numpad_pic", "NN_Numpad.png");
             close_icon = parser.GetValue("Files", "close_icon", "close.png");
-            change_view_list_icon = parser.GetValue("Files", "change_view_list_icon", "change_view_list.png");
+            pushpin_icon = parser.GetValue("Files", "pushpin_icon", "NN_PinButton.png");
+            pushpin_selected_icon = parser.GetValue("Files", "pushpin_selected_icon", "NN_PinButton_selected.png");
             change_view_stack_icon = parser.GetValue("Files", "change_view_stack_icon", "change_view_stack.png");
             collection_window_icon = parser.GetValue("Files", "collection_window_icon", "collection_window_icon.png");
             signup_icon = parser.GetValue("Files", "signup_icon", "signup.png");
@@ -881,32 +885,32 @@ namespace nature_net
             parser.SetValue("Paths", "contributions_path", contributions_path);
 
             // Files
-            parser.SetValue("Files", "background_pic", background_pic);
-            parser.SetValue("Files", "drop_avatar_pic", drop_avatar_pic);
-            parser.SetValue("Files", "loading_image_pic", loading_image_pic);
-            parser.SetValue("Files", "empty_image_pic", empty_image_pic);
-            parser.SetValue("Files", "not_found_image_pic", not_found_image_pic);
-            parser.SetValue("Files", "sound_image_pic", sound_image_pic);
-            parser.SetValue("Files", "video_image_pic", video_image_pic);
-            parser.SetValue("Files", "keyboard_pic", keyboard_pic);
-            parser.SetValue("Files", "keyboard_shift_pic", keyboard_shift_pic);
-            parser.SetValue("Files", "keyboard_caps_pic", keyboard_caps_pic);
-            parser.SetValue("Files", "keyboard_numpad_pic", keyboard_numpad_pic);
-            parser.SetValue("Files", "close_icon", close_icon);
-            parser.SetValue("Files", "change_view_list_icon", change_view_list_icon);
-            parser.SetValue("Files", "change_view_stack_icon", change_view_stack_icon);
-            parser.SetValue("Files", "collection_window_icon", collection_window_icon);
-            parser.SetValue("Files", "signup_icon", signup_icon);
-            parser.SetValue("Files", "signup_window_icon", signup_window_icon);
-            parser.SetValue("Files", "submit_idea_icon", submit_idea_icon);
-            parser.SetValue("Files", "thumbs_up_icon", thumbs_up_icon);
-            parser.SetValue("Files", "thumbs_down_icon", thumbs_down_icon);
-            parser.SetValue("Files", "keyboard_click_wav", keyboard_click_wav);
-            parser.SetValue("Files", "drag_icon", drag_icon);
-            parser.SetValue("Files", "drag_vertical_icon", drag_vertical_icon);
-            parser.SetValue("Files", "comment_icon", comment_icon);
-            parser.SetValue("Files", "reply_icon", reply_icon);
-            parser.SetValue("Files", "affiliation_icon", affiliation_icon);
+            //parser.SetValue("Files", "background_pic", background_pic);
+            //parser.SetValue("Files", "drop_avatar_pic", drop_avatar_pic);
+            //parser.SetValue("Files", "loading_image_pic", loading_image_pic);
+            //parser.SetValue("Files", "empty_image_pic", empty_image_pic);
+            //parser.SetValue("Files", "not_found_image_pic", not_found_image_pic);
+            //parser.SetValue("Files", "sound_image_pic", sound_image_pic);
+            //parser.SetValue("Files", "video_image_pic", video_image_pic);
+            //parser.SetValue("Files", "keyboard_pic", keyboard_pic);
+            //parser.SetValue("Files", "keyboard_shift_pic", keyboard_shift_pic);
+            //parser.SetValue("Files", "keyboard_caps_pic", keyboard_caps_pic);
+            //parser.SetValue("Files", "keyboard_numpad_pic", keyboard_numpad_pic);
+            //parser.SetValue("Files", "close_icon", close_icon);
+            //parser.SetValue("Files", "change_view_list_icon", change_view_list_icon);
+            //parser.SetValue("Files", "change_view_stack_icon", change_view_stack_icon);
+            //parser.SetValue("Files", "collection_window_icon", collection_window_icon);
+            //parser.SetValue("Files", "signup_icon", signup_icon);
+            //parser.SetValue("Files", "signup_window_icon", signup_window_icon);
+            //parser.SetValue("Files", "submit_idea_icon", submit_idea_icon);
+            //parser.SetValue("Files", "thumbs_up_icon", thumbs_up_icon);
+            //parser.SetValue("Files", "thumbs_down_icon", thumbs_down_icon);
+            //parser.SetValue("Files", "keyboard_click_wav", keyboard_click_wav);
+            //parser.SetValue("Files", "drag_icon", drag_icon);
+            //parser.SetValue("Files", "drag_vertical_icon", drag_vertical_icon);
+            //parser.SetValue("Files", "comment_icon", comment_icon);
+            //parser.SetValue("Files", "reply_icon", reply_icon);
+            //parser.SetValue("Files", "affiliation_icon", affiliation_icon);
 
             // Frame
             parser.SetValue("Frame", "frame_width", frame_width);
