@@ -213,6 +213,8 @@ namespace nature_net
         public static double design_idea_item_avatar_width = 30;
         public static double design_idea_right_panel_width = 55;
 
+        public static bool activity_icons_loaded = false;
+
         public static Random RAND = new Random();
         public static int SEED()
         {

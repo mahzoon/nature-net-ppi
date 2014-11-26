@@ -587,20 +587,20 @@ namespace nature_net.user_controls
         private void try_downloading_contribution(collection_item ci, bool force_download, bool force_create_thumbnail)
         {
             int i = ci._contribution.id;
-            if (!window_manager.downloaded_contributions.Contains(i) || force_download)
+            if (!window_manager.downloaded_contributions.ContainsKey(i) || force_download)
             {
                 //bool result = file_manager.download_file_from_googledirve(c.media_url, i);
                 bool result = file_manager.download_file(ci._contribution.media_url, i);
-                if (result) window_manager.downloaded_contributions.Add(i);
+                if (result) window_manager.downloaded_contributions.Add(i, file_manager.get_extension(ci._contribution.media_url));
             }
 
-            if (!window_manager.thumbnails.ContainsKey(i) || force_create_thumbnail)
+            if ((!window_manager.thumbnails.ContainsKey(i) || force_create_thumbnail) && window_manager.downloaded_contributions.ContainsKey(i))
             {
                 ImageSource img = null;
                 if (ci.is_image)
-                    img = configurations.GetThumbnailFromImage(i.ToString(), configurations.thumbnail_pixel_height);
+                    img = configurations.GetThumbnailFromImage(i.ToString() + "." + window_manager.downloaded_contributions[i], configurations.thumbnail_pixel_height);
                 if (ci.is_video)
-                    img = configurations.GetThumbnailFromVideo(i.ToString(), configurations.thumbnail_video_span, configurations.thumbnail_pixel_height);
+                    img = configurations.GetThumbnailFromVideo(i.ToString() + "." + window_manager.downloaded_contributions[i], configurations.thumbnail_video_span, configurations.thumbnail_pixel_height);
                 if (ci.is_audio)
                     img = configurations.img_sound_image_pic;
                 if (img == null)

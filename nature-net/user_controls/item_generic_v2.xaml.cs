@@ -101,7 +101,7 @@ namespace nature_net.user_controls
             i.user_info_icon.Source = this.user_info_icon.Source; i.user_info_icon.Margin = this.user_info_icon.Margin;
             i.user_info_icon.Visibility = this.user_info_icon.Visibility;
             i.user_info_name.Text = this.user_info_name.Text;i.user_info_name.Margin = this.user_info_name.Margin;
-            i.num_likes.Content = this.num_likes.Content; i.num_likes.Tag = this.num_likes.Tag;
+            i.num_likes.Content = this.num_likes.Content; i.num_likes.Tag = this.num_likes.Tag; i.num_likes.Visibility = this.num_likes.Visibility;
             i.top_value = this.top_value;
             i.affiliation_icon_small.Source = this.affiliation_icon_small.Source;
             i.affiliation_icon_small.Visibility = this.affiliation_icon_small.Visibility;

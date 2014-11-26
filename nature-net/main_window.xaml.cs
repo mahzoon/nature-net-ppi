@@ -267,12 +267,12 @@ namespace nature_net
             
             System.Windows.Point ps1 = element.PointToScreen(new System.Windows.Point(0, 0));
             System.Windows.Point ps2 = element.PointToScreen(new System.Windows.Point(element.Width, 50));
-            if (iframe != null && iframe.the_image != null)
+            if (iframe != null && iframe.the_item != null)
             {
                 UIElement o = (UIElement)e.ManipulationContainer;
                 System.Windows.Point new_point = o.TranslatePoint(e.ManipulationOrigin, iframe.the_item);
                 double old_width = iframe.the_item.Width;
-                double old_height = iframe.the_item.Height;
+                double old_height = iframe.the_item.Height; // height is null for the video
 
                 iframe.the_item.Width = iframe.the_item.Width * deltaManipulation.Scale.X;
                 iframe.the_item.Height = iframe.the_item.Height * deltaManipulation.Scale.X;

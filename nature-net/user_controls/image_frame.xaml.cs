@@ -93,7 +93,7 @@ namespace nature_net.user_controls
                     the_item.UpdateLayout();
                     //string fname = i._contribution.media_url;
                     //string ext = fname.Substring(fname.Length - 4, 4);
-                    the_media.Source = new Uri(configurations.GetAbsoluteContributionPath() + item._contribution.id.ToString());
+                    the_media.Source = new Uri(configurations.GetAbsoluteContributionPath() + item._contribution.id.ToString() + "." + window_manager.downloaded_contributions[contribution_id]);
                     the_media.Play();
                     return;
                 }
@@ -122,9 +122,10 @@ namespace nature_net.user_controls
                 }
                 //string fname = i._contribution.media_url;
                 //string ext = fname.Substring(fname.Length - 4, 4);
-                the_media.Source = new Uri(configurations.GetAbsoluteContributionPath() + item._contribution.id.ToString());
+                the_media.Source = new Uri(configurations.GetAbsoluteContributionPath() + item._contribution.id.ToString() + "." + window_manager.downloaded_contributions[contribution_id]);
                 the_media.Play();
                 the_media.MediaOpened += new RoutedEventHandler(the_media_MediaOpened);
+                the_media.MediaEnded += new RoutedEventHandler(the_media_MediaEnded);
                 //the_media.Loaded += new RoutedEventHandler(the_media_Loaded);
             }
 
@@ -133,7 +134,7 @@ namespace nature_net.user_controls
         public void load_image(object arg, DoWorkEventArgs e)
         {
             int contribution_id = (int)e.Argument;
-            if (!window_manager.downloaded_contributions.Contains(contribution_id))
+            if (!window_manager.downloaded_contributions.ContainsKey(contribution_id))
             {
                 naturenet_dataclassDataContext db = database_manager.GetTableTopDB();
                 var result1 = from c in db.Contributions
@@ -144,13 +145,13 @@ namespace nature_net.user_controls
                     Contribution contrib = result1.First<Contribution>();
                     //bool result = file_manager.download_file_from_googledirve(contrib.media_url, contribution_id);
                     bool result = file_manager.download_file(contrib.media_url, contribution_id);
-                    if (result) window_manager.downloaded_contributions.Add(contribution_id);
+                    if (result) window_manager.downloaded_contributions.Add(contribution_id, file_manager.get_extension(contrib.media_url));
                     else e.Result = -1;
                 }
             }
             try
             {
-                ImageSource src = new BitmapImage(new Uri(configurations.GetAbsoluteContributionPath() + contribution_id.ToString()));
+                ImageSource src = new BitmapImage(new Uri(configurations.GetAbsoluteContributionPath() + contribution_id.ToString() + "." + window_manager.downloaded_contributions[contribution_id]));
                 src.Freeze();
                 the_image = src;
                 //window_manager.contributions.Add(contribution_id, src);
@@ -174,7 +175,7 @@ namespace nature_net.user_controls
                         the_item.Height = 40;
                         title_bar.Background = Brushes.LightGray;
                         title_text.Text = "The file is not downloaded yet. Please try again later.";
-                        if (window_manager.downloaded_contributions.Contains(this.contribution_id))
+                        if (window_manager.downloaded_contributions.ContainsKey(this.contribution_id))
                             window_manager.downloaded_contributions.Remove(this.contribution_id);
                     }
                     else
@@ -192,8 +193,17 @@ namespace nature_net.user_controls
         {
             the_media.Visibility = System.Windows.Visibility.Visible;
             the_item.Background = Brushes.White;
-            the_item.Height = the_media.Height;
+
+            double h = the_media.NaturalVideoHeight;//window_manager.contributions[(int)e.Result].Height;
+            double w = the_media.NaturalVideoWidth;//window_manager.contributions[(int)e.Result].Width;
+            the_item.Height = (h / w) * the_item.Width;
             //the_media.Play();
+        }
+
+        void the_media_MediaEnded(object sender, RoutedEventArgs e)
+        {
+            the_media.Position = new TimeSpan(0);
+            the_media.Play();
         }
 
         //void the_media_Loaded(object sender, RoutedEventArgs e)

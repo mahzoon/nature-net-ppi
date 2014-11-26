@@ -145,7 +145,7 @@ namespace nature_net.user_controls
         public void load_image(object arg, DoWorkEventArgs e)
         {
             int contribution_id = (int)e.Argument;
-            if (!window_manager.downloaded_contributions.Contains(contribution_id))
+            if (!window_manager.downloaded_contributions.ContainsKey(contribution_id))
             {
                 naturenet_dataclassDataContext db = database_manager.GetTableTopDB();
                 var result1 = from c in db.Contributions
@@ -156,7 +156,7 @@ namespace nature_net.user_controls
                     Contribution contrib = result1.First<Contribution>();
                     //bool result = file_manager.download_file_from_googledirve(contrib.media_url, contribution_id);
                     bool result = file_manager.download_file(contrib.media_url, contribution_id);
-                    if (result) window_manager.downloaded_contributions.Add(contribution_id);
+                    if (result) window_manager.downloaded_contributions.Add(contribution_id, file_manager.get_extension(contrib.media_url));
                 }
             }
             try

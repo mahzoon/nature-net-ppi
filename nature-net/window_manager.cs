@@ -18,7 +18,9 @@ namespace nature_net
         public static tab_control left_tab;
         public static tab_control right_tab;
 
-        public static List<int> downloaded_contributions = new List<int>();
+        // contribution id, extension
+        public static Dictionary<int, string> downloaded_contributions = new Dictionary<int, string>();
+
         public static Dictionary<int, ImageSource> thumbnails = new Dictionary<int, ImageSource>();
         //public static Dictionary<int, ImageSource> contributions = new Dictionary<int, ImageSource>();
         public static Dictionary<int, MediaPlayer> media = new Dictionary<int, MediaPlayer>();
@@ -334,7 +336,7 @@ namespace nature_net
             {
                 try
                 {
-                    window_manager.downloaded_contributions.Add(Convert.ToInt32(f.Name.Split(new char[] { '.' })[0]));
+                    window_manager.downloaded_contributions.Add(Convert.ToInt32(f.Name.Split(new char[] { '.' })[0]), file_manager.get_extension(f.Name));
                 }
                 catch (Exception e3)
                 {

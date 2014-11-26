@@ -1319,6 +1319,28 @@ namespace nature_net.user_controls
                         activity_item ai = new activity_item();
                         ai.activity = a;
                         ai.count = cnt;
+                        ai.img = null;
+
+                        if (a.avatar != null && a.avatar != "")
+                        {
+                            try
+                            {
+                                if (!configurations.activity_icons_loaded)
+                                {
+                                    System.IO.FileStream file_stream = new System.IO.FileStream(configurations.GetAbsoluteImagePath() + ai.activity.id.ToString() + ".png", System.IO.FileMode.OpenOrCreate);
+                                    file_stream.Close();
+                                    System.Net.WebClient client = new System.Net.WebClient();
+                                    client.Headers.Add("user-agent", "Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.2; .NET CLR 1.0.3705;)");
+                                    client.DownloadFile(a.avatar, configurations.GetAbsoluteImagePath() + ai.activity.id.ToString() + ".png");
+                                }
+
+                                ImageSource src = new BitmapImage(new Uri(configurations.GetAbsoluteImagePath() + ai.activity.id.ToString() + ".png"));
+                                src.Freeze();
+                                ai.img = src;
+                            }
+                            catch (Exception ex) { log.WriteErrorLog(ex); }
+                        }
+
                         if (cnt != 0)
                             ai.username = n1.First().name;
                         else
@@ -1335,6 +1357,7 @@ namespace nature_net.user_controls
                 {
                     e.Result = (object)(new List<activity_item>());
                 }
+                configurations.activity_icons_loaded = true;
             }
             catch (Exception ex)
             {
@@ -1364,12 +1387,19 @@ namespace nature_net.user_controls
                 i.txt_level3.Text = a.username; i.number.Text = a.count.ToString();
                 i.Tag = a.activity.id;
                 i.txt_level1.Visibility = Visibility.Collapsed;
-                i.left_panel.Visibility = Visibility.Collapsed;
+                //i.left_panel.Visibility = Visibility.Collapsed;
+                i.num_likes.Visibility = Visibility.Collapsed;
                 if (item_width != 0) i.Width = item_width;
                 i.Margin = items_margins;
                 i.user_info.Visibility = Visibility.Collapsed; i.user_info_date.Text = i.txt_level2.Text;
                 i.top_value = a.count;
                 i.drag_icon_vertical.Source = configurations.img_drag_vertical_icon;
+                if (a.img != null)
+                {
+                    i.avatar.Source = a.img;
+                    i.avatar.Width = configurations.user_item_avatar_width; i.avatar.Height = configurations.user_item_avatar_width;
+                    i.avatar.Margin = new Thickness(1, 5, 1, 0);
+                }
                 if (configurations.show_vertical_drag) i.drag_icon_vertical_panel.Visibility = Visibility.Visible;
                 this._list.Items.Add(i);
             }
@@ -1404,6 +1434,7 @@ namespace nature_net.user_controls
 
     public class activity_item
     {
+        public ImageSource img;
         public Activity activity;
         public int count;
         public DateTime last_date;

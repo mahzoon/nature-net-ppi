@@ -17,16 +17,17 @@ namespace nature_net
 {
     public class file_manager
     {
-        public static bool download_file(string file_name, int contribution_id)
+        public static bool download_file(string url, int contribution_id)
         {
             try
             {
-                System.IO.FileStream file_stream = new System.IO.FileStream(
-                            configurations.GetAbsoluteContributionPath() + contribution_id.ToString(), System.IO.FileMode.OpenOrCreate);
-                file_stream.Close();
+                //System.IO.FileStream file_stream = new System.IO.FileStream(
+                //            configurations.GetAbsoluteContributionPath() + contribution_id.ToString(), System.IO.FileMode.OpenOrCreate);
+                //file_stream.Close();
+                string extension = get_extension(url);
                 WebClient client = new WebClient();
                 client.Headers.Add("user-agent", "Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.2; .NET CLR 1.0.3705;)");
-                client.DownloadFile(file_name, configurations.GetAbsoluteContributionPath() + contribution_id.ToString());
+                client.DownloadFile(url, configurations.GetAbsoluteContributionPath() + contribution_id.ToString() + "." + extension);
                 return true;
             }
             catch (Exception e)
@@ -34,6 +35,16 @@ namespace nature_net
                 log.WriteErrorLog(e);
                 return false;
             }
+        }
+
+        public static string get_extension(string url)
+        {
+            string extension = "";
+            string[] parts = url.Split(new char[] { '.' });
+            if (parts.Count() > 1)
+                if (parts[parts.Count() - 1].Length < 5)
+                    extension = parts[parts.Count() - 1];
+            return extension;
         }
 
         public static bool download_file_from_googledrive(string file_name, int contribution_id)
