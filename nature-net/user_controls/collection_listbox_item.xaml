@@ -16,14 +16,23 @@
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="*" />
+            <RowDefinition Height="70" />
             <RowDefinition Height="30" />
         </Grid.RowDefinitions>
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="*" />
         </Grid.ColumnDefinitions>
-        <Image Grid.Row="0" Grid.RowSpan="2" x:Name="img" Margin="0,0,7,0"></Image>
-        <TextBlock Name="upload_failed_count"  Grid.Row="0" HorizontalAlignment="Center" TextAlignment="Center" VerticalAlignment="Bottom" Margin="-5,0,0,-40" FontFamily="Calibri" FontSize="18"></TextBlock>
-        <Border Name="drag_panel_border" Grid.Row="1">
+        <Image Grid.Row="0" Grid.RowSpan="3" x:Name="img" Margin="0,0,7,0"></Image>
+        <DockPanel Grid.Row="1" Grid.RowSpan="2" Margin="0,0,7,10">
+            <TextBlock Name="upload_failed_count" TextAlignment="Center" FontFamily="Calibri" FontSize="18" DockPanel.Dock="Top" ></TextBlock>
+            <DockPanel Name="bottom_bar"  VerticalAlignment="Bottom" Background="#4A000000" DockPanel.Dock="Bottom" Height="35" Visibility="Hidden">
+                <StackPanel VerticalAlignment="Center">
+                <TextBlock Name="userinfo" Margin="5,0,0,0" FontFamily="Calibri" FontSize="10" Foreground="White">user</TextBlock>
+                <TextBlock Name="dateinfo" Margin="5,0,0,0" FontFamily="Calibri" FontSize="10" Foreground="White">date</TextBlock>
+                </StackPanel>
+            </DockPanel>
+        </DockPanel>
+        <Border Name="drag_panel_border" Grid.Row="2" Margin="0,0,7,0">
             <DockPanel Name="drag_panel">
                 <Image x:Name="drag" Height="13" DockPanel.Dock="Bottom" VerticalAlignment="Bottom"></Image>
             </DockPanel>

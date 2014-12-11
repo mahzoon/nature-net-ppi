@@ -338,6 +338,7 @@ namespace nature_net.user_controls
             var result1 = from c in db.Collection_Contribution_Mappings
                           where (c.Collection.User.name == (string)e.Argument) && (c.Collection.activity_id != 1)
                           && (c.Contribution.status != configurations.status_deleted)
+                          orderby c.Contribution.date descending
                           select c.Contribution;
             if (result1 == null)
             {
@@ -412,6 +413,12 @@ namespace nature_net.user_controls
                                cli2.img.Source = window_manager.thumbnails[i._contribution.id];
                                cli2.img.Tag = i;
                                cli2.drag.Source = configurations.img_drag_icon;
+                               if (i._contribution.modified_date.HasValue)
+                                   cli2.dateinfo.Text = configurations.GetDate_Formatted(i._contribution.modified_date.Value);
+                               else
+                                   cli2.dateinfo.Text = configurations.GetDate_Formatted(i._contribution.date);
+                               cli2.userinfo.Text = configurations.find_user_of_contribution(i._contribution).name;
+                               cli2.bottom_bar.Visibility = System.Windows.Visibility.Visible;
                            }
                            else
                            {
@@ -488,6 +495,7 @@ namespace nature_net.user_controls
             var result1 = from c in db.Collection_Contribution_Mappings
                           where (c.Contribution.location_id == (int)e.Argument) && (c.Collection.activity_id != 1)
                           && (c.Contribution.status != configurations.status_deleted)
+                          orderby c.Contribution.date descending
                           select c.Contribution;
             //var result1 = from c in db.Contributions
             //              where c.location_id == (int)e.Argument
