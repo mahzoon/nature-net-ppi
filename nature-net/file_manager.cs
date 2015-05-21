@@ -12,6 +12,9 @@ using Google.Apis.Util;
 using DotNetOpenAuth;
 using DotNetOpenAuth.OAuth2;
 using System.IO;
+using nature_net.user_controls;
+using System.Windows.Media;
+using System.Windows.Media.Imaging;
 
 namespace nature_net
 {
@@ -34,6 +37,50 @@ namespace nature_net
             {
                 log.WriteErrorLog(e);
                 return false;
+            }
+        }
+
+        public static void try_downloading_contribution(collection_item ci, bool force_download, bool force_create_thumbnail)
+        {
+            int i = ci._contribution.id;
+            if (!window_manager.downloaded_contributions.ContainsKey(i) || force_download)
+            {
+                //bool result = file_manager.download_file_from_googledirve(c.media_url, i);
+                bool result = file_manager.download_file(ci._contribution.media_url, i);
+                if (result) window_manager.downloaded_contributions.Add(i, file_manager.get_extension(ci._contribution.media_url));
+            }
+
+            if ((!window_manager.thumbnails.ContainsKey(i) || force_create_thumbnail) && window_manager.downloaded_contributions.ContainsKey(i))
+            {
+                ImageSource img = null;
+                if (ci.is_image)
+                    img = configurations.GetThumbnailFromImage(i.ToString() + "." + window_manager.downloaded_contributions[i], configurations.thumbnail_pixel_height);
+                if (ci.is_video)
+                    img = configurations.GetThumbnailFromVideo(i.ToString() + "." + window_manager.downloaded_contributions[i], configurations.thumbnail_video_span, configurations.thumbnail_pixel_height);
+                if (ci.is_audio)
+                    img = configurations.img_sound_image_pic;
+                if (img == null)
+                    return;
+
+                //if (!window_manager.thumbnails.ContainsKey(i))
+                //{
+                // save the thumbnail
+                try
+                {
+                    BitmapSource bs = img as BitmapSource;
+                    if (!ci.is_audio)
+                    {
+                        configurations.SaveThumbnail(bs, i.ToString());
+                    }
+                    img = new BitmapImage(new Uri(configurations.GetAbsoluteThumbnailPath() + i.ToString() + ".jpg"));
+                    img.Freeze();
+                    if (!window_manager.thumbnails.ContainsKey(i) || force_create_thumbnail)
+                        window_manager.thumbnails.Add(i, img);
+                    else
+                        window_manager.thumbnails[i] = img;
+                }
+                catch (Exception) { }   // not a problem
+                //}
             }
         }
 

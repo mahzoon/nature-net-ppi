@@ -1,0 +1,59 @@
+﻿<UserControl x:Class="nature_net.user_controls.help_window"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:uc="clr-namespace:nature_net.user_controls"
+             mc:Ignorable="d" 
+             d:DesignWidth="300">
+    
+    <StackPanel Name="whole">
+        <DockPanel Name="the_item" LastChildFill="False" IsManipulationEnabled="True">
+
+            <DockPanel Name="title_bar" Background="#0000AB00" LastChildFill="False" DockPanel.Dock="top" Panel.ZIndex="1">
+                <TextBlock Name="title_text" DockPanel.Dock="Left" VerticalAlignment="Top" Margin="10,12,10,10"></TextBlock>
+                <Button Name="close" Margin="3" Width="33" Height="33" DockPanel.Dock="Right">
+                    <Button.Style>
+                        <Style>
+                            <Setter Property="Button.Template">
+                                <Setter.Value>
+                                    <ControlTemplate>
+                                        <Border Name="border" BorderThickness="{TemplateBinding BorderThickness}" Padding="{TemplateBinding Padding}" BorderBrush="{TemplateBinding BorderBrush}" CornerRadius="5" Background="{TemplateBinding Background}">
+                                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center" />
+                                        </Border>
+                                    </ControlTemplate>
+                                </Setter.Value>
+                            </Setter>
+                        </Style>
+                    </Button.Style>
+                </Button>
+                <Button Name="pushpin" Margin="3" Width="33" Height="33" DockPanel.Dock="Right">
+                    <Button.Style>
+                        <Style>
+                            <Setter Property="Button.Template">
+                                <Setter.Value>
+                                    <ControlTemplate>
+                                        <Border Name="border" BorderThickness="{TemplateBinding BorderThickness}" Padding="{TemplateBinding Padding}" BorderBrush="{TemplateBinding BorderBrush}" CornerRadius="5" Background="{TemplateBinding Background}">
+                                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center" />
+                                        </Border>
+                                    </ControlTemplate>
+                                </Setter.Value>
+                            </Setter>
+                        </Style>
+                    </Button.Style>
+                </Button>
+            </DockPanel>
+
+            <MediaElement x:Name="the_media" Visibility="Collapsed" LoadedBehavior="Manual" 
+            UnloadedBehavior="Stop" IsManipulationEnabled="True" Panel.ZIndex="0"></MediaElement>
+        </DockPanel>
+        <StackPanel Name="the_content">
+            <DockPanel Name="metadata_panel"  DockPanel.Dock="Top">
+                <StackPanel Margin="5" DockPanel.Dock="Right" VerticalAlignment="Center">
+                    <TextBlock Name="metadata1" TextWrapping="Wrap" VerticalAlignment="Center"></TextBlock>
+                </StackPanel>
+            </DockPanel>
+        </StackPanel>
+    </StackPanel>
+
+</UserControl>

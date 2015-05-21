@@ -60,9 +60,9 @@ namespace nature_net.user_controls
             this.users_listbox.list_users_and_highlight(username, highlight, this.tab);
         }
 
-        public void highlight_design_idea_and_open_it(string title, bool highlight)
+        public void highlight_design_idea_and_open_it(string info, bool highlight)
         {
-            this.design_ideas_listbox.list_design_ideas_and_highlight(title, highlight, this.tab);
+            this.design_ideas_listbox.list_design_ideas_and_highlight(info, highlight, this.tab);
         }
 
         public void load_users()

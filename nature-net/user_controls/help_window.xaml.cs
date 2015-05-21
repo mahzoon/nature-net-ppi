@@ -11,76 +11,93 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
+using System.ComponentModel;
+using System.Windows.Threading;
 
 namespace nature_net.user_controls
 {
     /// <summary>
-    /// Interaction logic for window_frame.xaml
+    /// Interaction logic for help_window.xaml
     /// </summary>
-    public partial class window_frame : UserControl
+    public partial class help_window : UserControl
     {
         private System.Threading.Timer window_killer_timer;
         private bool timer_enabled = true;
         private ImageBrush pushpin_icon;
         private ImageBrush pushpin_selected_icon;
 
-        private int num_updates = 0;
-
-        public window_frame()
+        public help_window()
         {
             InitializeComponent();
 
             //Static Configuration Values:
-            this.Width = configurations.frame_width;
-            //this.title_bar.Background = new SolidColorBrush(Color.;
-            //this.frame.BorderBrush = new SolidColorBrush(Color.;
+            this.the_item.Width = configurations.frame_width;
+            this.the_item.Height = 300;
+            this.the_content.Width = configurations.frame_width;
+            this.the_media.Margin = new Thickness(0, -1 * configurations.frame_title_bar_height, 0, 0);
+            this.metadata_panel.Background = Brushes.LightGray;
+
             this.title_bar.Height = configurations.frame_title_bar_height;
-            this.window_icon.Width = configurations.frame_icon_width;
             var b1 = new ImageBrush();
             b1.ImageSource = configurations.img_close_icon;
             this.close.Background = b1;
+
             pushpin_icon = new ImageBrush();
             pushpin_icon.ImageSource = configurations.img_pushpin_icon;
             pushpin_selected_icon = new ImageBrush();
             pushpin_selected_icon.ImageSource = configurations.img_pushpin_selected_icon;
             this.pushpin.Background = pushpin_icon;
-            this.window_icon.Source = configurations.img_collection_window_icon;
 
             this.close.PreviewTouchDown += new EventHandler<TouchEventArgs>(close_Click);
             this.pushpin.PreviewTouchDown += new EventHandler<TouchEventArgs>(pushpin_Click);
 
-            this.PreviewTouchDown += new EventHandler<TouchEventArgs>(window_frame_PreviewTouchDown);
+            RenderOptions.SetBitmapScalingMode(the_item, configurations.scaling_mode);
+
+            this.PreviewTouchDown += new EventHandler<TouchEventArgs>(help_window_PreviewTouchDown);
         }
 
-        void window_frame_PreviewTouchDown(object sender, TouchEventArgs e)
+        void help_window_PreviewTouchDown(object sender, TouchEventArgs e)
         {
             this.postpone_killer_timer(true);
             e.Handled = false;
         }
 
-        public void set_title(string t)
+        public void view_help(string filename, string caption)
         {
-            this.title.Text = t;
+            this.metadata1.Text = caption;
+            the_media.Source = new Uri(configurations.GetAbsoluteImagePath() + filename);
+            the_media.Play();
+            the_media.MediaOpened += new RoutedEventHandler(the_media_MediaOpened);
+            the_media.MediaEnded += new RoutedEventHandler(the_media_MediaEnded);
+            //the_media.Loaded += new RoutedEventHandler(the_media_Loaded);
         }
 
-        public string get_title()
+        void the_media_MediaOpened(object sender, RoutedEventArgs e)
         {
-            return this.title.Text;
+            the_media.Visibility = System.Windows.Visibility.Visible;
+            the_item.Background = Brushes.White;
+
+            double h = the_media.NaturalVideoHeight;//window_manager.contributions[(int)e.Result].Height;
+            double w = the_media.NaturalVideoWidth;//window_manager.contributions[(int)e.Result].Width;
+            the_item.Height = (h / w) * the_item.Width;
+            //the_media.Play();
+            window_manager.UpdateZOrder(this, true);
+        }
+
+        void the_media_MediaEnded(object sender, RoutedEventArgs e)
+        {
+            the_media.Position = new TimeSpan(0);
+            the_media.Play();
         }
 
         public void set_kill_timer()
         {
-            window_killer_timer = new System.Threading.Timer(new System.Threading.TimerCallback(kill_this_window), this.title.Text, configurations.kill_window_millisec, System.Threading.Timeout.Infinite);
-        }
-
-        public void set_icon(ImageSource ico)
-        {
-            this.window_icon.Source = ico;
+            window_killer_timer = new System.Threading.Timer(new System.Threading.TimerCallback(kill_this_window), null, configurations.kill_window_millisec, System.Threading.Timeout.Infinite);
         }
 
         public void kill_this_window(Object stateInfo)
         {
-            log.WriteInteractionLog(19, "[Auto] frame closed with title: " + (string)stateInfo, null);
+            log.WriteInteractionLog(19, "[Auto] help frame closed.", null);
             this.Dispatcher.BeginInvoke(System.Windows.Threading.DispatcherPriority.Normal, new System.Action(() => { window_manager.close_window(this); }));
         }
 
@@ -93,24 +110,6 @@ namespace nature_net.user_controls
             }
             else
                 this.Dispatcher.BeginInvoke(System.Windows.Threading.DispatcherPriority.Normal, new System.Action(() => { if (timer_enabled) window_killer_timer.Change(configurations.kill_window_millisec, System.Threading.Timeout.Infinite); }));
-        }
-
-        void close_Click(object sender, RoutedEventArgs e)
-        {
-            try { log.WriteInteractionLog(19, "frame closed with title: " + this.title.Text, ((TouchEventArgs)e).TouchDevice); }
-            catch (Exception) { } // the type of e might not be TouchEventArgs
-            this.window_killer_timer.Change(System.Threading.Timeout.Infinite, System.Threading.Timeout.Infinite);
-            this.window_killer_timer.Dispose();
-            window_manager.close_window(this);
-        }
-
-        void pushpin_Click(object sender, RoutedEventArgs e)
-        {
-            bool s = toggle_timer();
-            if (s)
-                this.pushpin.Background = pushpin_icon;
-            else
-                this.pushpin.Background = pushpin_selected_icon;
         }
 
         public void disable_timer(bool same_thread)
@@ -140,12 +139,22 @@ namespace nature_net.user_controls
             return timer_enabled;
         }
 
-        public void UpdateContents()
+        void pushpin_Click(object sender, RoutedEventArgs e)
         {
-            try { window_content w = (window_content)this.window_content.Content; w.UpdateKeyboardPosition(); }
-            catch (Exception) { }
-            try { signup s = (signup)this.window_content.Content; s.UpdateKeyboardLayout(); }
-            catch (Exception) { }
+            bool s = toggle_timer();
+            if (s)
+                this.pushpin.Background = pushpin_icon;
+            else
+                this.pushpin.Background = pushpin_selected_icon;
+        }
+
+        void close_Click(object sender, RoutedEventArgs e)
+        {
+            try { log.WriteInteractionLog(19, "help frame closed.", ((TouchEventArgs)e).TouchDevice); }
+            catch (Exception) { } // e might not be Touch
+            this.window_killer_timer.Change(System.Threading.Timeout.Infinite, System.Threading.Timeout.Infinite);
+            this.window_killer_timer.Dispose();
+            window_manager.close_window(this);
         }
     }
 }

@@ -33,6 +33,8 @@ namespace nature_net.user_controls
         private ImageBrush pushpin_icon;
         private ImageBrush pushpin_selected_icon;
 
+        private int num_updates = 0;
+
         public image_frame()
         {
             InitializeComponent();
@@ -57,11 +59,6 @@ namespace nature_net.user_controls
             pushpin_selected_icon.ImageSource = configurations.img_pushpin_selected_icon;
             this.pushpin.Background = pushpin_icon;
 
-            if (configurations.response_to_mouse_clicks)
-            {
-                this.close.Click += new RoutedEventHandler(close_Click);
-                this.pushpin.Click += new RoutedEventHandler(pushpin_Click);
-            }
             this.close.PreviewTouchDown += new EventHandler<TouchEventArgs>(close_Click);
             this.pushpin.PreviewTouchDown += new EventHandler<TouchEventArgs>(pushpin_Click);
 
@@ -274,7 +271,8 @@ namespace nature_net.user_controls
 
         void close_Click(object sender, RoutedEventArgs e)
         {
-            log.WriteInteractionLog(19, "image frame closed.", ((TouchEventArgs)e).TouchDevice);
+            try { log.WriteInteractionLog(19, "image frame closed.", ((TouchEventArgs)e).TouchDevice); }
+            catch (Exception) { } // e might not be Touch
             this.window_killer_timer.Change(System.Threading.Timeout.Infinite, System.Threading.Timeout.Infinite);
             this.window_killer_timer.Dispose();
             window_manager.close_window(this);

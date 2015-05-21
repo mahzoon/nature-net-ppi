@@ -78,6 +78,10 @@
     <Reference Include="Microsoft.Surface, Version=2.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL" />
     <Reference Include="Microsoft.Surface.Core, Version=2.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL" />
     <Reference Include="Microsoft.Surface.Presentation, Version=2.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL" />
+    <Reference Include="Newtonsoft.Json, Version=6.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>bin\Debug\Newtonsoft.Json.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Data" />
     <Reference Include="System.Data.Linq" />
@@ -100,8 +104,8 @@
     <Compile Include="database_manager.cs" />
     <Compile Include="file_manager.cs" />
     <Compile Include="iniparser.cs" />
-    <Compile Include="list_refresher.cs" />
     <Compile Include="log.cs" />
+    <Compile Include="MouseTouchDevice.cs" />
     <Compile Include="naturenet_dataclass.designer.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
@@ -120,9 +124,6 @@
     <Compile Include="user_controls\collection_listbox_item.xaml.cs">
       <DependentUpon>collection_listbox_item.xaml</DependentUpon>
     </Compile>
-    <Compile Include="user_controls\custom_listbox.xaml.cs">
-      <DependentUpon>custom_listbox.xaml</DependentUpon>
-    </Compile>
     <Compile Include="user_controls\custom_listbox_v2.xaml.cs">
       <DependentUpon>custom_listbox_v2.xaml</DependentUpon>
     </Compile>
@@ -133,6 +134,12 @@
       <DependentUpon>contribution_view.xaml</DependentUpon>
     </Compile>
     <Compile Include="user_controls\FadingScrollViewer.cs" />
+    <Compile Include="user_controls\help_button.xaml.cs">
+      <DependentUpon>help_button.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="user_controls\help_window.xaml.cs">
+      <DependentUpon>help_window.xaml</DependentUpon>
+    </Compile>
     <Compile Include="user_controls\image_frame.xaml.cs">
       <DependentUpon>image_frame.xaml</DependentUpon>
     </Compile>
@@ -198,10 +205,6 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="user_controls\custom_listbox.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
     <Page Include="user_controls\custom_listbox_v2.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
@@ -214,13 +217,21 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
+    <Page Include="user_controls\help_button.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="user_controls\help_window.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="user_controls\image_frame.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="user_controls\item_generic.xaml">
-      <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
     </Page>
     <Page Include="user_controls\item_generic_v2.xaml">
       <SubType>Designer</SubType>

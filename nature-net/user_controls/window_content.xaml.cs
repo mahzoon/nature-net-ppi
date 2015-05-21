@@ -26,10 +26,12 @@ namespace nature_net.user_controls
         private int _object_id;
         private Type _object_type;
 
-        private int comment_user_id;
+        private int activity_id = -1;
+        private int comment_user_id = -1;
+        
         bool expand_state = true;
 
-        bool hide_expander = false;
+        bool is_submit_design_idea = false;
 
         virtual_keyboard keyboard;
         ContentControl keyboard_frame;
@@ -51,18 +53,23 @@ namespace nature_net.user_controls
 
             this.comment_icon.Source = configurations.img_comment_icon;
             this.leave_comment_area_default.Visibility = System.Windows.Visibility.Visible;
+            this.leave_comment_area_activity.Visibility = System.Windows.Visibility.Collapsed;
             this.leave_comment_area_reply.Visibility = System.Windows.Visibility.Collapsed;
             this.leave_comment_area_auth.Visibility = System.Windows.Visibility.Collapsed;
+
             this.submit_comment_default.PreviewTouchDown += new EventHandler<TouchEventArgs>(submit_comment_default_clicked);
+            this.submit_activity.PreviewTouchDown += new EventHandler<TouchEventArgs>(submit_activity_PreviewTouchDown);
+            this.cancel_activity.PreviewTouchDown += new EventHandler<TouchEventArgs>(cancel_activity_PreviewTouchDown);
             this.submit_comment_reply.PreviewTouchDown += new EventHandler<TouchEventArgs>(submit_comment_reply_clicked);
             this.cancel_comment_reply.PreviewTouchDown += new EventHandler<TouchEventArgs>(cancel_comment_reply_clicked);
             this.submit_comment_auth.PreviewTouchDown += new EventHandler<TouchEventArgs>(submit_comment_auth_clicked);
             this.cancel_comment_auth.PreviewTouchDown += new EventHandler<TouchEventArgs>(cancel_comment_auth_clicked);
 
             this.selected_user.AllowDrop = true;
+            this.selected_activity.AllowDrop = true;
             SurfaceDragDrop.AddPreviewDropHandler(this.selected_user, new EventHandler<SurfaceDragDropEventArgs>(item_dropped_on_leave_comment_area_auth));
-            if (configurations.response_to_mouse_clicks)
-                this.expander.Click += new RoutedEventHandler(expander_Click);
+            SurfaceDragDrop.AddPreviewDropHandler(this.selected_activity, new EventHandler<SurfaceDragDropEventArgs>(item_dropped_on_leave_comment_area_activity));
+
             this.expander.PreviewTouchDown += new EventHandler<TouchEventArgs>(expander_Click);
             
             this.comment_textbox_default.GotFocus += new RoutedEventHandler(comment_textbox_GotKeyboardFocus);
@@ -151,18 +158,44 @@ namespace nature_net.user_controls
 
         void expander_Click(object sender, RoutedEventArgs e)
         {
-            if (expand_state) log.WriteInteractionLog(23, "object_type: " + _object_type + "; object_id: " + _object_id.ToString(), ((TouchEventArgs)e).TouchDevice);
-            else log.WriteInteractionLog(22, "object_type: " + _object_type + "; object_id: " + _object_id.ToString(), ((TouchEventArgs)e).TouchDevice);
+            try
+            {
+                if (expand_state) log.WriteInteractionLog(23, "object_type: " + _object_type + "; object_id: " + _object_id.ToString(), ((TouchEventArgs)e).TouchDevice);
+                else log.WriteInteractionLog(22, "object_type: " + _object_type + "; object_id: " + _object_id.ToString(), ((TouchEventArgs)e).TouchDevice);
+            }
+            catch (Exception) { } // e might not be Touch
             ToggleCommentsSection();
         }
 
         void submit_comment_default_clicked(object sender, RoutedEventArgs e)
         {
-            if (hide_expander) // design idea
+            if (is_submit_design_idea) // design idea
+            {
                 log.WriteInteractionLog(28, "Idea; Text: " + this.GetActiveTextBox().Text, ((TouchEventArgs)e).TouchDevice);
+                GoToSelectActMode();
+            }
             else // comment
-                log.WriteInteractionLog(27, "Comment; Text: " + this.GetActiveTextBox().Text + "; object_type: " + _object_type + "; object_id: " + _object_id.ToString() , ((TouchEventArgs)e).TouchDevice);
+            {
+                log.WriteInteractionLog(27, "Comment; Text: " + this.GetActiveTextBox().Text + "; object_type: " + _object_type + "; object_id: " + _object_id.ToString(), ((TouchEventArgs)e).TouchDevice);
+                GotoAuthMode();
+            }
+        }
+
+        void submit_activity_PreviewTouchDown(object sender, TouchEventArgs e)
+        {
             GotoAuthMode();
+        }
+
+        void cancel_activity_PreviewTouchDown(object sender, TouchEventArgs e)
+        {
+            this.submit_activity.IsEnabled = false;
+            if (activity_id != -1)
+            {
+                activity_id = -1;
+                GoToSelectActMode();
+            }
+            else
+                GotoDefaultMode();
         }
 
         void submit_comment_reply_clicked(object sender, RoutedEventArgs e)
@@ -184,9 +217,9 @@ namespace nature_net.user_controls
                 this.error_desc.Visibility = System.Windows.Visibility.Visible;
                 this.error_desc.Content = "Comment text is empty.";
                 if (is_reply)
-                    log.WriteInteractionLog(41, (hide_expander?"Idea":"Comment") + "; Reply id: " + reply_id + "; Text is empty; object_type: " + _object_type + "; object_id: " + _object_id.ToString(), ((TouchEventArgs)e).TouchDevice);
+                    log.WriteInteractionLog(41, (is_submit_design_idea?"Idea":"Comment") + "; Reply id: " + reply_id + "; Text is empty; object_type: " + _object_type + "; object_id: " + _object_id.ToString(), ((TouchEventArgs)e).TouchDevice);
                 else
-                    log.WriteInteractionLog(41, (hide_expander?"Idea":"Comment") + "; Text is empty; object_type: " + _object_type + "; object_id: " + _object_id.ToString(), ((TouchEventArgs)e).TouchDevice);
+                    log.WriteInteractionLog(41, (is_submit_design_idea?"Idea":"Comment") + "; Text is empty; object_type: " + _object_type + "; object_id: " + _object_id.ToString(), ((TouchEventArgs)e).TouchDevice);
                 return;
             }
             // authenticate
@@ -197,17 +230,17 @@ namespace nature_net.user_controls
             if (auth_user.Count() == 1)
             {
                 if (is_reply)
-                    log.WriteInteractionLog(31, (hide_expander ? "Idea" : "Comment") + "; Reply id: " + reply_id + "; Text: " + this.GetActiveTextBox().Text + "; object_type: " + _object_type + "; object_id: " + _object_id.ToString() + "; Username=" + this.selected_user.title.Text, ((TouchEventArgs)e).TouchDevice);
+                    log.WriteInteractionLog(31, (is_submit_design_idea ? "Idea" : "Comment") + "; Reply id: " + reply_id + "; Text: " + this.GetActiveTextBox().Text + "; object_type: " + _object_type + "; object_id: " + _object_id.ToString() + "; Username=" + this.selected_user.title.Text, ((TouchEventArgs)e).TouchDevice);
                 else
-                    log.WriteInteractionLog(31, (hide_expander ? "Idea" : "Comment") + "; Text: " + this.GetActiveTextBox().Text + "; object_type: " + _object_type + "; object_id: " + _object_id.ToString() + "; Username=" + this.selected_user.title.Text, ((TouchEventArgs)e).TouchDevice);
+                    log.WriteInteractionLog(31, (is_submit_design_idea ? "Idea" : "Comment") + "; Text: " + this.GetActiveTextBox().Text + "; object_type: " + _object_type + "; object_id: " + _object_id.ToString() + "; Username=" + this.selected_user.title.Text, ((TouchEventArgs)e).TouchDevice);
                 submit_text(e);
             }
             else
             {
                 if (is_reply)
-                    log.WriteInteractionLog(30, (hide_expander ? "Idea" : "Comment") + "; Reply id: " + reply_id + "; Text: " + this.GetActiveTextBox().Text + "; object_type: " + _object_type + "; object_id: " + _object_id.ToString() + "; Username=" + this.selected_user.title.Text, ((TouchEventArgs)e).TouchDevice);
+                    log.WriteInteractionLog(30, (is_submit_design_idea ? "Idea" : "Comment") + "; Reply id: " + reply_id + "; Text: " + this.GetActiveTextBox().Text + "; object_type: " + _object_type + "; object_id: " + _object_id.ToString() + "; Username=" + this.selected_user.title.Text, ((TouchEventArgs)e).TouchDevice);
                 else
-                    log.WriteInteractionLog(30, (hide_expander ? "Idea" : "Comment") + "; Text: " + this.GetActiveTextBox().Text + "; object_type: " + _object_type + "; object_id: " + _object_id.ToString() + "; Username=" + this.selected_user.title.Text, ((TouchEventArgs)e).TouchDevice);
+                    log.WriteInteractionLog(30, (is_submit_design_idea ? "Idea" : "Comment") + "; Text: " + this.GetActiveTextBox().Text + "; object_type: " + _object_type + "; object_id: " + _object_id.ToString() + "; Username=" + this.selected_user.title.Text, ((TouchEventArgs)e).TouchDevice);
                 this.error_desc.Visibility = System.Windows.Visibility.Visible;
                 this.error_desc.Content = configurations.authentication_failed_text;
                 pin.Reset(true);
@@ -223,22 +256,40 @@ namespace nature_net.user_controls
             this.pin_area.Visibility = System.Windows.Visibility.Collapsed;
             this.pin.Reset(false);
             CheckTextBoxText();
-            if (is_reply)
+            if (comment_user_id != -1)
             {
-                if (e!= null) log.WriteInteractionLog(40, "Reply id was: " + reply_id + "; Text: " + this.GetActiveTextBox().Text + "; object_type: " + _object_type + "; object_id: " + _object_id.ToString(), ((TouchEventArgs)e).TouchDevice);
-                GotoReplyMode();
+                comment_user_id = -1;
+                GotoAuthMode();
             }
             else
             {
-                if (e != null) log.WriteInteractionLog(40, "Text: " + this.GetActiveTextBox().Text + "; object_type: " + _object_type + "; object_id: " + _object_id.ToString(), ((TouchEventArgs)e).TouchDevice);
-                GotoDefaultMode();
+                if (is_reply)
+                {
+                    if (e != null) log.WriteInteractionLog(40, "Reply id was: " + reply_id + "; Text: " + this.GetActiveTextBox().Text + "; object_type: " + _object_type + "; object_id: " + _object_id.ToString(), ((TouchEventArgs)e).TouchDevice);
+                    GotoReplyMode();
+                }
+                else
+                {
+                    if (is_submit_design_idea) // submit design idea
+                    {
+                        //GoToSelectActMode();
+                        this.leave_comment_area_auth.Visibility = System.Windows.Visibility.Collapsed;
+                        this.leave_comment_area_activity.IsEnabled = true;
+                        this.leave_comment_area_activity.Visibility = System.Windows.Visibility.Visible;
+                        this.buttons_activity.Visibility = System.Windows.Visibility.Visible;
+                    }
+                    else
+                    {
+                        if (e != null) log.WriteInteractionLog(40, "Text: " + this.GetActiveTextBox().Text + "; object_type: " + _object_type + "; object_id: " + _object_id.ToString(), ((TouchEventArgs)e).TouchDevice);
+                        GotoDefaultMode();
+                    }
+                }
             }
         }
 
         void submit_text(RoutedEventArgs e)
         {
-            bool is_design_idea = hide_expander;
-            if (is_design_idea)
+            if (is_submit_design_idea)
             {
                 Contribution idea = new Contribution();
                 idea.date = DateTime.Now;
@@ -247,7 +298,7 @@ namespace nature_net.user_controls
                 idea.tags = "Design Idea";
                 idea.status = "to do";
                 database_manager.InsertDesignIdea(idea, this.comment_user_id);
-                int collection_id = configurations.get_or_create_collection(this.comment_user_id, 1, DateTime.Now);
+                int collection_id = configurations.get_or_create_collection(this.comment_user_id, activity_id, DateTime.Now);
                 Collection_Contribution_Mapping map = new Collection_Contribution_Mapping();
                 map.collection_id = collection_id;
                 map.contribution_id = idea.id;
@@ -258,7 +309,7 @@ namespace nature_net.user_controls
                     ((design_ideas_listbox)the_item.Content).list_all_design_ideas();
                 //window_manager.load_design_ideas();
                 log.WriteInteractionLog(42, "Idea" + "; Text: " + this.GetActiveTextBox().Text + "; object_type: " + _object_type + "; object_id: " + _object_id.ToString(), ((TouchEventArgs)e).TouchDevice);
-                window_manager.close_submit_design_idea_window((window_frame)this.parent, idea.note);
+                window_manager.close_submit_design_idea_window((window_frame)this.parent, activity_id, idea.id);
                 //if (((design_ideas_listbox)the_item.Content).parent != null)
                 //    ((design_ideas_listbox)the_item.Content).parent.list_all_design_ideas();
             }
@@ -315,7 +366,7 @@ namespace nature_net.user_controls
             string[] data = (e.Cursor.Data.ToString()).Split(new Char[] { ';' });
             if (data == null) return;
             if (data.Count() < 4) return;
-            string context = data[0];
+            string context = data[0].ToLower();
             if (context == "user")
             {
                 string username = data[3];
@@ -323,14 +374,35 @@ namespace nature_net.user_controls
                 this.selected_user.title.Text = username;
                 this.comment_user_id = user_id;
                 this.selected_user.avatar.Source = new BitmapImage(new Uri(data[2]));
+                this.selected_user.more_info.Visibility = System.Windows.Visibility.Collapsed;
                 this.submit_comment_auth.IsEnabled = true;
                 this.pin_area.Visibility = System.Windows.Visibility.Visible;
                 if (keyboard_frame != null) keyboard_frame.Visibility = System.Windows.Visibility.Collapsed;
                 this.pin.Reset(true);
+                this.submit_comment_auth.Content = "Submit";
                 if (is_reply)
-                    log.WriteInteractionLog(29, (hide_expander ? "Idea" : "Comment") + "; user id: " + user_id + "; reply id: " + reply_id + "; Text: " + this.GetActiveTextBox().Text + "; object_type: " + _object_type + "; object_id: " + _object_id.ToString(), e.Cursor.GetPosition(null).X, e.Cursor.GetPosition(null).Y);
+                    log.WriteInteractionLog(29, (is_submit_design_idea ? "Idea" : "Comment") + "; user id: " + user_id + "; reply id: " + reply_id + "; Text: " + this.GetActiveTextBox().Text + "; object_type: " + _object_type + "; object_id: " + _object_id.ToString(), e.Cursor.GetPosition(null).X, e.Cursor.GetPosition(null).Y);
                 else
-                    log.WriteInteractionLog(29, (hide_expander ? "Idea" : "Comment") + "; user id: " + user_id + "; Text: " + this.GetActiveTextBox().Text + "; object_type: " + _object_type + "; object_id: " + _object_id.ToString(), e.Cursor.GetPosition(null).X, e.Cursor.GetPosition(null).Y);
+                    log.WriteInteractionLog(29, (is_submit_design_idea ? "Idea" : "Comment") + "; user id: " + user_id + "; Text: " + this.GetActiveTextBox().Text + "; object_type: " + _object_type + "; object_id: " + _object_id.ToString(), e.Cursor.GetPosition(null).X, e.Cursor.GetPosition(null).Y);
+            }
+            e.Handled = true;
+        }
+
+        void item_dropped_on_leave_comment_area_activity(object sender, SurfaceDragDropEventArgs e)
+        {
+            string[] data = (e.Cursor.Data.ToString()).Split(new Char[] { ';' });
+            if (data == null) return;
+            if (data.Count() < 4) return;
+            string context = data[0].ToLower();
+            if (context == "design idea type")
+            {
+                this.activity_id = Convert.ToInt32(((item_generic_v2)e.Cursor.Data).Tag);
+                this.selected_activity.title.Text = data[3];
+                this.selected_activity.avatar.Source = new BitmapImage(new Uri(data[2]));
+                this.selected_activity.more_info.Visibility = System.Windows.Visibility.Collapsed;
+                this.submit_activity.IsEnabled = true;
+                if (keyboard_frame != null) keyboard_frame.Visibility = System.Windows.Visibility.Collapsed;
+                //log.WriteInteractionLog(29, (hide_expander ? "Idea" : "Comment") + "; user id: " + user_id + "; Text: " + this.GetActiveTextBox().Text + "; object_type: " + _object_type + "; object_id: " + _object_id.ToString(), e.Cursor.GetPosition(null).X, e.Cursor.GetPosition(null).Y);
             }
             e.Handled = true;
         }
@@ -380,7 +452,7 @@ namespace nature_net.user_controls
         public void initialize_contents(UserControl uc, bool is_design, UserControl parent_frame)
         {
             //this.the_item.Content = uc;
-            this.hide_expander = is_design;
+            this.is_submit_design_idea = is_design;
             //this.expander.Visibility = System.Windows.Visibility.Collapsed;
             this.expander_metadata_panel.Visibility = System.Windows.Visibility.Collapsed;
             this.comments_listbox.Height = 0;
@@ -582,17 +654,55 @@ namespace nature_net.user_controls
         private void PrepareForAuth()
         {
             if (keyboard_frame != null) keyboard_frame.Visibility = System.Windows.Visibility.Collapsed;
-            this.selected_user.title.Text = "Drag your avatar and drop it here.";
+            this.selected_user.title.Text = configurations.choose_user_text;
             this.selected_user.center_panel.VerticalAlignment = VerticalAlignment.Center;
-            this.selected_user.avatar.Source = configurations.img_choose_avatar_pic;
+            this.selected_user.avatar.Source = configurations.img_choose_user_pic;
             this.selected_user.num_likes.Visibility = System.Windows.Visibility.Collapsed;
             this.selected_user.description.Visibility = System.Windows.Visibility.Collapsed;
             this.selected_user.user_info.Visibility = System.Windows.Visibility.Collapsed;
             this.selected_user.right_panel.Visibility = System.Windows.Visibility.Collapsed;
             this.selected_user.Background = Brushes.White;
             this.submit_comment_auth.Width = this.ActualWidth/2;
+            this.submit_comment_auth.Content = "Continue";
             this.cancel_comment_auth.Width = this.ActualWidth / 2;
             this.submit_comment_auth.IsEnabled = false;
+
+            if (configurations.show_help)
+            {
+                this.selected_user.more_info.Visibility = System.Windows.Visibility.Visible;
+                this.selected_user.help.Margin = new Thickness(10, 5, 0, 0);
+                this.selected_user.more_info.HorizontalAlignment = System.Windows.HorizontalAlignment.Left;
+                help_button hb = new help_button();
+                hb.filename = configurations.help_file_drag_user;
+                hb.caption = configurations.help_text_drag_user;
+                this.selected_user.help.Content = hb;
+            }
+        }
+
+        private void PrepareForSelectAct()
+        {
+            if (keyboard_frame != null) keyboard_frame.Visibility = System.Windows.Visibility.Collapsed;
+            this.selected_activity.title.Text = configurations.choose_activity_text;
+            this.selected_activity.center_panel.VerticalAlignment = VerticalAlignment.Center;
+            this.selected_activity.avatar.Source = configurations.img_choose_activity_pic;
+            this.selected_activity.num_likes.Visibility = System.Windows.Visibility.Collapsed;
+            this.selected_activity.description.Visibility = System.Windows.Visibility.Collapsed;
+            this.selected_activity.user_info.Visibility = System.Windows.Visibility.Collapsed;
+            this.selected_activity.right_panel.Visibility = System.Windows.Visibility.Collapsed;
+            this.selected_activity.Background = Brushes.White;
+            this.submit_activity.Width = this.ActualWidth / 2;
+            this.cancel_activity.Width = this.ActualWidth / 2;
+            this.submit_activity.IsEnabled = false;
+
+            if (configurations.show_help)
+            {
+                this.selected_activity.more_info.Visibility = System.Windows.Visibility.Visible;
+                this.selected_activity.help.Margin = new Thickness(0, -20, 5, 0);
+                help_button hb = new help_button();
+                hb.filename = configurations.help_file_drag_designidea;
+                hb.caption = configurations.help_text_drag_designidea;
+                this.selected_activity.help.Content = hb;
+            }
         }
 
         private void CheckTextBoxText()
@@ -600,7 +710,7 @@ namespace nature_net.user_controls
             if (GetActiveTextBox().Text == "")
             {
                 GetActiveTextBox().Foreground = Brushes.Gray;
-                if (hide_expander)
+                if (is_submit_design_idea)
                     GetActiveTextBox().Text = configurations.design_idea_init_text;
                 else
                     GetActiveTextBox().Text = configurations.comment_init_text;
@@ -649,6 +759,7 @@ namespace nature_net.user_controls
             this.submit_comment_default.Visibility = System.Windows.Visibility.Visible;
 
             this.leave_comment_area_default.Visibility = System.Windows.Visibility.Visible;
+            this.leave_comment_area_activity.Visibility = System.Windows.Visibility.Collapsed;
             this.leave_comment_area_reply.Visibility = System.Windows.Visibility.Collapsed;
             this.leave_comment_area_auth.Visibility = System.Windows.Visibility.Collapsed;
             if (is_reply)
@@ -663,6 +774,19 @@ namespace nature_net.user_controls
             //if (keyboard_frame != null) keyboard_frame.Visibility = System.Windows.Visibility.Collapsed;
             UpdateKeyboardPosition();
             //CheckTextBoxText();
+        }
+
+        private void GoToSelectActMode()
+        {
+            this.leave_comment_area_default.IsEnabled = false;
+            this.submit_comment_default.Visibility = System.Windows.Visibility.Collapsed;
+            this.leave_comment_area_auth.Visibility = System.Windows.Visibility.Collapsed;
+
+            this.leave_comment_area_activity.Visibility = System.Windows.Visibility.Visible;
+            this.buttons_activity.Visibility = System.Windows.Visibility.Visible;
+            this.leave_comment_area_activity.IsEnabled = true;
+
+            PrepareForSelectAct();
         }
 
         private void GotoReplyMode()
@@ -686,8 +810,16 @@ namespace nature_net.user_controls
             }
             else
             {
-                this.leave_comment_area_default.IsEnabled = false;
-                this.submit_comment_default.Visibility = System.Windows.Visibility.Collapsed;
+                if (is_submit_design_idea) // submit design idea
+                {
+                    this.leave_comment_area_activity.IsEnabled = false;
+                    this.buttons_activity.Visibility = System.Windows.Visibility.Collapsed;
+                }
+                else
+                {
+                    this.leave_comment_area_default.IsEnabled = false;
+                    this.submit_comment_default.Visibility = System.Windows.Visibility.Collapsed;
+                }
             }
             //this.leave_comment_area_default.Visibility = System.Windows.Visibility.Collapsed;
             //this.leave_comment_area_reply.Visibility = System.Windows.Visibility.Collapsed;

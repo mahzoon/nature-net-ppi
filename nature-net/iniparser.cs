@@ -193,7 +193,7 @@ namespace nature_net
             if (!data.ContainsKey(section))
                 return defaultValue;
             string v = data[section][key];
-            if (string.IsNullOrEmpty(v))
+            if (v == null)
                 return defaultValue;
             TypeConverter conv = TypeDescriptor.GetConverter(t);
             if (conv == null)

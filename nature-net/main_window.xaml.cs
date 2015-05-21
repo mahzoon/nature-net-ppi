@@ -46,6 +46,8 @@ namespace nature_net
                     window_manager.refresh_thumbnails();
 
                 InitializeComponent();
+                if (configurations.response_to_mouse_clicks)
+                    MouseTouchDevice.RegisterEvents(this);
 
                 this.Loaded += new RoutedEventHandler(MainWindow_Loaded);
                 this.Unloaded += new RoutedEventHandler(MainWindow_Unloaded);
@@ -89,12 +91,12 @@ namespace nature_net
 
         void MainWindow_Closing(object sender, System.ComponentModel.CancelEventArgs e)
         {
-            configurations.SaveConfigurations(parser);
+            //configurations.SaveConfigurations(parser);
         }
 
         void MainWindow_Unloaded(object sender, RoutedEventArgs e)
         {
-            configurations.SaveConfigurations(parser);
+            //configurations.SaveConfigurations(parser);
         }
 
         void update_changes(Object stateInfo)
@@ -162,7 +164,7 @@ namespace nature_net
         {
             string[] data = (e.Cursor.Data.ToString()).Split(new Char[] { ';' });
             if (data == null) return;
-            string context = data[0];
+            string context = data[0].ToLower();
             if (context == "user")
             {
                 if (data.Count() < 4) return;
@@ -173,20 +175,32 @@ namespace nature_net
                     e.Cursor.GetPosition(sender as IInputElement).X, e.Cursor.GetPosition(sender as IInputElement).Y);
                 e.Handled = true;
             }
-            if (context == "design idea")
+            if (context == "design idea type")
             {
-                if (data.Count() < 7) return;
-                log.WriteInteractionLog(16, "design idea opened by dragging; contribution id: " + data[1], e.Cursor.GetPosition(null).X, e.Cursor.GetPosition(null).Y);
+                //if (data.Count() < 7) return;
+                item_generic_v2 item = (item_generic_v2)e.Cursor.Data;
+                log.WriteInteractionLog(16, "design idea type opened by dragging; activity id: " + item.Tag,
+                    e.Cursor.GetPosition(null).X, e.Cursor.GetPosition(null).Y);
                 //window_manager.open_design_idea_window(data, e.Cursor.GetPosition(sender as IInputElement).X, e.Cursor.GetPosition(sender as IInputElement).Y);
-                window_manager.open_design_idea_window((item_generic_v2)e.Cursor.Data, e.Cursor.GetPosition(sender as IInputElement).X, e.Cursor.GetPosition(sender as IInputElement).Y);
+                //window_manager.open_design_idea_window((item_generic_v2)e.Cursor.Data, e.Cursor.GetPosition(sender as IInputElement).X, e.Cursor.GetPosition(sender as IInputElement).Y);
+                window_manager.open_activity_window(item.title.Text, Convert.ToInt32(item.Tag), e.Cursor.GetPosition(sender as IInputElement).X, e.Cursor.GetPosition(sender as IInputElement).Y);
                 e.Handled = true;
             }
-            if (context == "Image" || context == "Audio" || context == "Video" || context == "Media")
+            if (context == "design idea" || context == "birdcounting")
+            {
+                item_generic_v2 item = configurations.get_item_visuals((collection_item)e.Cursor.Data);
+                log.WriteInteractionLog(16, "design idea opened by dragging; contribution id: " + item.Tag,
+                    e.Cursor.GetPosition(null).X, e.Cursor.GetPosition(null).Y);
+                //window_manager.open_design_idea_window(data, e.Cursor.GetPosition(sender as IInputElement).X, e.Cursor.GetPosition(sender as IInputElement).Y);
+                window_manager.open_design_idea_window(item, e.Cursor.GetPosition(sender as IInputElement).X, e.Cursor.GetPosition(sender as IInputElement).Y);
+                e.Handled = true;
+            }
+            if (context == "image" || context == "audio" || context == "video" || context == "media")
             {
                 nature_net.user_controls.collection_item ci = (nature_net.user_controls.collection_item)(e.Cursor.Data);
                 log.WriteInteractionLog(17, context + " contribution opened by dragging; contribution id: " + ci._contribution.id, e.Cursor.GetPosition(null).X, e.Cursor.GetPosition(null).Y);
                 window_manager.open_contribution_window(ci, e.Cursor.GetPosition(sender as IInputElement).X,
-                    e.Cursor.GetPosition(sender as IInputElement).Y, context);
+                    e.Cursor.GetPosition(sender as IInputElement).Y);
                 e.Handled = true;
             }
             if (context == "comment")
@@ -256,10 +270,13 @@ namespace nature_net
             center = matrix.Transform(center);
             image_frame iframe = null;
             window_frame wframe = null;
+            help_window hwin = null;
             Matrix matrix2 = ((MatrixTransform)element.LayoutTransform).Matrix;
             try { wframe = (window_frame)element; wframe.postpone_killer_timer(true); }
             catch (Exception) { }
             try { iframe = (image_frame)element; iframe.postpone_killer_timer(true); }
+            catch (Exception) { }
+            try { hwin = (help_window)element; hwin.postpone_killer_timer(true); }
             catch (Exception) { }
 
             double x = 0;
@@ -288,6 +305,27 @@ namespace nature_net
                 iframe.close.Width = 33;
                 iframe.UpdateLayout();
             }
+            if (hwin != null && hwin.the_item != null)
+            {
+                UIElement o = (UIElement)e.ManipulationContainer;
+                System.Windows.Point new_point = o.TranslatePoint(e.ManipulationOrigin, hwin.the_item);
+                double old_width = hwin.the_item.Width;
+                double old_height = hwin.the_item.Height; // height is null for the video
+
+                hwin.the_item.Width = hwin.the_item.Width * deltaManipulation.Scale.X;
+                hwin.the_item.Height = hwin.the_item.Height * deltaManipulation.Scale.X;
+
+                x = (new_point.X / old_width) * (hwin.the_item.Width - old_width);
+                y = (new_point.Y / old_height) * (hwin.the_item.Height - old_height);
+
+                ps1 = hwin.the_item.PointToScreen(new System.Windows.Point(0, 0));
+                ps2 = hwin.the_item.PointToScreen(new System.Windows.Point(hwin.the_item.Width, hwin.the_item.Height));
+
+                hwin.title_bar.Height = configurations.frame_title_bar_height;
+                hwin.close.Height = 33;
+                hwin.close.Width = 33;
+                hwin.UpdateLayout();
+            }
 
             matrix.RotateAt(e.DeltaManipulation.Rotation, e.ManipulationOrigin.X, e.ManipulationOrigin.Y);// center.X, center.Y);
             //if (element.PointToScreen(new System.Windows.Point(0, 0)).X > 300 && e.DeltaManipulation.Translation.X > 0)
@@ -312,6 +350,7 @@ namespace nature_net
                 catch (Exception) { }
                 try { user_controls.image_frame w2 = (user_controls.image_frame)element; w2.UpdateContents(); }
                 catch (Exception) { }
+                window_manager.UpdateZOrder(element, true);
             }
         }
 

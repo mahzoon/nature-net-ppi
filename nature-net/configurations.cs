@@ -7,6 +7,9 @@ using System.Reflection;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows;
+using nature_net.user_controls;
+using Newtonsoft.Json;
+using System.Windows.Controls;
 
 namespace nature_net
 {
@@ -30,7 +33,9 @@ namespace nature_net
         public static string activities_date_desc = "Last Update: ";
         public static string activities_num_desc = "Contributions";
         public static string authentication_failed_text = "Whoops! That PIN was incorrect. Please try again.";
-        public static string frame_title = "Observations";
+        public static string frame_title_user_collection = "'s Observations";
+        public static string frame_title_location_collection = "Observations";
+        public static string frame_title_activity_collection = "";
         public static string affiliation_aces = "ACES";
         public static string status_implemented = "implemented";
         public static string status_deleted = "deleted";
@@ -39,6 +44,14 @@ namespace nature_net
         public static string status_initial_string = "";
         public static string default_user_text = "Anonymous";
         public static string default_user_desc = " (via web)";
+        public static string choose_user_text = "Drag your avatar and drop it here.";
+        public static string choose_activity_text = "Drag a design idea category and drop it here.";
+        public static string help_text = "Help";
+
+        public static string help_file_drag_user = "help1.mp4";
+        public static string help_text_drag_user = "Draggin user to open a collection";
+        public static string help_file_drag_designidea = "help1.mp4";
+        public static string help_text_drag_designidea = "Draggin user to open a collection";
 
         public static string signup_item_title = "Sign up";
         public static string submit_idea_item_title = "Submit Idea";
@@ -57,6 +70,7 @@ namespace nature_net
         public static bool top_most = false;
         public static bool show_update_label = false;
         public static bool response_to_mouse_clicks = true;
+        public static bool show_help = true;
         public static bool enable_single_rotation = true;
 
         public static int max_num_content_update = 12;
@@ -145,7 +159,9 @@ namespace nature_net
         static string keyboard_shift_pic = "NN_Keyboard_v2_shift.png";
         static string keyboard_caps_pic = "NN_Keyboard_v2_caps.png";
         static string keyboard_numpad_pic = "NN_Numpad.png";
-        static string choose_avatar_pic = "avatar.png";
+        static string choose_avatar_pic = "choose_avatar.png";
+        static string choose_user_pic = "choose_user.png";
+        static string choose_activity_pic = "choose_activity.png";
         static string close_icon = "close.png";
         static string pushpin_icon = "NN_PinButton.png";
         static string pushpin_selected_icon = "NN_PinButton_selected.png";
@@ -177,6 +193,8 @@ namespace nature_net
         public static ImageSource img_keyboard_caps_pic;
         public static ImageSource img_keyboard_numpad_pic;
         public static ImageSource img_choose_avatar_pic;
+        public static ImageSource img_choose_user_pic;
+        public static ImageSource img_choose_activity_pic;
         public static ImageSource img_close_icon;
         public static ImageSource img_pushpin_icon;
         public static ImageSource img_pushpin_selected_icon;
@@ -292,6 +310,8 @@ namespace nature_net
             img_keyboard_caps_pic = new BitmapImage(new Uri(configurations.GetAbsoluteImagePath() + keyboard_caps_pic));
             img_keyboard_numpad_pic = new BitmapImage(new Uri(configurations.GetAbsoluteImagePath() + keyboard_numpad_pic));
             img_choose_avatar_pic = new BitmapImage(new Uri(configurations.GetAbsoluteImagePath() + choose_avatar_pic));
+            img_choose_user_pic = new BitmapImage(new Uri(configurations.GetAbsoluteImagePath() + choose_user_pic));
+            img_choose_activity_pic = new BitmapImage(new Uri(configurations.GetAbsoluteImagePath() + choose_activity_pic));
             img_close_icon = new BitmapImage(new Uri(configurations.GetAbsoluteImagePath() + close_icon));
             img_collection_window_icon = new BitmapImage(new Uri(configurations.GetAbsoluteImagePath() + collection_window_icon));
             img_signup_window_icon = new BitmapImage(new Uri(configurations.GetAbsoluteImagePath() + signup_window_icon));
@@ -689,7 +709,9 @@ namespace nature_net
             users_no_date = parser.GetValue("General", "users_no_date", "Just Created");
             activities_date_desc = parser.GetValue("General", "activities_date_desc", "Last Update: ");
             activities_num_desc = parser.GetValue("General", "activities_num_desc", "Contributions");
-            frame_title = parser.GetValue("General", "frame_title", "Observations");
+            frame_title_user_collection = parser.GetValue("General", "frame_title_user_collection", " Observations");
+            frame_title_location_collection = parser.GetValue("General", "frame_title_location_collection", "");
+            frame_title_activity_collection = parser.GetValue("General", "frame_title_activity_collection", " Contributions");
             affiliation_aces = parser.GetValue("General", "affiliation_aces", "ACES");
             status_implemented = parser.GetValue("General", "status_implemented", "implemented");
             status_deleted = parser.GetValue("General", "status_deleted", "deleted");
@@ -698,6 +720,16 @@ namespace nature_net
             status_initial_string = parser.GetValue("General", "status_initial_string", "");
             default_user_text = parser.GetValue("General", "default_user_text", "Anonymous");
             default_user_desc = parser.GetValue("General", "default_user_desc", default_user_desc);
+            choose_user_text = parser.GetValue("General", "choose_user_text", choose_user_text);
+            choose_activity_text = parser.GetValue("General", "choose_activity_text", choose_activity_text);
+
+            // Help
+            show_help = parser.GetValue("Help", "show_help", true);
+            help_text = parser.GetValue("Help", "help_text", help_text);
+            help_file_drag_user = parser.GetValue("Help", "help_file_drag_user", help_file_drag_user);
+            help_text_drag_user = parser.GetValue("Help", "help_text_drag_user", help_text_drag_user);
+            help_file_drag_designidea = parser.GetValue("Help", "help_file_drag_designidea", help_file_drag_designidea);
+            help_text_drag_designidea = parser.GetValue("Help", "help_text_drag_designidea", help_text_drag_designidea);
 
             // Parameters
             high_contrast = parser.GetValue("Parameters", "high_contrast", false);
@@ -775,6 +807,9 @@ namespace nature_net
             keyboard_shift_pic = parser.GetValue("Files", "keyboard_shift_pic", "NN_Keyboard_v2_shift.png");
             keyboard_caps_pic = parser.GetValue("Files", "keyboard_caps_pic", "NN_Keyboard_v2_caps.png");
             keyboard_numpad_pic = parser.GetValue("Files", "keyboard_numpad_pic", "NN_Numpad.png");
+            choose_avatar_pic = parser.GetValue("Files", "choose_avatar_pic", "choose_avatar.png");
+            choose_activity_pic = parser.GetValue("Files", "choose_activity_pic", "choose_activity.png");
+            choose_user_pic = parser.GetValue("Files", "choose_user_pic", "choose_user.png");
             close_icon = parser.GetValue("Files", "close_icon", "close.png");
             pushpin_icon = parser.GetValue("Files", "pushpin_icon", "NN_PinButton.png");
             pushpin_selected_icon = parser.GetValue("Files", "pushpin_selected_icon", "NN_PinButton_selected.png");
@@ -808,21 +843,6 @@ namespace nature_net
             parser.SetValue("Locations", "location_dot_color", location_dot_color);
             parser.SetValue("Locations", "location_dot_outline_color", location_dot_outline_color);
             parser.SetValue("Locations", "location_dot_font_color", location_dot_font_color);
-
-            // General variables
-            //parser.SetValue("General", "line_break", "\"" + line_break.ToString() + "\"");
-            parser.SetValue("General", "log_file", log_file);
-            parser.SetValue("General", "contribution_comment_date", contribution_comment_date);
-            parser.SetValue("General", "contribution_comment_tag", contribution_comment_tag);
-            parser.SetValue("General", "contribution_comment_location", contribution_comment_location);
-            parser.SetValue("General", "designidea_date_desc", designidea_date_desc);
-            parser.SetValue("General", "designidea_num_desc", designidea_num_desc);
-            parser.SetValue("General", "users_date_desc", users_date_desc);
-            parser.SetValue("General", "users_num_desc", users_num_desc);
-            parser.SetValue("General", "users_no_date", users_no_date);
-            parser.SetValue("General", "activities_date_desc", activities_date_desc);
-            parser.SetValue("General", "activities_num_desc", activities_num_desc);
-            parser.SetValue("General", "frame_title", frame_title);
 
             // Parameters
             parser.SetValue("Parameters", "high_contrast", high_contrast);
@@ -865,54 +885,6 @@ namespace nature_net
             parser.SetValue("Parameters", "update_period_ms", update_period_ms);
             parser.SetValue("Parameters", "scaling_mode", scaling_mode);
             parser.SetValue("Parameters", "click_opacity_on_collection_item", click_opacity_on_collection_item);
-
-            // Google Drive
-            parser.SetValue("GoogleDrive", "googledrive_directory_id", googledrive_directory_id);
-            parser.SetValue("GoogleDrive", "googledrive_client_id", googledrive_client_id);
-            parser.SetValue("GoogleDrive", "googledrive_client_secret", googledrive_client_secret);
-            parser.SetValue("GoogleDrive", "googledrive_storage", googledrive_storage);
-            parser.SetValue("GoogleDrive", "googledrive_key", googledrive_key);
-            parser.SetValue("GoogleDrive", "googledrive_refresh_token", googledrive_refresh_token);
-            parser.SetValue("GoogleDrive", "googledrive_lastchange", googledrive_lastchange);
-            parser.SetValue("GoogleDrive", "googledrive_userfilename", googledrive_userfilename);
-            parser.SetValue("GoogleDrive", "googledrive_userfiletitle", googledrive_userfiletitle);
-            parser.SetValue("GoogleDrive", "googledrive_ideafilename", googledrive_ideafilename);
-            parser.SetValue("GoogleDrive", "googledrive_ideafiletitle", googledrive_ideafiletitle);
-            parser.SetValue("GoogleDrive", "download_buffer_size", download_buffer_size); // 10KB = 10 * 1024
-
-            // Paths
-            parser.SetValue("Paths", "image_path", image_path);
-            parser.SetValue("Paths", "avatar_path", avatar_path);
-            parser.SetValue("Paths", "thumbnails_path", thumbnails_path);
-            parser.SetValue("Paths", "contributions_path", contributions_path);
-
-            // Files
-            //parser.SetValue("Files", "background_pic", background_pic);
-            //parser.SetValue("Files", "drop_avatar_pic", drop_avatar_pic);
-            //parser.SetValue("Files", "loading_image_pic", loading_image_pic);
-            //parser.SetValue("Files", "empty_image_pic", empty_image_pic);
-            //parser.SetValue("Files", "not_found_image_pic", not_found_image_pic);
-            //parser.SetValue("Files", "sound_image_pic", sound_image_pic);
-            //parser.SetValue("Files", "video_image_pic", video_image_pic);
-            //parser.SetValue("Files", "keyboard_pic", keyboard_pic);
-            //parser.SetValue("Files", "keyboard_shift_pic", keyboard_shift_pic);
-            //parser.SetValue("Files", "keyboard_caps_pic", keyboard_caps_pic);
-            //parser.SetValue("Files", "keyboard_numpad_pic", keyboard_numpad_pic);
-            //parser.SetValue("Files", "close_icon", close_icon);
-            //parser.SetValue("Files", "change_view_list_icon", change_view_list_icon);
-            //parser.SetValue("Files", "change_view_stack_icon", change_view_stack_icon);
-            //parser.SetValue("Files", "collection_window_icon", collection_window_icon);
-            //parser.SetValue("Files", "signup_icon", signup_icon);
-            //parser.SetValue("Files", "signup_window_icon", signup_window_icon);
-            //parser.SetValue("Files", "submit_idea_icon", submit_idea_icon);
-            //parser.SetValue("Files", "thumbs_up_icon", thumbs_up_icon);
-            //parser.SetValue("Files", "thumbs_down_icon", thumbs_down_icon);
-            //parser.SetValue("Files", "keyboard_click_wav", keyboard_click_wav);
-            //parser.SetValue("Files", "drag_icon", drag_icon);
-            //parser.SetValue("Files", "drag_vertical_icon", drag_vertical_icon);
-            //parser.SetValue("Files", "comment_icon", comment_icon);
-            //parser.SetValue("Files", "reply_icon", reply_icon);
-            //parser.SetValue("Files", "affiliation_icon", affiliation_icon);
 
             // Frame
             parser.SetValue("Frame", "frame_width", frame_width);
@@ -1069,6 +1041,370 @@ namespace nature_net
             if (users == null) return null;
             if (users.Count() == 0) return null;
             return users.First<User>();
+        }
+
+        public static Activity find_activity_of_contribution(Contribution c)
+        {
+            naturenet_dataclassDataContext db = database_manager.GetTableTopDB();
+            var activities = from mappings in db.Collection_Contribution_Mappings
+                             where mappings.contribution_id == c.id
+                             select mappings.Collection.Activity;
+            if (activities == null) return null;
+            if (activities.Count() == 0) return null;
+            return activities.First<Activity>();
+        }
+
+        public static string get_display_text_for_birdcounting(string note_content, string activity_info)
+        {
+            string text_to_display = "";
+            try
+            {
+                NoteContent nc = JsonConvert.DeserializeObject<NoteContent>(note_content);
+                Extras ex = JsonConvert.DeserializeObject<Extras>(activity_info);
+                foreach (BirdInfo b_a in ex.birds)
+                {
+                    foreach (BirdInfo b_n in nc.birds)
+                    {
+                        if (b_n.name == b_a.name)
+                            text_to_display = text_to_display + "\r\n" + b_a.name + ": " + b_n.count;
+                    }
+                }
+                if (text_to_display.Length > 2)
+                    text_to_display = text_to_display.Substring(2);
+            }
+            catch (Exception) { } // try to make sense of what is stored in note content but if couldnt no worries
+            if (text_to_display == "")
+            {
+                // default text
+                try
+                {
+                    Extras ex = JsonConvert.DeserializeObject<Extras>(activity_info);
+                    foreach (BirdInfo b_a in ex.birds)
+                        text_to_display = text_to_display + "\r\n" + b_a.name + ": 0";
+                    if (text_to_display.Length > 2)
+                        text_to_display.Substring(2);
+                }
+                catch (Exception) { }
+            }
+            return text_to_display;
+        }
+
+        public static List<Contribution> get_contributions_for_activity(int activity_id, bool include_birdcounting)
+        {
+            naturenet_dataclassDataContext db = database_manager.GetTableTopDB();
+            List<Contribution> list_a = new List<Contribution>();
+            var result_a = from c0 in db.Collection_Contribution_Mappings
+                           where c0.Collection.activity_id == activity_id
+                           && (c0.Contribution.status != configurations.status_deleted)
+                           && (c0.Contribution.tags != "BirdCounting")
+                           select c0.Contribution;
+            if (result_a != null)
+                list_a = result_a.ToList<Contribution>();
+            List<Contribution> list_b = new List<Contribution>();
+            if (include_birdcounting)
+            {
+                var result_b = from c0 in db.Collection_Contribution_Mappings
+                               where c0.Collection.activity_id == activity_id
+                               && (c0.Contribution.status != configurations.status_deleted)
+                               && (c0.Contribution.tags == "BirdCounting")
+                               orderby c0.Contribution.date descending
+                               group c0 by new { c0.Contribution.date.Date, c0.Collection.User.name } into groups
+                               select groups.OrderByDescending(p => p.Contribution.date).First().Contribution;
+                if (result_b != null)
+                    list_b = result_b.ToList<Contribution>();
+            }
+            list_a.AddRange(list_b);
+            list_a = list_a.OrderByDescending(p => p.date).ToList<Contribution>();
+            return list_a;
+        }
+
+        public static List<Contribution> get_contributions_for_user(string username, bool include_birdcounting, bool include_designideas)
+        {
+            naturenet_dataclassDataContext db = database_manager.GetTableTopDB();
+            List<Contribution> list_a = new List<Contribution>();
+            var result_a = from c0 in db.Collection_Contribution_Mappings
+                           where (c0.Collection.User.name == username)
+                           && (c0.Contribution.status != configurations.status_deleted)
+                           && (c0.Contribution.tags != "BirdCounting")
+                           && (c0.Contribution.tags != "Design Idea")
+                           select c0.Contribution;
+            if (result_a != null)
+                list_a = result_a.ToList<Contribution>();
+            
+            List<Contribution> list_b = new List<Contribution>();
+            if (include_birdcounting)
+            {
+                var result_b = from c0 in db.Collection_Contribution_Mappings
+                               where (c0.Collection.User.name == username)
+                                && (c0.Contribution.status != configurations.status_deleted)
+                                && (c0.Contribution.tags == "BirdCounting")
+                               orderby c0.Contribution.date descending
+                               group c0 by new { c0.Contribution.date.Date, c0.Collection.User.name } into groups
+                               select groups.OrderByDescending(p => p.Contribution.date).First().Contribution;
+                if (result_b != null)
+                    list_b = result_b.ToList<Contribution>();
+            }
+            list_a.AddRange(list_b);
+
+            List<Contribution> list_c = new List<Contribution>();
+            if (include_designideas)
+            {
+                var result_c = from c0 in db.Collection_Contribution_Mappings
+                               where (c0.Collection.User.name == username)
+                                && (c0.Contribution.status != configurations.status_deleted)
+                                && (c0.Contribution.tags == "Design Idea")
+                               select c0.Contribution;
+                if (result_c != null)
+                    list_c = result_c.ToList<Contribution>();
+            }
+            list_a.AddRange(list_c);
+
+            list_a = list_a.OrderByDescending(p => p.date).ToList<Contribution>();
+            return list_a;
+        }
+
+        public static List<Contribution> get_contributions_for_location(int location_id, bool include_birdcounting, bool include_designideas)
+        {
+            naturenet_dataclassDataContext db = database_manager.GetTableTopDB();
+            List<Contribution> list_a = new List<Contribution>();
+            var result_a = from c0 in db.Collection_Contribution_Mappings
+                           where (c0.Contribution.location_id == location_id)
+                           && (c0.Contribution.status != configurations.status_deleted)
+                           && (c0.Contribution.tags != "BirdCounting")
+                           && (c0.Contribution.tags != "Design Idea")
+                           select c0.Contribution;
+            if (result_a != null)
+                list_a = result_a.ToList<Contribution>();
+
+            List<Contribution> list_b = new List<Contribution>();
+            if (include_birdcounting)
+            {
+                var result_b = from c0 in db.Collection_Contribution_Mappings
+                               where (c0.Contribution.location_id == location_id)
+                                && (c0.Contribution.status != configurations.status_deleted)
+                                && (c0.Contribution.tags == "BirdCounting")
+                               orderby c0.Contribution.date descending
+                               group c0 by new { c0.Contribution.date.Date, c0.Collection.User.name } into groups
+                               select groups.OrderByDescending(p => p.Contribution.date).First().Contribution;
+                if (result_b != null)
+                    list_b = result_b.ToList<Contribution>();
+            }
+            list_a.AddRange(list_b);
+
+            List<Contribution> list_c = new List<Contribution>();
+            if (include_designideas)
+            {
+                var result_c = from c0 in db.Collection_Contribution_Mappings
+                               where (c0.Contribution.location_id == location_id)
+                                && (c0.Contribution.status != configurations.status_deleted)
+                                && (c0.Contribution.tags == "Design Idea")
+                               select c0.Contribution;
+                if (result_c != null)
+                    list_c = result_c.ToList<Contribution>();
+            }
+            list_a.AddRange(list_c);
+
+            list_a = list_a.OrderByDescending(p => p.date).ToList<Contribution>();
+            return list_a;
+        }
+
+        public static collection_item create_collection_item_from_contribution(Contribution c)
+        {
+            collection_item ci = new collection_item();
+            ci._contribution = c;
+            ci.text_to_display = c.note;
+
+            if (c.tags != null)
+            {
+                if (c.tags.Contains("Photo"))
+                    ci.is_image = true;
+                if (c.tags.Contains("Video"))
+                    ci.is_video = true;
+                if (c.tags.Contains("Audio"))
+                    ci.is_audio = true;
+                if (c.tags.Contains("Design Idea"))
+                {
+                    ci.should_have_media = false;
+                }
+                if (c.tags.Contains("BirdCounting"))
+                {
+                    ci.should_have_media = false;
+                }
+                ci.contribution_type = c.tags;
+            }
+
+            if (ci.contribution_type == "BirdCounting")
+            {
+                Activity a = configurations.find_activity_of_contribution(c);
+                string[] activity_info = a.technical_info.Split(new char[] { ';' });
+                if (activity_info.Count() > 2)
+                {
+                    ci.text_to_display = configurations.get_display_text_for_birdcounting(ci._contribution.note, activity_info[2]);
+                    try
+                    {
+                        Extras ex = JsonConvert.DeserializeObject<Extras>(activity_info[2]);
+                        if (ex.birds.Count > 0)
+                        {
+                            if (!File.Exists(configurations.GetAbsoluteImagePath() + ex.birds[0].name + ".png"))
+                            {
+                                System.IO.FileStream file_stream = new System.IO.FileStream(configurations.GetAbsoluteImagePath() + ex.birds[0].name + ".png", System.IO.FileMode.Create);
+                                file_stream.Close();
+                                System.Net.WebClient client = new System.Net.WebClient();
+                                client.Headers.Add("user-agent", "Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.2; .NET CLR 1.0.3705;)");
+                                client.DownloadFile(ex.birds[0].image, configurations.GetAbsoluteImagePath() + ex.birds[0].name + ".png");
+                            }
+                            ImageSource src = new BitmapImage(new Uri(configurations.GetAbsoluteImagePath() + ex.birds[0].name + ".png"));
+                            src.Freeze();
+                            ci.default_contrib_img = src;
+                        }
+                    }
+                    catch (Exception ex) { log.WriteErrorLog(ex); }
+                }
+            }
+
+            if (c.media_url == null || c.media_url == "") return ci;
+
+            file_manager.try_downloading_contribution(ci, false, false);
+            return ci;
+        }
+
+        public static item_generic_v2 get_designidea_item_visuals(int id)
+        {
+            naturenet_dataclassDataContext db = database_manager.GetTableTopDB();
+            var contributions = from c in db.Contributions
+                                where c.id == id
+                                select c;
+            if (contributions.Count() != 1) return null;
+            Contribution contribution = contributions.Single<Contribution>();
+            collection_item ci = configurations.create_collection_item_from_contribution(contribution);
+            item_generic_v2 i = configurations.get_item_visuals(ci);
+            return i;
+        }
+
+        public static item_generic_v2 get_item_visuals(collection_item ci)
+        {
+            Contribution c = ci._contribution;
+            item_generic_v2 i = new item_generic_v2();
+            i.user_info_icon.Visibility = Visibility.Collapsed;
+            //i.user_info_name.Text = c.web_username;
+
+            naturenet_dataclassDataContext db = database_manager.GetTableTopDB();
+            var us = from cc in db.Collection_Contribution_Mappings
+                     where cc.contribution_id == c.id
+                     select cc.Collection.User;
+            if (us.Count() > 0)
+            {
+                User u = us.First<User>();
+                i.user_info_name.Text = u.name;
+                if (u.affiliation != null && u.affiliation.ToLower() == configurations.affiliation_aces.ToLower())
+                {
+                    i.affiliation_icon_small.Source = configurations.img_affiliation_icon;
+                    i.affiliation_icon_small.Visibility = Visibility.Visible;
+                }
+                try
+                {
+                    ImageSource src = new BitmapImage(new Uri(configurations.GetAbsoluteAvatarPath() + u.avatar));
+                    src.Freeze();
+                    i.user_info_icon.Source = src;
+                    i.user_info_icon.Visibility = Visibility.Visible;
+                }
+                catch (Exception) { }
+            }
+            else
+            {
+                if (c.web_username != null)
+                {
+                    var webusers = from w in db.WebUsers
+                                   where w.username == c.web_username
+                                   select w;
+                    if (webusers.Count() == 1)
+                    {
+                        WebUser webuser = webusers.Single<WebUser>();
+                        i.user_info_name.Text = webuser.username + configurations.default_user_desc;
+                        //i.affiliation = configurations.default_webuser_affiliation;
+                        if (webuser.user_id.HasValue)
+                        {
+                            var users = from u in db.Users
+                                        where u.id == webuser.user_id.Value
+                                        select u;
+                            if (users.Count() == 1)
+                            {
+                                User the_user = users.Single<User>();
+                                i.user_info_name.Text = the_user.name + configurations.default_user_desc;
+                                try
+                                {
+                                    ImageSource src = new BitmapImage(new Uri(configurations.GetAbsoluteAvatarPath() + the_user.avatar));
+                                    src.Freeze();
+                                    i.user_info_icon.Source = src;
+                                    i.user_info_icon.Visibility = Visibility.Visible;
+                                }
+                                catch (Exception) { }
+                                if (the_user.affiliation != null && the_user.affiliation.ToLower() == configurations.affiliation_aces.ToLower())
+                                {
+                                    i.affiliation_icon_small.Source = configurations.img_affiliation_icon;
+                                    i.affiliation_icon_small.Visibility = Visibility.Visible;
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+
+            DateTime last_time = c.date;
+            var n1 = from f in db.Feedbacks
+                     where (f.object_type == "nature_net.Contribution") && (f.object_id == c.id)
+                     orderby f.date descending
+                     select f;
+            int cnt = 0; int num_like = 0; int num_dislike = 0; int num_comments = 0;
+            if (n1 != null)
+                cnt = n1.Count();
+            if (cnt != 0)
+            {
+                last_time = n1.First().date;
+                foreach (Feedback f2 in n1)
+                {
+                    if (f2.Feedback_Type.name == "Like")
+                        if (Convert.ToBoolean(f2.note))
+                            num_like++;
+                        else
+                            num_dislike++;
+                    if (f2.Feedback_Type.name == "Comment")
+                        num_comments++;
+                }
+            }
+
+            i.Background = Brushes.White;
+            i.title.Text = ci.text_to_display;
+            i.description.Visibility = Visibility.Collapsed;
+            TextBlock.SetFontWeight(i.title, FontWeights.Normal);
+            i.title.FontSize = configurations.design_idea_item_title_font_size;
+            i.user_info.Margin = new Thickness(5);
+            i.user_info_date.Text = configurations.GetDate_Formatted(c.date);
+            i.user_info_name.Margin = new Thickness(2, 0, 0, 0); i.user_info_date.Margin = new Thickness(2, 0, 2, 0);
+            i.user_info_name.FontSize = configurations.design_idea_item_user_info_font_size; i.user_info_date.FontSize = configurations.design_idea_item_user_info_font_size;
+            i.number.Text = num_comments.ToString();
+            i.number_icon.Visibility = Visibility.Collapsed;
+            i.txt_level1.Text = configurations.designidea_num_desc;
+            i.txt_level2.Visibility = Visibility.Collapsed; i.txt_level3.Visibility = Visibility.Collapsed;
+            i.avatar.Source = configurations.img_thumbs_up_icon;
+            i.num_likes.Content = num_like.ToString();
+            i.avatar.Width = configurations.design_idea_item_avatar_width; i.avatar.Height = configurations.design_idea_item_avatar_width; i.avatar.Margin = new Thickness(5, 5, 5, 0); i.avatar.Tag = i;
+            i.Tag = c.id;
+            if (c.status != null && c.status.ToLower() == configurations.status_implemented.ToLower())
+            {
+                //i.pre_title.Text = configurations.implemented_text;
+                //i.pre_title.FontWeight = FontWeights.Bold;
+                i.affiliation_icon.Height = 15;
+                i.affiliation_icon.Source = configurations.img_implemented_icon;
+                i.affiliation_icon.Visibility = Visibility.Visible;
+            }
+            i.right_panel.Width = configurations.design_idea_right_panel_width;
+            i.top_value = num_like;
+            i.drag_icon_vertical.Source = configurations.img_drag_vertical_icon;
+            if (configurations.show_vertical_drag) i.drag_icon_vertical_panel.Visibility = Visibility.Visible;
+            //if (thumbs_up_handler != null)
+            i.avatar.Tag = i;
+            return i;
         }
     }
 }

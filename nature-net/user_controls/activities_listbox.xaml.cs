@@ -31,7 +31,7 @@ namespace nature_net.user_controls
         int pos_x_increment = 30;
         int max_pos_x = 250;
 
-        list_refresher refresher;
+        private bool has_touched_down = false;
 
         public activities_listbox()
         {
@@ -50,31 +50,24 @@ namespace nature_net.user_controls
             this.activities_list.populator.header = header;
 
             this.activities_list.Background = Brushes.White;
-
-            this.refresher = new list_refresher();
-            this.refresher.activities_populator = this.activities_list.populator;
         }
 
         public void list_all_activities()
         {
-            if (!configurations.use_list_refresher)
-            {
-                this.Dispatcher.BeginInvoke(System.Windows.Threading.DispatcherPriority.Normal,
-                   new System.Action(() =>
-                   {
-                       //this.activities_list.populator.item_width = this.Width - 3;
-                       this.activities_list.populator.list_all_activities();
-                   }));
-            }
-            else
-                refresher.list_all_activities();
+            this.Dispatcher.BeginInvoke(System.Windows.Threading.DispatcherPriority.Normal,
+               new System.Action(() =>
+               {
+                   //this.activities_list.populator.item_width = this.Width - 3;
+                   this.activities_list.populator.list_all_activities();
+               }));
         }
 
         bool activity_item_selected(object i, TouchEventArgs e)
         {
             item_generic_v2 item = (item_generic_v2)i;
             string[] activity_item = ("activity;" + item.ToString()).Split(new Char[] { ';' });
-            log.WriteInteractionLog(15, "tapped the listbox item: " + item.ToString(), e.TouchDevice);
+            if (e != null)
+                log.WriteInteractionLog(15, "tapped the listbox item: " + item.ToString(), e.TouchDevice);
             window_manager.open_activity_window(item.title.Text, Convert.ToInt32(item.Tag), 65, item.PointToScreen(new Point(0, 0)).Y);
             return true;
         }
@@ -112,12 +105,18 @@ namespace nature_net.user_controls
 
         void submit_PreviewTouchDown(object sender, TouchEventArgs e)//RoutedEventArgs e)
         {
-            submit_idea.Background = Brushes.LightGray;
+            //submit_idea.Background = Brushes.LightGray;
+            submit_idea.Background = Brushes.White;
+            has_touched_down = true;
         }
 
         void submit_PreviewTouchUp(object sender, TouchEventArgs e)//RoutedEventArgs e)
         {
-            submit_idea.Background = Brushes.White;
+            if (!has_touched_down)
+                return;
+            has_touched_down = false;
+            //submit_idea.Background = Brushes.White;
+            submit_idea.Background = Brushes.LightGray;
             log.WriteInteractionLog(6, "", e.TouchDevice);
             window_manager.open_design_idea_window_ext(null, last_pos_x, submit_idea.PointToScreen(new Point(0, 0)).Y);
             last_pos_x = last_pos_x + pos_x_increment;

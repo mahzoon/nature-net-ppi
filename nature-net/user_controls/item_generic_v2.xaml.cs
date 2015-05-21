@@ -132,4 +132,11 @@ namespace nature_net.user_controls
                 log.WriteInteractionLog(13, "item: " + this.ToString(), te.TouchDevice);
         }
     }
+
+    public delegate void manipulation_starting_handler(object sender, ManipulationStartingEventArgs e);
+    public delegate void manipulation_delta_handler(object sender, ManipulationDeltaEventArgs e);
+    public delegate void avatar_touch_down_handler(object sender, TouchEventArgs e);
+    public delegate void thumbs_up(object sender, TouchEventArgs e);
+    public delegate void thumbs_down(object sender, EventArgs e);
+    public delegate void reply_clicked(object sender, EventArgs e);
 }

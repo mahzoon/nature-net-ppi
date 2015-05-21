@@ -45,6 +45,8 @@ namespace nature_net.user_controls
         public custom_listbox_v2()
         {
             InitializeComponent();
+            //if (configurations.response_to_mouse_clicks)
+            //    this.selectable = true;
         }
 
         public void initialize(bool horizontal, string prefix, ItemSelected i)
@@ -75,17 +77,12 @@ namespace nature_net.user_controls
                 this._list.PreviewTouchDown += new EventHandler<TouchEventArgs>(_list_PreviewTouchDown);
                 this._list.PreviewTouchMove += new EventHandler<TouchEventArgs>(_list_PreviewTouchMove);
                 this._list.PreviewTouchUp += new EventHandler<TouchEventArgs>(_list_PreviewTouchUp);
-
-                //this._list.PreviewMouseLeftButtonDown += new MouseButtonEventHandler(_list_PreviewMouseLeftButtonDown);
             }
 
             if (configurations.high_contrast)
                 this._list.Background = Brushes.DarkGreen;
             else
                 this._list.Background = Brushes.Transparent;
-
-            //if (configurations.response_to_mouse_clicks)
-            this._list.SelectionChanged += new SelectionChangedEventHandler(_list_SelectionChanged);
         }
 
         void _list_PreviewMouseLeftButtonDown(object sender, MouseButtonEventArgs e)
@@ -388,7 +385,6 @@ namespace nature_net.user_controls
             }
             this.last_selected_index = _list.SelectedIndex;
         }
-
         private void _list_select_item(object item, TouchEventArgs e)
         {
             //if (list_comments)
@@ -731,7 +727,7 @@ namespace nature_net.user_controls
 
     public class list_populator
     {
-        public item_generic initial_item = null;
+        public item_generic_v2 initial_item = null;
         public double item_width;
         public ListBox _list;
         public Thickness items_margins = new Thickness(0);
@@ -753,8 +749,10 @@ namespace nature_net.user_controls
 
         public list_populator()
         {
-            worker_design_ideas.DoWork += new DoWorkEventHandler(get_all_design_ideas);
-            worker_design_ideas.RunWorkerCompleted += new RunWorkerCompletedEventHandler(display_all_design_ideas);
+            //worker_design_ideas.DoWork += new DoWorkEventHandler(get_all_design_ideas);
+            //worker_design_ideas.RunWorkerCompleted += new RunWorkerCompletedEventHandler(display_all_design_ideas);
+            worker_design_ideas.DoWork += new DoWorkEventHandler(get_all_activities);
+            worker_design_ideas.RunWorkerCompleted += new RunWorkerCompletedEventHandler(display_all_activities);
             worker_activities.DoWork += new DoWorkEventHandler(get_all_activities);
             worker_activities.RunWorkerCompleted += new RunWorkerCompletedEventHandler(display_all_activities);
             worker_users.DoWork += new DoWorkEventHandler(get_all_users);
@@ -767,190 +765,14 @@ namespace nature_net.user_controls
         public void list_all_design_ideas()
         {
             if (!worker_design_ideas.IsBusy)
-                worker_design_ideas.RunWorkerAsync(null);
-        }
-        public void get_all_design_ideas(object arg, DoWorkEventArgs e)
-        {
-            e.Result = (object)(new List<design_idea_item>());
-            e.Result = get_all_design_ideas();
-        }
-        public void display_all_design_ideas(object di, RunWorkerCompletedEventArgs e)
-        {
-            this._list.Items.Dispatcher.BeginInvoke(DispatcherPriority.Normal,
-                new System.Action(() =>
-                {
-                    display_all_design_ideas((List<design_idea_item>)e.Result);
-                }));
+                worker_design_ideas.RunWorkerAsync("Design");
         }
         public void list_all_design_ideas_sync()
         {
-            List<design_idea_item> idea_items = get_all_design_ideas();
-            display_all_design_ideas(idea_items);
+            List<activity_item> design_idea_items = get_all_activities("Design");
+            display_all_activities(design_idea_items);
         }
-        public List<design_idea_item> get_all_design_ideas()
-        {
-            try
-            {
-                naturenet_dataclassDataContext db = database_manager.GetTableTopDB();
-                var r = from d in db.Design_Ideas
-                        where (d.status != configurations.status_implemented || show_done) &&
-                                (d.status == configurations.status_implemented || show_not_done) &&
-                                (d.status != configurations.status_deleted)
-                        orderby d.date descending
-                        select d;
-                if (r == null)
-                {
-                    return new List<design_idea_item>();
-                }
-                List<design_idea_item> ideas = new List<design_idea_item>();
-                foreach (Design_Idea d in r)
-                {
-                    DateTime last_time = d.date;
-                    var n1 = from f in db.Feedbacks
-                             where (f.object_type == "nature_net.Contribution") && (f.object_id == d.id)
-                             orderby f.date descending
-                             select f;
-                    int cnt = 0; int num_like = 0; int num_dislike = 0; int num_comments = 0;
-                    if (n1 != null)
-                        cnt = n1.Count();
-                    if (cnt != 0)
-                    {
-                        last_time = n1.First().date;
-                        foreach (Feedback f2 in n1)
-                        {
-                            if (f2.Feedback_Type.name == "Like")
-                                if (Convert.ToBoolean(f2.note))
-                                    num_like++;
-                                else
-                                    num_dislike++;
-                            if (f2.Feedback_Type.name == "Comment")
-                                num_comments++;
-                        }
-                    }
-                    design_idea_item i = new design_idea_item();
-                    try
-                    {
-                        ImageSource src = new BitmapImage(new Uri(configurations.GetAbsoluteAvatarPath() + d.avatar));
-                        src.Freeze();
-                        i.img = src;
-                    }
-                    catch (Exception) { i.img = null; }
-                    i.design_idea = d;
-                    i.count = num_comments;
-                    i.last_date = last_time;
-                    i.num_dislike = num_dislike;
-                    i.num_like = num_like;
-
-                    i.username = i.design_idea.name;
-                    i.affiliation = i.design_idea.affiliation;
-                    if (i.design_idea.name == "Default User")
-                    {
-                        i.username = configurations.default_user_text;
-                        //i.affiliation = configurations.default_user_affiliation;
-                        if (i.design_idea.web_username != null)
-                        {
-                            var webusers = from w in db.WebUsers
-                                           where w.username == i.design_idea.web_username
-                                           select w;
-                            if (webusers.Count() == 1)
-                            {
-                                WebUser webuser = webusers.Single<WebUser>();
-                                i.username = webuser.username + configurations.default_user_desc;
-                                //i.affiliation = configurations.default_webuser_affiliation;
-                                if (webuser.user_id.HasValue)
-                                {
-                                    var users = from u in db.Users
-                                                where u.id == webuser.user_id.Value
-                                                select u;
-                                    if (users.Count() == 1)
-                                    {
-                                        User the_user = users.Single<User>();
-                                        i.username = the_user.name + configurations.default_user_desc;
-                                        try
-                                        {
-                                            ImageSource src = new BitmapImage(new Uri(configurations.GetAbsoluteAvatarPath() + the_user.avatar));
-                                            src.Freeze();
-                                            i.img = src;
-                                        }
-                                        catch (Exception) { i.img = null; }
-                                        i.affiliation = the_user.affiliation;
-                                    }
-                                }
-                            }
-                        }
-                    }
-
-                    ideas.Add(i);
-                }
-                return ideas;
-            }
-            catch (Exception ex)
-            {
-                log.WriteErrorLog(ex);
-                return new List<design_idea_item>();
-            }
-        }
-        public void display_all_design_ideas(List<design_idea_item> ideas)
-        {
-            this._list.Items.Clear();
-            if (initial_item != null)
-                this._list.Items.Add(initial_item);
-
-            foreach (design_idea_item idea in ideas)
-            {
-                item_generic_v2 i = new item_generic_v2();
-                i.Background = Brushes.White;
-                i.title.Text = idea.design_idea.note; i.description.Visibility = Visibility.Collapsed;
-                TextBlock.SetFontWeight(i.title, FontWeights.Normal);
-                i.title.FontSize = configurations.design_idea_item_title_font_size;
-                i.user_info.Margin = new Thickness(5);
-                if (idea.img == null)
-                    i.user_info_icon.Visibility = Visibility.Collapsed;
-                else
-                    i.user_info_icon.Source = idea.img;
-                i.user_info_name.Text = idea.username;
-                //i.user_info_date.Text = configurations.GetDate_Formatted(idea.last_date);
-                i.user_info_date.Text = configurations.GetDate_Formatted(idea.design_idea.date);
-                i.user_info_name.Margin = new Thickness(2, 0, 0, 0); i.user_info_date.Margin = new Thickness(2, 0, 2, 0);
-                i.user_info_name.FontSize = configurations.design_idea_item_user_info_font_size; i.user_info_date.FontSize = configurations.design_idea_item_user_info_font_size;
-                i.number.Text = idea.count.ToString(); i.number_icon.Visibility = Visibility.Collapsed;
-                i.txt_level1.Text = configurations.designidea_num_desc;
-                i.txt_level2.Visibility = Visibility.Collapsed; i.txt_level3.Visibility = Visibility.Collapsed;
-                i.avatar.Source = configurations.img_thumbs_up_icon; i.num_likes.Content = idea.num_like.ToString();
-                i.avatar.Width = configurations.design_idea_item_avatar_width; i.avatar.Height = configurations.design_idea_item_avatar_width; i.avatar.Margin = new Thickness(5,5,5,0); i.avatar.Tag = i;
-                i.Tag = idea.design_idea.id;
-                i.Margin = items_margins;
-                if (item_width != 0) i.Width = item_width;
-                if (idea.affiliation != null && idea.affiliation.ToLower() == configurations.affiliation_aces.ToLower())
-                {
-                    i.affiliation_icon_small.Source = configurations.img_affiliation_icon;
-                    i.affiliation_icon_small.Visibility = Visibility.Visible;
-                }
-                if (idea.design_idea.status != null && idea.design_idea.status.ToLower() == configurations.status_implemented.ToLower())
-                {
-                    //i.pre_title.Text = configurations.implemented_text;
-                    //i.pre_title.FontWeight = FontWeights.Bold;
-                    i.affiliation_icon.Height = 15;
-                    i.affiliation_icon.Source = configurations.img_implemented_icon;
-                    i.affiliation_icon.Visibility = Visibility.Visible;
-                    if (item_width != 0) i.title.MaxWidth = configurations.idea_text_scale_factor * item_width;
-                }
-                i.right_panel.Width = configurations.design_idea_right_panel_width;
-                //i.left_panel.VerticalAlignment = VerticalAlignment.Center; DockPanel.SetDock(i.number, Dock.Left); DockPanel.SetDock(i.txt_level1, Dock.Left);
-                i.top_value = idea.num_like;
-                i.drag_icon_vertical.Source = configurations.img_drag_vertical_icon;
-                if (configurations.show_vertical_drag) i.drag_icon_vertical_panel.Visibility = Visibility.Visible;
-                if (thumbs_up_handler != null)
-                    i.avatar.Tag = i;
-                this._list.Items.Add(i);
-            }
-            if (header.atoz.IsChecked.Value && header.atoz_order != null) header.atoz_order();
-            if (header.top.IsChecked.Value && header.top_order != null) header.top_order();
-            if (header.recent.IsChecked.Value && header.recent_order != null) header.recent_order();
-            this._list.Items.Refresh();
-            this._list.UpdateLayout();
-        }
-
+        
         // for users
         public void list_all_users()
         {
@@ -1288,17 +1110,22 @@ namespace nature_net.user_controls
         public void list_all_activities()
         {
             if (!worker_activities.IsBusy)
-                worker_activities.RunWorkerAsync();
+                worker_activities.RunWorkerAsync("Activity");
         }
         public void get_all_activities(object arg, DoWorkEventArgs e)
         {
-            e.Result = (object)(new List<activity_item>());
+            string activity_type = (string)e.Argument;
+            e.Result = (object)(get_all_activities(activity_type));
+            configurations.activity_icons_loaded = true;
+        }
+        public List<activity_item> get_all_activities(string activity_type)
+        {
             try
             {
                 naturenet_dataclassDataContext db = database_manager.GetTableTopDB();
                 var r = from a in db.Activities
                         //where (a.name != "Free Observation") && (a.name != "Design Idea")
-                        where (a.name != "Design Idea")
+                        where (!a.expire_date.HasValue || a.expire_date.Value > DateTime.Now) || (a.id == 1)
                         select a;
                 if (r != null)
                 {
@@ -1306,6 +1133,9 @@ namespace nature_net.user_controls
                     List<activity_item> activity_items = new List<activity_item>();
                     foreach (Activity a in r)
                     {
+                        if (a.technical_info.Split(new char[] { ';' })[1] != activity_type)
+                            continue;
+
                         DateTime last_time = a.creation_date;
                         var n1 = from m in db.Collection_Contribution_Mappings
                                  where m.Collection.activity_id == a.id
@@ -1334,9 +1164,24 @@ namespace nature_net.user_controls
                                     client.DownloadFile(a.avatar, configurations.GetAbsoluteImagePath() + ai.activity.id.ToString() + ".png");
                                 }
 
-                                ImageSource src = new BitmapImage(new Uri(configurations.GetAbsoluteImagePath() + ai.activity.id.ToString() + ".png"));
-                                src.Freeze();
-                                ai.img = src;
+                                try
+                                {
+                                    ImageSource src = new BitmapImage(new Uri(configurations.GetAbsoluteImagePath() + ai.activity.id.ToString() + ".png"));
+                                    src.Freeze();
+                                    ai.img = src;
+                                }
+                                catch (Exception)
+                                {
+                                    //retry
+                                    System.IO.FileStream file_stream = new System.IO.FileStream(configurations.GetAbsoluteImagePath() + ai.activity.id.ToString() + ".png", System.IO.FileMode.OpenOrCreate);
+                                    file_stream.Close();
+                                    System.Net.WebClient client = new System.Net.WebClient();
+                                    client.Headers.Add("user-agent", "Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.2; .NET CLR 1.0.3705;)");
+                                    client.DownloadFile(a.avatar, configurations.GetAbsoluteImagePath() + ai.activity.id.ToString() + ".png");
+                                    ImageSource src = new BitmapImage(new Uri(configurations.GetAbsoluteImagePath() + ai.activity.id.ToString() + ".png"));
+                                    src.Freeze();
+                                    ai.img = src;
+                                }
                             }
                             catch (Exception ex) { log.WriteErrorLog(ex); }
                         }
@@ -1347,22 +1192,22 @@ namespace nature_net.user_controls
                             ai.username = "";
                         if (cnt != 0)
                             last_time = n1.First().date;
-                        
+
                         ai.last_date = last_time;
                         activity_items.Add(ai);
                     }
-                    e.Result = (object)activity_items;
+                    return activity_items;
                 }
                 else
                 {
-                    e.Result = (object)(new List<activity_item>());
+                    return new List<activity_item>();
                 }
-                configurations.activity_icons_loaded = true;
             }
             catch (Exception ex)
             {
                 log.WriteErrorLog(ex);
             }
+            return new List<activity_item>();
         }
         public void display_all_activities(object arg, RunWorkerCompletedEventArgs e)
         {

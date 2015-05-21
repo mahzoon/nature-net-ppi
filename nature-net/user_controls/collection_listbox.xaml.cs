@@ -18,6 +18,7 @@ using Microsoft.Surface;
 using Microsoft.Surface.Core;
 using Microsoft.Surface.Presentation;
 using Microsoft.Surface.Presentation.Controls;
+using Newtonsoft.Json;
 
 namespace nature_net.user_controls
 {
@@ -70,7 +71,7 @@ namespace nature_net.user_controls
             //this.contributions.PreviewTouchDown += new EventHandler<System.Windows.Input.TouchEventArgs>(contributions_TouchDown);
         }
 
-        void collection_listbox_Loaded(object sender, RoutedEventArgs e)
+        private void collection_listbox_Loaded(object sender, RoutedEventArgs e)
         {
             //GradientStopCollection gsc = new GradientStopCollection();
             //gsc.Add(new GradientStop(Colors.LightGray, 0.0));
@@ -84,7 +85,7 @@ namespace nature_net.user_controls
             this.contributions.Background = Brushes.LightGray;
         }
 
-        void contributions_PreviewTouchMove(object sender, System.Windows.Input.TouchEventArgs e)
+        private void contributions_PreviewTouchMove(object sender, System.Windows.Input.TouchEventArgs e)
         {
             FrameworkElement findSource = e.OriginalSource as FrameworkElement;
             ListBoxItem element = null;
@@ -240,7 +241,7 @@ namespace nature_net.user_controls
             catch (Exception) { }
         }
 
-        void contributions_TouchDown(object sender, System.Windows.Input.TouchEventArgs e)
+        private void contributions_TouchDown(object sender, System.Windows.Input.TouchEventArgs e)
         {
             ScrollViewer scroll = configurations.GetDescendantByType(this.contributions, typeof(ScrollViewer)) as ScrollViewer;
             last_scroll_offset = scroll.HorizontalOffset;
@@ -268,7 +269,7 @@ namespace nature_net.user_controls
             e.Handled = true;
         }
 
-        void contributions_PreviewTouchUp(object sender, System.Windows.Input.TouchEventArgs e)
+        private void contributions_PreviewTouchUp(object sender, System.Windows.Input.TouchEventArgs e)
         {
             //TextBlock tm = new TextBlock(); tm.Foreground = Brushes.White;
             //Canvas.SetLeft(tm, 200); Canvas.SetTop(tm, debug_var);
@@ -304,7 +305,7 @@ namespace nature_net.user_controls
             worker.WorkerReportsProgress = true;
             worker.DoWork += new DoWorkEventHandler(get_contributions_in_location);
             worker.ProgressChanged += new ProgressChangedEventHandler(progress_changed);
-            worker.RunWorkerCompleted += new RunWorkerCompletedEventHandler(display_all_contributions);
+            worker.RunWorkerCompleted += new RunWorkerCompletedEventHandler(display_contributions);
             if (!worker.IsBusy)
                 worker.RunWorkerAsync((object)location);
         }
@@ -315,131 +316,48 @@ namespace nature_net.user_controls
             worker.WorkerReportsProgress = true;
             worker.DoWork += new DoWorkEventHandler(get_contributions_in_activity);
             worker.ProgressChanged += new ProgressChangedEventHandler(progress_changed);
-            worker.RunWorkerCompleted += new RunWorkerCompletedEventHandler(display_all_contributions);
+            worker.RunWorkerCompleted += new RunWorkerCompletedEventHandler(display_contributions);
             if (!worker.IsBusy)
                 worker.RunWorkerAsync((object)activity_id);
         }
 
-        public void list_all_contributions(string username)
+        public void list_contributions_for_user(string username)
         {
             this.collection_username = username;
             this.contributions.content_name = "contributions for user: " + username;
             worker.WorkerReportsProgress = true;
-            worker.DoWork += new DoWorkEventHandler(get_all_contributions);
+            worker.DoWork += new DoWorkEventHandler(get_contributions_for_user);
             worker.ProgressChanged += new ProgressChangedEventHandler(progress_changed);
-            worker.RunWorkerCompleted += new RunWorkerCompletedEventHandler(display_all_contributions);
+            worker.RunWorkerCompleted += new RunWorkerCompletedEventHandler(display_contributions);
             if (!worker.IsBusy)
                 worker.RunWorkerAsync((object)username);
         }
 
-        public void get_all_contributions(object arg, DoWorkEventArgs e)
+        private void get_contributions_in_location(object arg, DoWorkEventArgs e)
         {
-            naturenet_dataclassDataContext db = database_manager.GetTableTopDB();
-            var result1 = from c in db.Collection_Contribution_Mappings
-                          where (c.Collection.User.name == (string)e.Argument) && (c.Collection.activity_id != 1)
-                          && (c.Contribution.status != configurations.status_deleted)
-                          orderby c.Contribution.date descending
-                          select c.Contribution;
-            if (result1 == null)
-            {
-                e.Result = (object)(new List<collection_item>());
-                return;
-            }
-            //List<int> contribution_ids = result1.ToList<int>();
-            //var result2 = from m in db.Contributions
-            //              where contribution_ids.Contains(m.id)
-            //              select m;
-            List<Contribution> medias = result1.ToList<Contribution>();
-            List<collection_item> loaded_items = new List<collection_item>();
-            loading_progress lp0 = new loading_progress();
-            lp0.current_progress = 0; lp0.total = medias.Count;
-            lp0.loaded_items = loaded_items;
-            worker.ReportProgress(0, lp0);
-            // download the image if there is no image;
-            // create thumbnail if there is no thumbnail
-            List<collection_item> items = new List<collection_item>();
-            
-            for (int counter = 0; counter < medias.Count; counter++)
-            {
-                collection_item ci = create_collection_item_from_contribution(medias[counter]);
-                items.Add(ci);
-                loaded_items.Add(ci);
-                loading_progress lp = new loading_progress();
-                lp.current_progress = counter + 1;
-                lp.total = medias.Count;
-                lp.loaded_items = loaded_items; 
-                worker.ReportProgress(counter + 1, lp);
-            }
+            int location_id = (int)e.Argument;
+            List<Contribution> contributions = configurations.get_contributions_for_location(location_id, true, true);
+            List<collection_item> items = create_collection_items_from_contributions(contributions);
             e.Result = (object)items;
         }
 
-        void progress_changed(object sender, ProgressChangedEventArgs e)
+        private void get_contributions_in_activity(object arg, DoWorkEventArgs e)
         {
-            this.contributions._list.Items.Dispatcher.BeginInvoke(DispatcherPriority.Normal,
-               new System.Action(() =>
-               {
-                   try
-                   {
-                       loading_progress progress = (loading_progress)e.UserState;
-                       //collection_listbox_item cli = (collection_listbox_item)this.contributions._list.Items[this.contributions._list.Items.Count - 1];
-                       string progress_text = " (loading " + (e.ProgressPercentage).ToString() + " of " + progress.total + ")";
-                       string[] title = this.parent.get_title().Split(new string[] { " (" }, StringSplitOptions.RemoveEmptyEntries);
-                       this.parent.set_title(title[0] + progress_text);
-
-                       if (progress.current_progress == 0)
-                       {
-                           this.contributions._list.Items.Clear();
-                           for (int counter = 0; counter < progress.total; counter++)
-                           {
-                               collection_listbox_item c = new collection_listbox_item();
-                               c.img.Source = configurations.img_loading_image_pic;
-                               //c.img.GifSource = configurations.GetAbsoluteImagePath() + "loading1.gif";
-                               c.img.Tag = null;
-                               //c.percentage.Visibility = System.Windows.Visibility.Collapsed;
-                               //c.percentage.Text = (e.ProgressPercentage).ToString() + " of " + progress.total + " contribution(s) downloaded.";
-                               c.drag.Visibility = System.Windows.Visibility.Collapsed;
-                               this.contributions._list.Items.Add(c);
-                           }
-                       }
-                       else
-                       {
-                           ////load the item
-                           collection_item i = progress.loaded_items[progress.current_progress - 1];
-                           collection_listbox_item cli2 = new collection_listbox_item();
-
-                           //Image img = new Image();
-                           if (window_manager.thumbnails.ContainsKey(i._contribution.id))
-                           {
-                               cli2.img.Source = window_manager.thumbnails[i._contribution.id];
-                               cli2.img.Tag = i;
-                               cli2.drag.Source = configurations.img_drag_icon;
-                               if (i._contribution.modified_date.HasValue)
-                                   cli2.dateinfo.Text = configurations.GetDate_Formatted(i._contribution.modified_date.Value);
-                               else
-                                   cli2.dateinfo.Text = configurations.GetDate_Formatted(i._contribution.date);
-                               cli2.userinfo.Text = configurations.find_user_of_contribution(i._contribution).name;
-                               cli2.bottom_bar.Visibility = System.Windows.Visibility.Visible;
-                           }
-                           else
-                           {
-                               cli2.img.Source = configurations.img_not_found_image_pic;
-                               cli2.img.Tag = null;
-                               //cli2.Width = 0;
-                               cli2.Visibility = System.Windows.Visibility.Collapsed;
-                               upload_failed_items.Add(cli2);
-                           }
-                           cli2.collection_item = i;
-                           this.contributions._list.Items.RemoveAt(progress.current_progress - 1);
-                           this.contributions._list.Items.Insert(progress.current_progress - 1, cli2);
-                       }
-
-                       this.contributions._list.Items.Refresh();
-                   }
-                   catch (Exception) { }
-               }));
+            int activity_id = (int)e.Argument;
+            List<Contribution> contributions = configurations.get_contributions_for_activity(activity_id, true);
+            List<collection_item> items = create_collection_items_from_contributions(contributions);
+            e.Result = (object)items;
         }
 
-        public void display_all_contributions(object c_obj, RunWorkerCompletedEventArgs e)
+        private void get_contributions_for_user(object arg, DoWorkEventArgs e)
+        {
+            string username = (string)e.Argument;
+            List<Contribution> contributions = configurations.get_contributions_for_user(username, true, true);
+            List<collection_item> items = create_collection_items_from_contributions(contributions);
+            e.Result = (object)items;
+        }
+
+        private void display_contributions(object c_obj, RunWorkerCompletedEventArgs e)
         {
             this.contributions._list.Items.Dispatcher.BeginInvoke(DispatcherPriority.Normal,
                new System.Action(() =>
@@ -489,167 +407,209 @@ namespace nature_net.user_controls
                }));
         }
 
-        public void get_contributions_in_location(object arg, DoWorkEventArgs e)
+        private static void display_design_idea_collectionitem(collection_item i, collection_listbox_item cli2)
         {
-            naturenet_dataclassDataContext db = database_manager.GetTableTopDB();
-            var result1 = from c in db.Collection_Contribution_Mappings
-                          where (c.Contribution.location_id == (int)e.Argument) && (c.Collection.activity_id != 1)
-                          && (c.Contribution.status != configurations.status_deleted)
-                          orderby c.Contribution.date descending
-                          select c.Contribution;
-            //var result1 = from c in db.Contributions
-            //              where c.location_id == (int)e.Argument
-            //              select c;
-            if (result1 == null)
-            {
-                e.Result = (object)(new List<collection_item>());
-                return;
-            }
-            List<Contribution> medias = result1.ToList<Contribution>();
+            cli2.img.Tag = i;
+            cli2.drag.Source = configurations.img_drag_icon;
+            if (i._contribution.modified_date.HasValue)
+                cli2.dateinfo.Text = configurations.GetDate_Formatted(i._contribution.modified_date.Value);
+            else
+                cli2.dateinfo.Text = configurations.GetDate_Formatted(i._contribution.date);
+            cli2.userinfo.Text = configurations.find_user_of_contribution(i._contribution).name;
+            cli2.bottom_bar.Visibility = System.Windows.Visibility.Visible;
+            cli2.Width = 140;
+            cli2.Margin = new Thickness(5, 5, 0, 5);
+            cli2.info_bar.Margin = new Thickness(0, 0, 0, 10);
+            //cli2.whole_grid.Background = Brushes.White;
+            //cli2.Background = Brushes.White;
+            cli2.BorderBrush = Brushes.DarkGray;
+            cli2.BorderThickness = new Thickness(2);
+            cli2.upload_failed_count.Margin = new Thickness(5, -20, 5, 5);
+            cli2.upload_failed_count.TextAlignment = TextAlignment.Left;
+            cli2.upload_failed_count.FontFamily = new System.Windows.Media.FontFamily("Calibri");
+            cli2.upload_failed_count.FontSize = 14;
+            cli2.upload_failed_count.Foreground = Brushes.Black;
+            cli2.upload_failed_count.TextWrapping = TextWrapping.Wrap;
+            string text = i.text_to_display;
+            if (text.Length > 110) text = text.Substring(0, 107) + "...";
+            cli2.upload_failed_count.Text = text;
+        }
+
+        private static void display_birdcounting_collectionitem(collection_item i, collection_listbox_item cli2)
+        {
+            cli2.img.Source = i.default_contrib_img;
+            cli2.img.VerticalAlignment = VerticalAlignment.Top;
+            cli2.img.Tag = i;
+            cli2.drag.Source = configurations.img_drag_icon;
+            if (i._contribution.modified_date.HasValue)
+                cli2.dateinfo.Text = configurations.GetDate_Formatted(i._contribution.modified_date.Value);
+            else
+                cli2.dateinfo.Text = configurations.GetDate_Formatted(i._contribution.date);
+            cli2.userinfo.Text = configurations.find_user_of_contribution(i._contribution).name;
+            cli2.bottom_bar.Visibility = System.Windows.Visibility.Visible;
+            cli2.Width = 150;
+
+            cli2.Margin = new Thickness(5, 5, 0, 5);
+            cli2.img.Margin = new Thickness(0, 0, 0, 0);
+            cli2.info_bar.Margin = new Thickness(0, 0, 0, 10);
+            cli2.info_text.Margin = new Thickness(0, 0, 0, 5);
+            cli2.upload_failed_count.Padding = new Thickness(5);
+            cli2.upload_failed_count.Background = (SolidColorBrush)(new BrushConverter().ConvertFrom("#4A000000"));
+            //cli2.upload_failed_count.Margin = new Thickness(5, 0, 5, 0);//(5, -20, 5, 5);
+
+            //cli2.whole_grid.Background = Brushes.White;
+            //cli2.Background = Brushes.White;
+            cli2.BorderBrush = Brushes.DarkGray;
+            cli2.BorderThickness = new Thickness(2);
+            cli2.info_text.Height = 85;
+            cli2.upload_failed_count.TextAlignment = TextAlignment.Left;
+            cli2.upload_failed_count.VerticalAlignment = VerticalAlignment.Bottom;
+            cli2.upload_failed_count.FontFamily = new System.Windows.Media.FontFamily("Calibri");
+            cli2.upload_failed_count.FontSize = 12;
+            cli2.upload_failed_count.Foreground = Brushes.White;
+            cli2.upload_failed_count.TextWrapping = TextWrapping.Wrap;
+            string text = i.text_to_display.Trim();
+            if (text.Length > 110) text = text.Substring(0, 107) + "...";
+            cli2.upload_failed_count.Text = text;
+        }
+
+        private List<collection_item> create_collection_items_from_contributions(List<Contribution> contributions)
+        {
             List<collection_item> loaded_items = new List<collection_item>();
             loading_progress lp0 = new loading_progress();
-            lp0.current_progress = 0; lp0.total = medias.Count;
+            lp0.current_progress = 0; lp0.total = contributions.Count;
             lp0.loaded_items = loaded_items;
             worker.ReportProgress(0, lp0);
-
+            // download the image if there is no image;
+            // create thumbnail if there is no thumbnail
             List<collection_item> items = new List<collection_item>();
-            for (int counter = 0; counter < medias.Count; counter++)
+
+            for (int counter = 0; counter < contributions.Count; counter++)
             {
-                collection_item ci = create_collection_item_from_contribution(medias[counter]);
+                collection_item ci = configurations.create_collection_item_from_contribution(contributions[counter]);
                 items.Add(ci);
                 loaded_items.Add(ci);
                 loading_progress lp = new loading_progress();
                 lp.current_progress = counter + 1;
-                lp.total = medias.Count;
+                lp.total = contributions.Count;
                 lp.loaded_items = loaded_items;
                 worker.ReportProgress(counter + 1, lp);
             }
-            e.Result = (object)items;
+            return items;
         }
 
-        public void get_contributions_in_activity(object arg, DoWorkEventArgs e)
+        private void progress_changed(object sender, ProgressChangedEventArgs e)
         {
-            naturenet_dataclassDataContext db = database_manager.GetTableTopDB();
-            var result0 = from c0 in db.Collection_Contribution_Mappings
-                          where c0.Collection.activity_id == (int)e.Argument
-                          && (c0.Contribution.status != configurations.status_deleted)
-                          orderby c0.Contribution.date descending
-                          select c0.Contribution;
-            if (result0 == null)
-            {
-                e.Result = (object)(new List<collection_item>());
-                return;
-            }
-            List<Contribution> medias = result0.ToList<Contribution>();
-            List<collection_item> loaded_items = new List<collection_item>();
-            loading_progress lp0 = new loading_progress();
-            lp0.current_progress = 0; lp0.total = medias.Count;
-            lp0.loaded_items = loaded_items;
-            worker.ReportProgress(0, lp0);
+            this.contributions._list.Items.Dispatcher.BeginInvoke(DispatcherPriority.Normal,
+               new System.Action(() =>
+               {
+                   try
+                   {
+                       loading_progress progress = (loading_progress)e.UserState;
+                       //collection_listbox_item cli = (collection_listbox_item)this.contributions._list.Items[this.contributions._list.Items.Count - 1];
+                       string progress_text = " (loading " + (e.ProgressPercentage).ToString() + " of " + progress.total + ")";
+                       string[] title = this.parent.get_title().Split(new string[] { " (" }, StringSplitOptions.RemoveEmptyEntries);
+                       this.parent.set_title(title[0] + progress_text);
 
-            List<collection_item> items = new List<collection_item>();
-            for (int counter = 0; counter < medias.Count; counter++)
-            {
-                collection_item ci = create_collection_item_from_contribution(medias[counter]);
-                items.Add(ci);
-                loaded_items.Add(ci);
-                loading_progress lp = new loading_progress();
-                lp.current_progress = counter + 1;
-                lp.total = medias.Count;
-                lp.loaded_items = loaded_items;
-                worker.ReportProgress(counter + 1, lp);
-            }
-            e.Result = (object)items;
+                       if (progress.current_progress == 0)
+                       {
+                           this.contributions._list.Items.Clear();
+                           for (int counter = 0; counter < progress.total; counter++)
+                           {
+                               collection_listbox_item c = new collection_listbox_item();
+                               c.img.Source = configurations.img_loading_image_pic;
+                               //c.img.GifSource = configurations.GetAbsoluteImagePath() + "loading1.gif";
+                               c.img.Tag = null;
+                               //c.percentage.Visibility = System.Windows.Visibility.Collapsed;
+                               //c.percentage.Text = (e.ProgressPercentage).ToString() + " of " + progress.total + " contribution(s) downloaded.";
+                               c.drag.Visibility = System.Windows.Visibility.Collapsed;
+                               this.contributions._list.Items.Add(c);
+                           }
+                       }
+                       else
+                       {
+                           ////load the item
+                           collection_item i = progress.loaded_items[progress.current_progress - 1];
+                           collection_listbox_item cli2 = new collection_listbox_item();
+
+                           //Image img = new Image();
+                           if (window_manager.thumbnails.ContainsKey(i._contribution.id))
+                           {
+                               cli2.img.Source = window_manager.thumbnails[i._contribution.id];
+                               cli2.img.Tag = i;
+                               cli2.drag.Source = configurations.img_drag_icon;
+                               if (i._contribution.modified_date.HasValue)
+                                   cli2.dateinfo.Text = configurations.GetDate_Formatted(i._contribution.modified_date.Value);
+                               else
+                                   cli2.dateinfo.Text = configurations.GetDate_Formatted(i._contribution.date);
+                               cli2.userinfo.Text = configurations.find_user_of_contribution(i._contribution).name;
+                               cli2.bottom_bar.Visibility = System.Windows.Visibility.Visible;
+                               cli2.Margin = new Thickness(5, 5, 5, 5);
+                               cli2.img.Margin = new Thickness(0, 0, 0, 5);
+                               cli2.info_bar.Margin = new Thickness(0, 0, 0, 10);
+                               cli2.drag_panel.Margin = new Thickness(0, 0, 0, -4);
+                           }
+                           else
+                           {
+                               if (i.should_have_media)
+                               {
+                                   cli2.img.Source = configurations.img_not_found_image_pic;
+                                   cli2.img.Tag = null;
+                                   //cli2.Width = 0;
+                                   cli2.Visibility = System.Windows.Visibility.Collapsed;
+                                   upload_failed_items.Add(cli2);
+                               }
+                               else if (i.contribution_type == "Design Idea")
+                               {
+                                   display_design_idea_collectionitem(i, cli2);
+                               }
+                               else if (i.contribution_type == "BirdCounting")
+                               {
+                                   display_birdcounting_collectionitem(i, cli2);
+                               }
+                           }
+                           cli2.collection_item = i;
+                           this.contributions._list.Items.RemoveAt(progress.current_progress - 1);
+                           this.contributions._list.Items.Insert(progress.current_progress - 1, cli2);
+                       }
+
+                       this.contributions._list.Items.Refresh();
+                   }
+                   catch (Exception) { }
+               }));
         }
 
-        public collection_item create_collection_item_from_contribution(Contribution c)
+        private bool item_selected(object obj, System.Windows.Input.TouchEventArgs e)
         {
-            collection_item ci = new collection_item();
-            ci._contribution = c;
-
-            if (c.tags != null)
-            {
-                if (c.tags.Contains("Photo"))
-                    ci.is_image = true;
-                if (c.tags.Contains("Video"))
-                    ci.is_video = true;
-                if (c.tags.Contains("Audio"))
-                    ci.is_audio = true;
-            }
-
-            if (c.media_url == null || c.media_url == "") return ci;
-            //string fname = c.media_url;
-            //string ext = fname.Substring(fname.Length - 4, 4);
-            //ext = ext.ToLower();
-            //if (ext == ".jpg" || ext == ".bmp" || ext == ".png")
-            //    ci.is_image = true;
-            //if (ext == ".wmv" || ext == ".mpg" || ext == "mpeg" || ext == ".avi" || ext == ".mp4" || ext == ".3gp" || ext == ".mov")
-            //    ci.is_video = true;
-            //if (ext == ".wav" || ext == ".mp3")
-            //    ci.is_audio = true;
-
-            try_downloading_contribution(ci, false, false);
-            return ci;
-        }
-
-        private void try_downloading_contribution(collection_item ci, bool force_download, bool force_create_thumbnail)
-        {
-            int i = ci._contribution.id;
-            if (!window_manager.downloaded_contributions.ContainsKey(i) || force_download)
-            {
-                //bool result = file_manager.download_file_from_googledirve(c.media_url, i);
-                bool result = file_manager.download_file(ci._contribution.media_url, i);
-                if (result) window_manager.downloaded_contributions.Add(i, file_manager.get_extension(ci._contribution.media_url));
-            }
-
-            if ((!window_manager.thumbnails.ContainsKey(i) || force_create_thumbnail) && window_manager.downloaded_contributions.ContainsKey(i))
-            {
-                ImageSource img = null;
-                if (ci.is_image)
-                    img = configurations.GetThumbnailFromImage(i.ToString() + "." + window_manager.downloaded_contributions[i], configurations.thumbnail_pixel_height);
-                if (ci.is_video)
-                    img = configurations.GetThumbnailFromVideo(i.ToString() + "." + window_manager.downloaded_contributions[i], configurations.thumbnail_video_span, configurations.thumbnail_pixel_height);
-                if (ci.is_audio)
-                    img = configurations.img_sound_image_pic;
-                if (img == null)
-                    return;
-
-                //if (!window_manager.thumbnails.ContainsKey(i))
-                //{
-                // save the thumbnail
-                try
-                {
-                    BitmapSource bs = img as BitmapSource;
-                    if (!ci.is_audio)
-                    {
-                        configurations.SaveThumbnail(bs, i.ToString());
-                    }
-                    img = new BitmapImage(new Uri(configurations.GetAbsoluteThumbnailPath() + i.ToString() + ".jpg"));
-                    img.Freeze();
-                    if (!window_manager.thumbnails.ContainsKey(i) || force_create_thumbnail)
-                        window_manager.thumbnails.Add(i, img);
-                    else
-                        window_manager.thumbnails[i] = img;
-                }
-                catch (Exception) { }   // not a problem
-                //}
-            }
-        }
-
-        bool item_selected(object i, System.Windows.Input.TouchEventArgs e)
-        {
-            collection_listbox_item item = (collection_listbox_item)i;
+            collection_listbox_item item = (collection_listbox_item)obj;
             collection_item ci = (collection_item)item.img.Tag;
             if (ci != null)
             {
-                log.WriteInteractionLog(17, "tapped the collection item, contribution id: " + ci._contribution.id, e.TouchDevice);
-                window_manager.open_contribution_window(ci,
-                    item.PointToScreen(new Point(0, 0)).X - window_manager.main_canvas.PointToScreen(new Point(0, 0)).X,
-                    item.PointToScreen(new Point(0, 0)).Y, ci.ToString());
+                if (e != null)
+                    log.WriteInteractionLog(17, "tapped the collection item, contribution id: " + ci._contribution.id, e.TouchDevice);
+                if (ci.should_have_media)
+                    window_manager.open_contribution_window(ci,
+                        item.PointToScreen(new Point(0, 0)).X - window_manager.main_canvas.PointToScreen(new Point(0, 0)).X,
+                        item.PointToScreen(new Point(0, 0)).Y);
+                else if (ci.contribution_type == "Design Idea")
+                {
+                    item_generic_v2 i = configurations.get_item_visuals(ci);
+                    window_manager.open_design_idea_window(i,
+                        item.PointToScreen(new Point(0, 0)).X - window_manager.main_canvas.PointToScreen(new Point(0, 0)).X,
+                        item.PointToScreen(new Point(0, 0)).Y, ci.ToString());
+                }
+                else if (ci.contribution_type == "BirdCounting")
+                {
+                    item_generic_v2 i = configurations.get_item_visuals(ci);
+                    window_manager.open_design_idea_window(i,
+                        item.PointToScreen(new Point(0, 0)).X - window_manager.main_canvas.PointToScreen(new Point(0, 0)).X,
+                        item.PointToScreen(new Point(0, 0)).Y, ci.ToString());
+                }
             }
             else
             {
-                log.WriteInteractionLog(17, "tapped the collection item (retry item)", e.TouchDevice);
+                if (e != null)
+                    log.WriteInteractionLog(17, "tapped the collection item (retry item)", e.TouchDevice);
                 worker_retry.DoWork += new DoWorkEventHandler(retry_downloading);
                 //worker.RunWorkerCompleted += new RunWorkerCompletedEventHandler(display_all_contributions);
                 if (!worker_retry.IsBusy)
@@ -658,7 +618,7 @@ namespace nature_net.user_controls
             return true;
         }
 
-        void retry_downloading(object sender, DoWorkEventArgs e)
+        private void retry_downloading(object sender, DoWorkEventArgs e)
         {
             if (upload_failed_items.Count == 0) return;
             this.contributions._list.Items.Dispatcher.BeginInvoke(DispatcherPriority.Normal,
@@ -675,7 +635,7 @@ namespace nature_net.user_controls
                                select c;
                 if (contribs.Count() != 1) continue;
                 ci._contribution = contribs.Single<Contribution>();
-                try_downloading_contribution(ci, true, true);
+                file_manager.try_downloading_contribution(ci, true, true);
                 if (!window_manager.thumbnails.ContainsKey(ci._contribution.id))
                 { failed_items.Add(cli); }           
             }
@@ -716,7 +676,7 @@ namespace nature_net.user_controls
                 }));
         }
 
-        public bool start_drag(ListBoxItem item, collection_item contribution_item, TouchDevice touch_device, ImageSource i)
+        private bool start_drag(ListBoxItem item, collection_item contribution_item, TouchDevice touch_device, ImageSource i)
         {
             Image i2 = new Image();
             i2.Source = i;
@@ -749,6 +709,7 @@ namespace nature_net.user_controls
 
             return (startDragOkay != null);
         }
+
     }
 
     public class collection_item
@@ -757,13 +718,18 @@ namespace nature_net.user_controls
         public bool is_audio = false;
         public bool is_image = false;
         public bool is_video = false;
+        public bool should_have_media = true;
+        public string contribution_type = "";
+        public string text_to_display = "";
+        public ImageSource default_contrib_img;
 
         public override string ToString()
         {
             if (is_audio) return "Audio";
             if (is_image) return "Image";
             if (is_video) return "Video";
-            return "Media";
+            if (contribution_type != "") return contribution_type;
+            return "Contribution";
         }
     }
 
@@ -774,4 +740,26 @@ namespace nature_net.user_controls
         public List<collection_item> loaded_items;
     }
 
+    public class Extras
+    {
+        public string icon { get; set; }
+        public string type { get; set; }
+        public bool active { get; set; }
+        public List<BirdInfo> birds { get; set; }
+    }
+
+    public class BirdInfo
+    {
+        public string name { get; set; }
+        public string image { get; set; }
+        public int count { get; set; }
+        public int seasonal_count { get; set; }
+    }
+
+    public class NoteContent
+    {
+        public List<BirdInfo> birds { get; set; }
+        public string type { get; set; }
+        public string description { get; set; }
+    }
 }

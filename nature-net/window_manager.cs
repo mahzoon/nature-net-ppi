@@ -30,6 +30,7 @@ namespace nature_net
         public static List<window_frame> image_display_frames = new List<window_frame>();
         public static List<window_frame> activity_frames = new List<window_frame>();
         public static List<image_frame> image_frames = new List<image_frame>();
+        public static List<help_window> help_windows = new List<help_window>();
 
         public static Dictionary<string, ImageSource> avatars = new Dictionary<string, ImageSource>();
 
@@ -46,14 +47,15 @@ namespace nature_net
             c_listbox.parent = frame;
             c_listbox.list_contributions_in_location(location_id);
             //content.initialize_contents(c_listbox);
-            content.initialize_contents(c_listbox, Type.GetType("nature_net.Location"), location_id, frame, configurations.frame_title + " in " + location_id.ToString() + ": " + location);
+            content.initialize_contents(c_listbox, Type.GetType("nature_net.Location"), location_id, frame,
+                configurations.frame_title_location_collection + " in " + location_id.ToString() + ": " + location);
             frame.window_content.Content = content;
             
             content.list_all_comments();
 
             window_manager.collection_frames.Add(frame);
             open_window(frame, pos_x - (frame.Width / 2), pos_y - (c_listbox.Height));
-            frame.set_title(configurations.frame_title + " in " + location_id.ToString() + ": " + location);
+            frame.set_title(configurations.frame_title_location_collection + " in " + location_id.ToString() + ": " + location);
             frame.set_kill_timer();
         }
 
@@ -66,18 +68,19 @@ namespace nature_net
             window_content content = new window_content();
             collection_listbox c_listbox = new collection_listbox();
             c_listbox.parent = frame;
-            c_listbox.list_all_contributions(username);
-            content.initialize_contents(c_listbox, Type.GetType("nature_net.User"), userid, frame, username + "'s " + configurations.frame_title.ToLower());
+            c_listbox.list_contributions_for_user(username);
+            content.initialize_contents(c_listbox, Type.GetType("nature_net.User"), userid, frame,
+                username + configurations.frame_title_user_collection);
             frame.window_content.Content = content;
             content.list_all_comments();
 
             window_manager.collection_frames.Add(frame);
             open_window(frame, pos_x, pos_y);
-            frame.set_title(username + "'s " + configurations.frame_title.ToLower());
+            frame.set_title(username + configurations.frame_title_user_collection);
             frame.set_kill_timer();
         }
 
-        public static void open_contribution_window(collection_item citem, double pos_x, double pos_y, string ctype)
+        public static void open_contribution_window(collection_item citem, double pos_x, double pos_y)
         {
             if (window_manager.image_frames.Count + 1 > configurations.max_image_display_frame)
                 return;
@@ -147,57 +150,6 @@ namespace nature_net
             frame.set_title(idea_item.user_info_name.Text + "'s " + title);
             frame.set_kill_timer();
         }
-        //public static void open_design_idea_window(string[] idea_item, double pos_x, double pos_y, string title = "Design Idea")
-        //{
-        //    if (window_manager.design_ideas_frames.Count + 1 > configurations.max_design_ideas_frame)
-        //        return;
-
-        //    window_frame frame = new window_frame();
-        //    window_content content = new window_content();
-
-        //    item_generic_v2 i = new item_generic_v2();
-        //    i.title.Text = idea_item[3]; i.description.Visibility = Visibility.Collapsed;
-        //    i.title.FontSize = 17;
-        //    i.user_info.Margin = new Thickness(5);
-        //    i.user_info_name.Text = idea_item[5]; i.user_info_date.Text = idea_item[9];
-        //    i.user_info_name.Margin = new Thickness(2, 0, 0, 0); i.user_info_date.Margin = new Thickness(2, 0, 2, 0);
-        //    i.user_info_name.FontSize = 10; i.user_info_date.FontSize = 10;
-        //    try { i.user_info_icon.Source = new BitmapImage(new Uri(idea_item[2])); }
-        //    catch (Exception) { i.user_info_icon.Visibility = Visibility.Collapsed; }
-        //    if (idea_item[12] == "False")
-        //        i.user_info_icon.Visibility = Visibility.Collapsed;
-        //    i.number.Text = idea_item[7]; i.number_icon.Visibility = Visibility.Collapsed;
-        //    i.txt_level1.Text = configurations.designidea_num_desc;
-        //    i.txt_level2.Visibility = Visibility.Collapsed; i.txt_level3.Visibility = Visibility.Collapsed;
-        //    i.avatar.Source = configurations.img_thumbs_up_icon; i.num_likes.Content = idea_item[8]; i.avatar.Tag = i;
-        //    i.avatar.Width = 45; i.avatar.Height = 45; i.avatar.Margin = new Thickness(5);
-        //    i.right_panel.Width = configurations.design_idea_right_panel_width;
-        //    i.set_like_handler();
-        //    i.Tag = idea_item[1]; i.top_value = Convert.ToInt32(idea_item[8]);
-        //    if (idea_item[10] == "Visible")
-        //    {
-        //        i.affiliation_icon_small.Source = configurations.img_affiliation_icon;
-        //        i.affiliation_icon_small.Visibility = Visibility.Visible;
-        //    }
-        //    if (idea_item[11] == "Visible")
-        //    {
-        //        i.affiliation_icon.Height = 15;
-        //        i.affiliation_icon.Source = configurations.img_implemented_icon;
-        //        i.affiliation_icon.Visibility = Visibility.Visible;
-        //        i.title.MaxWidth = 230;
-        //    }
-            
-        //    i.Background = new SolidColorBrush(Colors.White);
-        //    i.Width = frame.Width;
-        //    content.initialize_contents(i, Type.GetType("nature_net.Contribution"), Convert.ToInt32(idea_item[1]), frame, idea_item[5] + "'s " + title);
-
-        //    frame.window_content.Content = content;
-
-        //    window_manager.design_ideas_frames.Add(frame);
-        //    open_window(frame, pos_x, pos_y);
-        //    frame.hide_change_view();
-        //    frame.set_title(idea_item[5] + "'s " + title);
-        //}
 
         public static void open_design_idea_window_ext(design_ideas_listbox parent, double pos_x, double pos_y)
         {
@@ -247,7 +199,8 @@ namespace nature_net
             collection_listbox c_listbox = new collection_listbox();
             c_listbox.parent = frame;
             c_listbox.list_contributions_in_activity(activity_id);
-            content.initialize_contents(c_listbox, Type.GetType("nature_net.Activity"), activity_id, frame, activity_name + "'s " + configurations.frame_title.ToLower());
+            content.initialize_contents(c_listbox, Type.GetType("nature_net.Activity"), activity_id, frame,
+                activity_name + configurations.frame_title_activity_collection);
             frame.window_content.Content = content;
             content.list_all_comments();
 
@@ -256,8 +209,28 @@ namespace nature_net
             string title = activity_name;
             //if (activity_name.Length > configurations.max_activity_frame_title_chars)
             //    title = activity_name.Substring(0, 10) + "...";
-            frame.set_title(title + "'s " + configurations.frame_title.ToLower());
+            frame.set_title(title + configurations.frame_title_activity_collection);
             frame.set_kill_timer();
+        }
+
+        public static void open_help_window(string filename, string caption, double pos_x, double pos_y)
+        {
+            if (window_manager.help_windows.Count + 1 > configurations.max_image_display_frame)
+                return;
+
+            help_window hwin = new help_window();
+            hwin.view_help(filename, caption);
+            main_canvas.Children.Add(hwin);
+            window_manager.help_windows.Add(hwin);
+
+            double h = hwin.ActualHeight;
+            pos_x = pos_x - (hwin.ActualWidth / 2);
+            if (pos_y > window_manager.main_canvas.ActualHeight - h)
+                pos_y = window_manager.main_canvas.ActualHeight - h;
+            TranslateTransform m = new TranslateTransform(pos_x, pos_y);
+            Matrix matrix = m.Value;
+            hwin.RenderTransform = new MatrixTransform(matrix);
+            hwin.set_kill_timer();
         }
 
         private static void open_window(window_frame frame, double pos_x, double pos_y)
@@ -313,6 +286,12 @@ namespace nature_net
             main_canvas.Children.Remove(frame);
         }
 
+        public static void close_window(help_window frame)
+        {
+            help_windows.Remove(frame);
+            main_canvas.Children.Remove(frame);
+        }
+
         public static void close_signup_window(window_frame frame, string username)
         {
             signup_frames.Remove(frame);
@@ -320,11 +299,23 @@ namespace nature_net
             highlight_timer = new System.Threading.Timer(new System.Threading.TimerCallback(highlight_callback_users_t), username, 100, System.Threading.Timeout.Infinite);
         }
 
-        public static void close_submit_design_idea_window(window_frame frame, string title)
+        public static void close_submit_design_idea_window(window_frame frame, int activity_id, int contribution_id)
         {
             design_ideas_frames.Remove(frame);
             main_canvas.Children.Remove(frame);
-            highlight_timer = new System.Threading.Timer(new System.Threading.TimerCallback(highlight_callback_design_ideas_t), title, 100, System.Threading.Timeout.Infinite);
+            highlight_timer = new System.Threading.Timer(new System.Threading.TimerCallback(highlight_callback_design_ideas_t),
+                activity_id + ";" + contribution_id, 100, System.Threading.Timeout.Infinite);
+        }
+
+        public static Point move_window(UIElement frame, Point last_position, System.Windows.Input.MouseEventArgs e)
+        {
+            if (last_position.X == 0 && last_position.Y == 0) last_position = e.GetPosition(main_canvas);
+            Matrix matrix = ((MatrixTransform)frame.RenderTransform).Matrix;
+            //System.Windows.Point center = new System.Windows.Point(frame.ActualWidth / 2, frame.ActualHeight / 2);
+            //center = matrix.Transform(center);
+            matrix.Translate(e.GetPosition(main_canvas).X - last_position.X, e.GetPosition(main_canvas).Y - last_position.Y);
+            frame.RenderTransform = new MatrixTransform(matrix);
+            return e.GetPosition(main_canvas);
         }
 
         public static void refresh_downloaded_contributions()
