@@ -36,6 +36,7 @@ namespace nature_net
         public static string frame_title_user_collection = "'s Observations";
         public static string frame_title_location_collection = "Observations";
         public static string frame_title_activity_collection = "";
+        public static string frame_title_activity_contribution = "";
         public static string affiliation_aces = "ACES";
         public static string status_implemented = "implemented";
         public static string status_deleted = "deleted";
@@ -66,7 +67,7 @@ namespace nature_net
         public static string comment_init_text = "Add Comment";
         public static string design_idea_init_text = "Design Idea";
 
-        public static bool high_contrast = false;
+        public static bool high_contrast { set; get; }
         public static bool top_most = false;
         public static bool show_update_label = false;
         public static bool response_to_mouse_clicks = true;
@@ -170,6 +171,7 @@ namespace nature_net
         static string signup_icon = "signup.png";
         static string signup_window_icon = "signup_window_icon.png";
         static string submit_idea_icon = "submit_idea.png";
+        static string submit_idea_comment = "submit_idea2.png";
         static string thumbs_up_icon = "tu.jpg";
         static string thumbs_down_icon = "td.jpg";
         static string drag_icon = "drag.png";
@@ -178,6 +180,8 @@ namespace nature_net
         static string reply_icon = "reply.png";
         static string affiliation_icon = "affiliation.png";
         static string implemented_icon = "implemented.png";
+        static string idea_background = "idea_background.png";
+        static string collection_background = "collection_background.png";
 
         public static string keyboard_click_wav = "click.wav";
 
@@ -203,6 +207,7 @@ namespace nature_net
         public static ImageSource img_signup_window_icon;
         public static ImageSource img_signup_icon;
         public static ImageSource img_submit_idea_icon;
+        public static ImageSource img_submit_idea_comment;
         public static ImageSource img_thumbs_up_icon;
         public static ImageSource img_thumbs_down_icon;
         public static ImageSource img_drag_icon;
@@ -211,6 +216,8 @@ namespace nature_net
         public static ImageSource img_reply_icon;
         public static ImageSource img_affiliation_icon;
         public static ImageSource img_implemented_icon;
+        public static ImageSource img_idea_background;
+        //public static ImageSource img_collection_background;
 
         public static int frame_width = 300;
         public static int frame_title_bar_height = 40;
@@ -320,6 +327,7 @@ namespace nature_net
             img_change_view_stack_icon = new BitmapImage(new Uri(configurations.GetAbsoluteImagePath() + change_view_stack_icon));
             img_signup_icon = new BitmapImage(new Uri(configurations.GetAbsoluteImagePath() + signup_icon));
             img_submit_idea_icon = new BitmapImage(new Uri(configurations.GetAbsoluteImagePath() + submit_idea_icon));
+            img_submit_idea_comment = new BitmapImage(new Uri(configurations.GetAbsoluteImagePath() + submit_idea_comment));
             img_thumbs_up_icon = new BitmapImage(new Uri(configurations.GetAbsoluteImagePath() + thumbs_up_icon));
             img_thumbs_down_icon = new BitmapImage(new Uri(configurations.GetAbsoluteImagePath() + thumbs_down_icon));
             img_thumbs_down_icon = new BitmapImage(new Uri(configurations.GetAbsoluteImagePath() + thumbs_down_icon));
@@ -329,6 +337,8 @@ namespace nature_net
             img_reply_icon = new BitmapImage(new Uri(configurations.GetAbsoluteImagePath() + reply_icon));
             img_affiliation_icon = new BitmapImage(new Uri(configurations.GetAbsoluteImagePath() + affiliation_icon));
             img_implemented_icon = new BitmapImage(new Uri(configurations.GetAbsoluteImagePath() + implemented_icon));
+            img_idea_background = new BitmapImage(new Uri(configurations.GetAbsoluteImagePath() + idea_background));
+            //img_collection_background = new BitmapImage(new Uri(configurations.GetAbsoluteImagePath() + collection_background));
         }
 
         public static string GetDate_Formatted(DateTime dt)
@@ -712,6 +722,7 @@ namespace nature_net
             frame_title_user_collection = parser.GetValue("General", "frame_title_user_collection", " Observations");
             frame_title_location_collection = parser.GetValue("General", "frame_title_location_collection", "");
             frame_title_activity_collection = parser.GetValue("General", "frame_title_activity_collection", " Contributions");
+            frame_title_activity_contribution = parser.GetValue("General", "frame_title_activity_contribution", "");
             affiliation_aces = parser.GetValue("General", "affiliation_aces", "ACES");
             status_implemented = parser.GetValue("General", "status_implemented", "implemented");
             status_deleted = parser.GetValue("General", "status_deleted", "deleted");
@@ -805,7 +816,7 @@ namespace nature_net
             video_image_pic = parser.GetValue("Files", "video_image_pic", "film.png");
             keyboard_pic = parser.GetValue("Files", "keyboard_pic", "NN_Keyboard_v2.png");
             keyboard_shift_pic = parser.GetValue("Files", "keyboard_shift_pic", "NN_Keyboard_v2_shift.png");
-            keyboard_caps_pic = parser.GetValue("Files", "keyboard_caps_pic", "NN_Keyboard_v2_caps.png");
+            keyboard_caps_pic = parser.GetValue("F iles", "keyboard_caps_pic", "NN_Keyboard_v2_caps.png");
             keyboard_numpad_pic = parser.GetValue("Files", "keyboard_numpad_pic", "NN_Numpad.png");
             choose_avatar_pic = parser.GetValue("Files", "choose_avatar_pic", "choose_avatar.png");
             choose_activity_pic = parser.GetValue("Files", "choose_activity_pic", "choose_activity.png");
@@ -818,6 +829,7 @@ namespace nature_net
             signup_icon = parser.GetValue("Files", "signup_icon", "signup.png");
             signup_window_icon = parser.GetValue("Files", "signup_window_icon", "signup_window_icon.png");
             submit_idea_icon = parser.GetValue("Files", "submit_idea_icon", "submit_idea.png");
+            submit_idea_comment = parser.GetValue("Files", "submit_idea_comment", "submit_idea2.png");
             thumbs_up_icon = parser.GetValue("Files", "thumbs_up_icon", "tu.jpg");
             thumbs_down_icon = parser.GetValue("Files", "thumbs_down_icon", "td.jpg");
             drag_icon = parser.GetValue("Files", "drag_icon", "drag.png");
@@ -827,6 +839,8 @@ namespace nature_net
             affiliation_icon = parser.GetValue("Files", "affiliation_icon", "affiliation.png");
             implemented_icon = parser.GetValue("Files", "implemented_icon", "implemented.png");
             keyboard_click_wav = parser.GetValue("Files", "keyboard_click_wav", "click.wav");
+            idea_background = parser.GetValue("Files", "idea_background", "idea_background.png");
+            collection_background = parser.GetValue("Files", "collection_background", "collection_background.png");
 
             // Frame
             frame_width = parser.GetValue("Frame", "frame_width", 300);

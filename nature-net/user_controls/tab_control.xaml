@@ -4,6 +4,7 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:uc="clr-namespace:nature_net.user_controls"
+             xmlns:nn="clr-namespace:nature_net"
              mc:Ignorable="d" 
              d:DesignHeight="300" d:DesignWidth="340">
 
@@ -49,12 +50,42 @@
                                     </MultiTrigger.Conditions>
                                     <Setter TargetName="Border" Property="BorderThickness" Value="2,0,2,2" />
                                 </MultiTrigger>
-                                <Trigger Property="IsSelected" Value="True">
-                                    <Setter TargetName="Border" Property="Background" Value="LightGreen" />
-                                </Trigger>
-                                <Trigger Property="IsSelected" Value="False">
+
+                                <!--<Trigger Property="IsSelected" Value="False">
                                     <Setter TargetName="Border" Property="Background" Value="White" />
                                 </Trigger>
+                                <Trigger Property="IsSelected" Value="True">
+                                    <Setter TargetName="Border" Property="Background" Value="LightGreen" />
+                                </Trigger>-->
+                                <MultiDataTrigger>
+                                    <MultiDataTrigger.Conditions>
+                                        <Condition Binding="{Binding Path=IsSelected, RelativeSource={RelativeSource Self}}" Value="True" />
+                                        <Condition Binding="{Binding Source={x:Static nn:configurations.high_contrast}}" Value="True" />
+                                    </MultiDataTrigger.Conditions>
+                                    <Setter TargetName="Border" Property="Background" Value="Gray" />
+                                </MultiDataTrigger>
+                                <MultiDataTrigger>
+                                    <MultiDataTrigger.Conditions>
+                                        <Condition Binding="{Binding Path=IsSelected, RelativeSource={RelativeSource Self}}" Value="True" />
+                                        <Condition Binding="{Binding Source={x:Static nn:configurations.high_contrast}}" Value="False" />
+                                    </MultiDataTrigger.Conditions>
+                                    <Setter TargetName="Border" Property="Background" Value="LightGreen" />
+                                </MultiDataTrigger>
+                                <MultiDataTrigger>
+                                    <MultiDataTrigger.Conditions>
+                                        <Condition Binding="{Binding Path=IsSelected, RelativeSource={RelativeSource Self}}" Value="False" />
+                                        <Condition Binding="{Binding Source={x:Static nn:configurations.high_contrast}}" Value="True" />
+                                    </MultiDataTrigger.Conditions>
+                                    <Setter TargetName="Border" Property="Background" Value="LightGray" />
+                                </MultiDataTrigger>
+                                <MultiDataTrigger>
+                                    <MultiDataTrigger.Conditions>
+                                        <Condition Binding="{Binding Path=IsSelected, RelativeSource={RelativeSource Self}}" Value="False" />
+                                        <Condition Binding="{Binding Source={x:Static nn:configurations.high_contrast}}" Value="False" />
+                                    </MultiDataTrigger.Conditions>
+                                    <Setter TargetName="Border" Property="Background" Value="White" />
+                                </MultiDataTrigger>
+
                                 <Trigger Property="TabStripPlacement" Value="Right">
                                     <Setter TargetName="Border" Property="CornerRadius" Value="0,20,5,0" />
                                     <Setter TargetName="Border" Property="Margin" Value="-2,0,0,0" />

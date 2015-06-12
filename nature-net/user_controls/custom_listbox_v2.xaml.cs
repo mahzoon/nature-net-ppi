@@ -35,6 +35,7 @@ namespace nature_net.user_controls
         private Point drag_direction2;
         private Dictionary<int, touch_info> touch_points = new Dictionary<int, touch_info>();
         private int last_selected_index = -1;
+        private Brush init_background;
 
         private double debug_var = 10;
         private Canvas debug_canvas;
@@ -47,6 +48,10 @@ namespace nature_net.user_controls
             InitializeComponent();
             //if (configurations.response_to_mouse_clicks)
             //    this.selectable = true;
+            if (configurations.high_contrast)
+            {
+                this.whole_list.Background = Brushes.DarkGray;
+            }
         }
 
         public void initialize(bool horizontal, string prefix, ItemSelected i)
@@ -78,11 +83,6 @@ namespace nature_net.user_controls
                 this._list.PreviewTouchMove += new EventHandler<TouchEventArgs>(_list_PreviewTouchMove);
                 this._list.PreviewTouchUp += new EventHandler<TouchEventArgs>(_list_PreviewTouchUp);
             }
-
-            if (configurations.high_contrast)
-                this._list.Background = Brushes.DarkGreen;
-            else
-                this._list.Background = Brushes.Transparent;
         }
 
         void _list_PreviewMouseLeftButtonDown(object sender, MouseButtonEventArgs e)
@@ -675,6 +675,7 @@ namespace nature_net.user_controls
                 return;
             if (select)
             {
+                this.init_background = i.Background;
                 if (i.GetType() != Type.GetType("nature_net.user_controls.collection_listbox_item"))
                     i.Background = Brushes.LightGray;
                 else
@@ -682,7 +683,8 @@ namespace nature_net.user_controls
             }
             else
             {
-                i.Background = Brushes.Transparent;
+                //i.Background = Brushes.Transparent;
+                i.Background = this.init_background;
                 i.Opacity = 1;
             }
         }

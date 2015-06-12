@@ -68,7 +68,8 @@ namespace nature_net.user_controls
             string[] activity_item = ("activity;" + item.ToString()).Split(new Char[] { ';' });
             if (e != null)
                 log.WriteInteractionLog(15, "tapped the listbox item: " + item.ToString(), e.TouchDevice);
-            window_manager.open_activity_window(item.title.Text, Convert.ToInt32(item.Tag), 65, item.PointToScreen(new Point(0, 0)).Y);
+            window_manager.open_activity_window(item.title.Text, Convert.ToInt32(item.Tag),
+                65, item.PointToScreen(new Point(0, 0)).Y, false, item.avatar.Source);
             return true;
         }
 
@@ -117,6 +118,11 @@ namespace nature_net.user_controls
             has_touched_down = false;
             //submit_idea.Background = Brushes.White;
             submit_idea.Background = Brushes.LightGray;
+            if (configurations.high_contrast)
+            {
+                submit_idea.Background = Brushes.DarkGray;
+                submit_idea.right_panel.Background = Brushes.DarkGray;
+            }
             log.WriteInteractionLog(6, "", e.TouchDevice);
             window_manager.open_design_idea_window_ext(null, last_pos_x, submit_idea.PointToScreen(new Point(0, 0)).Y);
             last_pos_x = last_pos_x + pos_x_increment;
@@ -142,6 +148,12 @@ namespace nature_net.user_controls
             submit_idea.Margin = new Thickness(2, 2, 2, 0);
             submit_idea.Height = configurations.user_item_avatar_width; //signup.avatar.Height;
             //submit_idea.right_panel.Width = configurations.design_idea_right_panel_width;
+
+            if (configurations.high_contrast)
+            {
+                submit_idea.Background = Brushes.DarkGray;
+                submit_idea.right_panel.Background = Brushes.DarkGray;
+            }
 
             submit_idea.PreviewTouchDown += new EventHandler<TouchEventArgs>(submit_PreviewTouchDown);
             submit_idea.PreviewTouchUp += new EventHandler<TouchEventArgs>(submit_PreviewTouchUp);

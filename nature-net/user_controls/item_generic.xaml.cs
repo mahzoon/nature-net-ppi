@@ -38,7 +38,7 @@ namespace nature_net.user_controls
 
             if (configurations.high_contrast)
             {
-                this.Background = Brushes.Green;
+                this.Background = Brushes.LightGray;
             }
             this.img_like.Width = configurations.toolbar_item_width; this.img_dislike.Width = configurations.toolbar_item_width;
             //var brush1 = new ImageBrush();

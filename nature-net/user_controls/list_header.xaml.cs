@@ -28,6 +28,10 @@ namespace nature_net.user_controls
         public list_header()
         {
             InitializeComponent();
+            if (configurations.high_contrast)
+            {
+                this.whole.Background = Brushes.DarkGray;
+            }
         }
 
         public void sort()

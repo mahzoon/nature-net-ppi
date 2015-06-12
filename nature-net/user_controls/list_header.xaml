@@ -3,6 +3,7 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:nn="clr-namespace:nature_net"
              mc:Ignorable="d" 
              d:DesignHeight="85" d:DesignWidth="256">
     
@@ -20,10 +21,44 @@
                                                VerticalAlignment="Center"/>
                         </Border>
                         <ControlTemplate.Triggers>
-                            <Trigger Property="ToggleButton.IsChecked" Value="True">
+
+                            <MultiDataTrigger>
+                                <MultiDataTrigger.Conditions>
+                                    <Condition Binding="{Binding Path=IsChecked, RelativeSource={RelativeSource Self}}" Value="True" />
+                                    <Condition Binding="{Binding Source={x:Static nn:configurations.high_contrast}}" Value="True" />
+                                </MultiDataTrigger.Conditions>
+                                <Setter TargetName="outer" Property="Background" Value="Gray"/>
+                                <Setter TargetName="display" Property="Foreground" Value="White"/>
+                            </MultiDataTrigger>
+                            <MultiDataTrigger>
+                                <MultiDataTrigger.Conditions>
+                                    <Condition Binding="{Binding Path=IsChecked, RelativeSource={RelativeSource Self}}" Value="True" />
+                                    <Condition Binding="{Binding Source={x:Static nn:configurations.high_contrast}}" Value="False" />
+                                </MultiDataTrigger.Conditions>
                                 <Setter TargetName="outer" Property="Background" Value="DarkGreen"/>
                                 <Setter TargetName="display" Property="Foreground" Value="White"/>
-                            </Trigger>
+                            </MultiDataTrigger>
+                            <MultiDataTrigger>
+                                <MultiDataTrigger.Conditions>
+                                    <Condition Binding="{Binding Path=IsChecked, RelativeSource={RelativeSource Self}}" Value="False" />
+                                    <Condition Binding="{Binding Source={x:Static nn:configurations.high_contrast}}" Value="True" />
+                                </MultiDataTrigger.Conditions>
+                                <Setter TargetName="outer" Property="Background" Value="LightGray"/>
+                                <Setter TargetName="display" Property="Foreground" Value="Black"/>
+                            </MultiDataTrigger>
+                            <MultiDataTrigger>
+                                <MultiDataTrigger.Conditions>
+                                    <Condition Binding="{Binding Path=IsChecked, RelativeSource={RelativeSource Self}}" Value="False" />
+                                    <Condition Binding="{Binding Source={x:Static nn:configurations.high_contrast}}" Value="False" />
+                                </MultiDataTrigger.Conditions>
+                                <Setter TargetName="outer" Property="Background" Value="White"/>
+                                <Setter TargetName="display" Property="Foreground" Value="Black"/>
+                            </MultiDataTrigger>
+
+                            <!--<Trigger Property="ToggleButton.IsChecked" Value="True">
+                                <Setter TargetName="outer" Property="Background" Value="DarkGreen"/>
+                                <Setter TargetName="display" Property="Foreground" Value="White"/>
+                            </Trigger>-->
                         </ControlTemplate.Triggers>
                     </ControlTemplate>
                 </Setter.Value>

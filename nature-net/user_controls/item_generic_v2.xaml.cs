@@ -36,6 +36,11 @@ namespace nature_net.user_controls
             this.item_border.BorderThickness = new Thickness(0, 0, 0, 1);
             this.right_panel_border.Background = configurations.right_panel_background;
             right_panel.Width = configurations.right_panel_width;
+
+            if (configurations.high_contrast)
+            {
+                this.Background = Brushes.LightGray;
+            }
         }
 
         public void set_like_handler()

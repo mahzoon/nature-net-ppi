@@ -12,17 +12,17 @@ namespace nature_net
         [STAThread]
         public static void Main()
         {
-            //try
-            //{
+            try
+            {
                 program p = new program();
                 p.StartupUri = new System.Uri("main_window.xaml", System.UriKind.Relative);
                 p.Run();
-            //}
-            //catch (Exception ex)
-            //{
-            //    log.WriteErrorLog(ex);
-            //    MessageBox.Show("Sorry! The program needs to be restarted.");
-            //}
+            }
+            catch (Exception ex)
+            {
+                log.WriteErrorLog(ex);
+                MessageBox.Show("Sorry! The program needs to be restarted.");
+            }
         }
     }
 }

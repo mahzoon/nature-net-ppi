@@ -59,7 +59,7 @@ namespace nature_net
             frame.set_kill_timer();
         }
 
-        public static void open_collection_window(string username, int userid, double pos_x, double pos_y)
+        public static void open_collection_window(string username, int userid, double pos_x, double pos_y, ImageSource icon)
         {
             if (window_manager.collection_frames.Count + 1 > configurations.max_collection_frame)
                 return;
@@ -72,6 +72,7 @@ namespace nature_net
             content.initialize_contents(c_listbox, Type.GetType("nature_net.User"), userid, frame,
                 username + configurations.frame_title_user_collection);
             frame.window_content.Content = content;
+            frame.set_icon(icon);
             content.list_all_comments();
 
             window_manager.collection_frames.Add(frame);
@@ -123,7 +124,7 @@ namespace nature_net
             iframe.set_kill_timer();
         }
 
-        public static void open_design_idea_window(item_generic_v2 idea_item, double pos_x, double pos_y, string title = "Design Idea")
+        public static void open_design_idea_window(item_generic_v2 idea_item, double pos_x, double pos_y, string activity_name)
         {
             if (window_manager.design_ideas_frames.Count + 1 > configurations.max_design_ideas_frame)
                 return;
@@ -142,12 +143,14 @@ namespace nature_net
             if (idea.affiliation_icon.Visibility == Visibility.Visible)
                 idea.title.MaxWidth = 0.6 * frame.Width;
 
-            content.initialize_contents(idea, Type.GetType("nature_net.Contribution"), Convert.ToInt32(idea_item.Tag), frame, idea_item.user_info_name.Text + "'s " + title);
+            content.initialize_contents(idea, Type.GetType("nature_net.Contribution"),
+                Convert.ToInt32(idea_item.Tag), frame,
+                idea_item.user_info_name.Text + "'s " + activity_name + " " + configurations.frame_title_activity_contribution);
             frame.window_content.Content = content;
 
             window_manager.design_ideas_frames.Add(frame);
             open_window(frame, pos_x, pos_y);
-            frame.set_title(idea_item.user_info_name.Text + "'s " + title);
+            frame.set_title(idea_item.user_info_name.Text + "'s " + activity_name + " " + configurations.frame_title_activity_contribution);
             frame.set_kill_timer();
         }
 
@@ -189,7 +192,7 @@ namespace nature_net
             frame.set_kill_timer();
         }
 
-        public static void open_activity_window(string activity_name, int activity_id, double pos_x, double pos_y)
+        public static void open_activity_window(string activity_name, int activity_id, double pos_x, double pos_y, bool is_designidea_type, ImageSource icon)
         {
             if (window_manager.activity_frames.Count + 1 > configurations.max_activity_frame)
                 return;
@@ -199,9 +202,11 @@ namespace nature_net
             collection_listbox c_listbox = new collection_listbox();
             c_listbox.parent = frame;
             c_listbox.list_contributions_in_activity(activity_id);
+            content.is_idea_collection = is_designidea_type;
             content.initialize_contents(c_listbox, Type.GetType("nature_net.Activity"), activity_id, frame,
-                activity_name + configurations.frame_title_activity_collection);
+                configurations.frame_title_activity_collection + " " + activity_name);
             frame.window_content.Content = content;
+            frame.set_icon(icon);
             content.list_all_comments();
 
             window_manager.activity_frames.Add(frame);
@@ -209,7 +214,7 @@ namespace nature_net
             string title = activity_name;
             //if (activity_name.Length > configurations.max_activity_frame_title_chars)
             //    title = activity_name.Substring(0, 10) + "...";
-            frame.set_title(title + configurations.frame_title_activity_collection);
+            frame.set_title(configurations.frame_title_activity_collection + " " + activity_name);
             frame.set_kill_timer();
         }
 

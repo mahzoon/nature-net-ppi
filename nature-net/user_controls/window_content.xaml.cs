@@ -32,6 +32,7 @@ namespace nature_net.user_controls
         bool expand_state = true;
 
         bool is_submit_design_idea = false;
+        public bool is_idea_collection = false;
 
         virtual_keyboard keyboard;
         ContentControl keyboard_frame;
@@ -422,8 +423,17 @@ namespace nature_net.user_controls
             //brush.Stretch = Stretch.None;
             //this.leave_comment_canvas.Background = brush;
 
-            this.comment_textbox_default.Text = configurations.comment_init_text;
-            this.comment_textbox_reply.Text = configurations.comment_init_text;
+            if (is_idea_collection)
+            {
+                this.comment_textbox_default.Text = configurations.submit_idea_item_title;
+                this.comment_textbox_reply.Text = configurations.submit_idea_item_title;
+                this.comment_icon.Source = configurations.img_submit_idea_comment;
+            }
+            else
+            {
+                this.comment_textbox_default.Text = configurations.comment_init_text;
+                this.comment_textbox_reply.Text = configurations.comment_init_text;
+            }
             this.parent = parent_frame;
             this.pin.parent = parent_frame;
         }
@@ -442,9 +452,17 @@ namespace nature_net.user_controls
             //brush.ImageSource = configurations.img_drop_avatar_pic;
             //brush.Stretch = Stretch.None;
             //this.leave_comment_canvas.Background = brush;
-
-            this.comment_textbox_default.Text = configurations.comment_init_text;
-            this.comment_textbox_reply.Text = configurations.comment_init_text;
+            if (is_idea_collection)
+            {
+                this.comment_textbox_default.Text = configurations.submit_idea_item_title;
+                this.comment_textbox_reply.Text = configurations.submit_idea_item_title;
+                this.comment_icon.Source = configurations.img_submit_idea_comment;
+            }
+            else
+            {
+                this.comment_textbox_default.Text = configurations.comment_init_text;
+                this.comment_textbox_reply.Text = configurations.comment_init_text;
+            }
             this.parent = parent_frame;
             this.pin.parent = parent_frame;
         }
@@ -712,6 +730,8 @@ namespace nature_net.user_controls
                 GetActiveTextBox().Foreground = Brushes.Gray;
                 if (is_submit_design_idea)
                     GetActiveTextBox().Text = configurations.design_idea_init_text;
+                else if (is_idea_collection)
+                    GetActiveTextBox().Text = configurations.submit_idea_item_title;
                 else
                     GetActiveTextBox().Text = configurations.comment_init_text;
             }

@@ -48,7 +48,7 @@
         </Style>
     </UserControl.Resources>
     
-    <DockPanel>
+    <DockPanel Name="whole_list">
         <ListBox Name="_list_vertical" Style="{StaticResource NewListBox}" uc:FadingScrollViewer.PanningMode="VerticalOnly">
             <ListBox.ItemContainerStyle>
                 <Style TargetType="{x:Type ListBoxItem}">

@@ -24,7 +24,6 @@ namespace nature_net.user_controls
             InitializeComponent();
 
             //Static Configuration Values:
-            
         }
 
         public void load_control(bool left, int selected_tab_id, double screen_width)

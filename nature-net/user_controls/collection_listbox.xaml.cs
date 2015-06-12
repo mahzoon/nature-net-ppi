@@ -46,10 +46,11 @@ namespace nature_net.user_controls
         double last_scroll_offset = 0;
 
         string collection_username;
-
+        
         public collection_listbox()
         {
             InitializeComponent();
+            //this.Background = new ImageBrush(configurations.img_collection_background);
             contributions.initialize(true, "", new ItemSelected(this.item_selected));
 
             collection_listbox_item cli = new collection_listbox_item();
@@ -410,6 +411,7 @@ namespace nature_net.user_controls
         private static void display_design_idea_collectionitem(collection_item i, collection_listbox_item cli2)
         {
             cli2.img.Tag = i;
+            cli2.Background = new ImageBrush(configurations.img_idea_background);
             cli2.drag.Source = configurations.img_drag_icon;
             if (i._contribution.modified_date.HasValue)
                 cli2.dateinfo.Text = configurations.GetDate_Formatted(i._contribution.modified_date.Value);
@@ -423,15 +425,18 @@ namespace nature_net.user_controls
             //cli2.whole_grid.Background = Brushes.White;
             //cli2.Background = Brushes.White;
             cli2.BorderBrush = Brushes.DarkGray;
-            cli2.BorderThickness = new Thickness(2);
-            cli2.upload_failed_count.Margin = new Thickness(5, -20, 5, 5);
+            cli2.BorderThickness = new Thickness(1);
+            cli2.info_text.Margin = new Thickness(5, -18, 5, 5);
             cli2.upload_failed_count.TextAlignment = TextAlignment.Left;
             cli2.upload_failed_count.FontFamily = new System.Windows.Media.FontFamily("Calibri");
-            cli2.upload_failed_count.FontSize = 14;
+            cli2.upload_failed_count.FontSize = 16;
             cli2.upload_failed_count.Foreground = Brushes.Black;
             cli2.upload_failed_count.TextWrapping = TextWrapping.Wrap;
+            cli2.upload_failed_count.VerticalAlignment = VerticalAlignment.Center;
+            //cli2.info_text.Background = Brushes.Red;
+            cli2.info_text.Height = 100;
             string text = i.text_to_display;
-            if (text.Length > 110) text = text.Substring(0, 107) + "...";
+            if (text.Length > 65) text = text.Substring(0, 62) + "...";
             cli2.upload_failed_count.Text = text;
         }
 
@@ -585,6 +590,7 @@ namespace nature_net.user_controls
             collection_item ci = (collection_item)item.img.Tag;
             if (ci != null)
             {
+                Activity a = configurations.find_activity_of_contribution(ci._contribution);
                 if (e != null)
                     log.WriteInteractionLog(17, "tapped the collection item, contribution id: " + ci._contribution.id, e.TouchDevice);
                 if (ci.should_have_media)
@@ -596,14 +602,14 @@ namespace nature_net.user_controls
                     item_generic_v2 i = configurations.get_item_visuals(ci);
                     window_manager.open_design_idea_window(i,
                         item.PointToScreen(new Point(0, 0)).X - window_manager.main_canvas.PointToScreen(new Point(0, 0)).X,
-                        item.PointToScreen(new Point(0, 0)).Y, ci.ToString());
+                        item.PointToScreen(new Point(0, 0)).Y, a.name);
                 }
                 else if (ci.contribution_type == "BirdCounting")
                 {
                     item_generic_v2 i = configurations.get_item_visuals(ci);
                     window_manager.open_design_idea_window(i,
                         item.PointToScreen(new Point(0, 0)).X - window_manager.main_canvas.PointToScreen(new Point(0, 0)).X,
-                        item.PointToScreen(new Point(0, 0)).Y, ci.ToString());
+                        item.PointToScreen(new Point(0, 0)).Y, a.name);
                 }
             }
             else

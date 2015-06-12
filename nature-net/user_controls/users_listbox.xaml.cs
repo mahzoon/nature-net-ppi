@@ -63,6 +63,11 @@ namespace nature_net.user_controls
             has_touched_down = false;
             //signup.Background = Brushes.White;
             signup.Background = Brushes.LightGray;
+            if (configurations.high_contrast)
+            {
+                signup.Background = Brushes.DarkGray;
+                signup.right_panel.Background = Brushes.DarkGray;
+            }
 
             log.WriteInteractionLog(5, "", e.TouchDevice);
             window_manager.open_signup_window(last_pos_x, signup.PointToScreen(new Point(0, 0)).Y);
@@ -109,7 +114,8 @@ namespace nature_net.user_controls
                        double x = 0;
                        if (this.users_list._list.Tag != null)
                            x = (double)this.users_list._list.Tag;
-                       window_manager.open_collection_window((string)i.title.Text, (int)i.Tag, 65, x + 30);//lbi.PointToScreen(new Point(0,0)).Y);
+                       window_manager.open_collection_window((string)i.title.Text, (int)i.Tag,
+                           65, x + 30, i.avatar.Source);//lbi.PointToScreen(new Point(0,0)).Y);
                    }
                    else
                        i.Background = Brushes.White;
@@ -132,7 +138,8 @@ namespace nature_net.user_controls
             item_generic_v2 item = (item_generic_v2)i;
             if (e != null)
                 log.WriteInteractionLog(14, "tapped the listbox item: " + item.ToString(), e.TouchDevice);
-            window_manager.open_collection_window((string)item.title.Text, (int)item.Tag, 65, item.PointToScreen(new Point(0, 0)).Y);
+            window_manager.open_collection_window((string)item.title.Text, (int)item.Tag,
+                65, item.PointToScreen(new Point(0, 0)).Y, item.avatar.Source);
             return true;
         }
 
@@ -177,6 +184,11 @@ namespace nature_net.user_controls
             signup.Margin = new Thickness(2, 2, 2, 0);
             signup.Height = configurations.user_item_avatar_width; //signup.avatar.Height;
 
+            if (configurations.high_contrast)
+            {
+                signup.Background = Brushes.DarkGray;
+                signup.right_panel.Background = Brushes.DarkGray;
+            }
             signup.PreviewTouchDown += new EventHandler<TouchEventArgs>(signup_PreviewTouchDown);
             signup.PreviewTouchUp += new EventHandler<TouchEventArgs>(signup_PreviewTouchUp);
             signup_panel.Children.Add(signup);

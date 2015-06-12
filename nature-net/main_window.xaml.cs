@@ -155,9 +155,9 @@ namespace nature_net
 
         void application_panel_PreviewTouchUp(object sender, TouchEventArgs e)
         {
-            this.left_tab.users_listbox.signup.Background = System.Windows.Media.Brushes.LightGray;
-            this.left_tab.design_ideas_listbox.submit_idea.Background = System.Windows.Media.Brushes.LightGray;
-            this.left_tab.activities_listbox.submit_idea.Background = System.Windows.Media.Brushes.LightGray;
+            //this.left_tab.users_listbox.signup.Background = System.Windows.Media.Brushes.LightGray;
+            //this.left_tab.design_ideas_listbox.submit_idea.Background = System.Windows.Media.Brushes.LightGray;
+            //this.left_tab.activities_listbox.submit_idea.Background = System.Windows.Media.Brushes.LightGray;
         }
 
         void item_droped_on_workspace(object sender, SurfaceDragDropEventArgs e)
@@ -167,12 +167,14 @@ namespace nature_net
             string context = data[0].ToLower();
             if (context == "user")
             {
+                item_generic_v2 item = (item_generic_v2)e.Cursor.Data;
                 if (data.Count() < 4) return;
                 string username = data[3];
                 int user_id = Convert.ToInt32(data[1]);
                 log.WriteInteractionLog(14, "user collection opened by dragging; user id: " + user_id, e.Cursor.GetPosition(null).X, e.Cursor.GetPosition(null).Y);
                 window_manager.open_collection_window(username, user_id,
-                    e.Cursor.GetPosition(sender as IInputElement).X, e.Cursor.GetPosition(sender as IInputElement).Y);
+                    e.Cursor.GetPosition(sender as IInputElement).X,
+                    e.Cursor.GetPosition(sender as IInputElement).Y, item.avatar.Source);
                 e.Handled = true;
             }
             if (context == "design idea type")
@@ -183,16 +185,22 @@ namespace nature_net
                     e.Cursor.GetPosition(null).X, e.Cursor.GetPosition(null).Y);
                 //window_manager.open_design_idea_window(data, e.Cursor.GetPosition(sender as IInputElement).X, e.Cursor.GetPosition(sender as IInputElement).Y);
                 //window_manager.open_design_idea_window((item_generic_v2)e.Cursor.Data, e.Cursor.GetPosition(sender as IInputElement).X, e.Cursor.GetPosition(sender as IInputElement).Y);
-                window_manager.open_activity_window(item.title.Text, Convert.ToInt32(item.Tag), e.Cursor.GetPosition(sender as IInputElement).X, e.Cursor.GetPosition(sender as IInputElement).Y);
+                window_manager.open_activity_window(item.title.Text, Convert.ToInt32(item.Tag),
+                    e.Cursor.GetPosition(sender as IInputElement).X,
+                    e.Cursor.GetPosition(sender as IInputElement).Y, true, item.avatar.Source);
                 e.Handled = true;
             }
             if (context == "design idea" || context == "birdcounting")
             {
-                item_generic_v2 item = configurations.get_item_visuals((collection_item)e.Cursor.Data);
+                collection_item ci = (collection_item)e.Cursor.Data;
+                item_generic_v2 item = configurations.get_item_visuals(ci);
                 log.WriteInteractionLog(16, "design idea opened by dragging; contribution id: " + item.Tag,
                     e.Cursor.GetPosition(null).X, e.Cursor.GetPosition(null).Y);
                 //window_manager.open_design_idea_window(data, e.Cursor.GetPosition(sender as IInputElement).X, e.Cursor.GetPosition(sender as IInputElement).Y);
-                window_manager.open_design_idea_window(item, e.Cursor.GetPosition(sender as IInputElement).X, e.Cursor.GetPosition(sender as IInputElement).Y);
+                Activity a = configurations.find_activity_of_contribution(ci._contribution);
+                window_manager.open_design_idea_window(item,
+                    e.Cursor.GetPosition(sender as IInputElement).X,
+                    e.Cursor.GetPosition(sender as IInputElement).Y, a.name);
                 e.Handled = true;
             }
             if (context == "image" || context == "audio" || context == "video" || context == "media")
@@ -213,10 +221,12 @@ namespace nature_net
             }
             if (context == "activity")
             {
+                item_generic_v2 item = (item_generic_v2)e.Cursor.Data;
                 if (data.Count() < 7) return;
                 log.WriteInteractionLog(15, "activity collection opened by dragging; activity id: " + data[1], e.Cursor.GetPosition(null).X, e.Cursor.GetPosition(null).Y);
-                window_manager.open_activity_window(data[3], Convert.ToInt32(data[1]), e.Cursor.GetPosition(sender as IInputElement).X,
-                    e.Cursor.GetPosition(sender as IInputElement).Y);
+                window_manager.open_activity_window(data[3], Convert.ToInt32(data[1]),
+                    e.Cursor.GetPosition(sender as IInputElement).X,
+                    e.Cursor.GetPosition(sender as IInputElement).Y, false, item.avatar.Source);
                 e.Handled = true;
             }
             log.WriteInteractionLog(43, context, e.Cursor.GetPosition(null).X, e.Cursor.GetPosition(null).Y);
