@@ -748,6 +748,9 @@ namespace nature_net.user_controls
         private readonly BackgroundWorker worker_activities = new BackgroundWorker();
         private readonly BackgroundWorker worker_users = new BackgroundWorker();
         private readonly BackgroundWorker worker_comments = new BackgroundWorker();
+        //
+        Dictionary<string, ImageSource> activity_icons = new Dictionary<string, ImageSource>();
+        Dictionary<string, ImageSource> user_icons = new Dictionary<string, ImageSource>();
 
         public list_populator()
         {
@@ -831,9 +834,15 @@ namespace nature_net.user_controls
                     if (n2 != null)
                         cnt = cnt + n2.Count();
                     user_item i = new user_item();
-                    ImageSource src = new BitmapImage(new Uri(configurations.GetAbsoluteAvatarPath() + u.avatar));
-                    src.Freeze();
-                    i.img = src;
+                    if (user_icons.ContainsKey(u.avatar))
+                        i.img = user_icons[u.avatar];
+                    else
+                    {
+                        ImageSource src = new BitmapImage(new Uri(configurations.GetAbsoluteAvatarPath() + u.avatar));
+                        src.Freeze();
+                        user_icons.Add(u.avatar, src);
+                        i.img = src;
+                    }
                     i.user = u;
                     i.count = cnt;
                     i.has_date = false;
@@ -1078,7 +1087,18 @@ namespace nature_net.user_controls
                        //i.content.Text = cig.comment.note;
                        i.content.Visibility = Visibility.Collapsed;
                        if (item_width != 0) i.Width = item_width + 2;
-                       try { i.avatar.Source = new BitmapImage(new Uri(configurations.GetAbsoluteAvatarPath() + cig.avatar)); }
+                       try
+                       {
+                           if (user_icons.ContainsKey(cig.avatar))
+                               i.avatar.Source = user_icons[cig.avatar];
+                           else
+                           {
+                               ImageSource src = new BitmapImage(new Uri(configurations.GetAbsoluteAvatarPath() + cig.avatar));
+                               src.Freeze();
+                               user_icons.Add(cig.avatar, src);
+                               i.avatar.Source = src;
+                           }
+                       }
                        catch (Exception) { i.avatar.Visibility = Visibility.Collapsed; }
                        i.Tag = cig.comment.id;
                        if (cig.affiliation != null && cig.affiliation.ToLower() == configurations.affiliation_aces.ToLower())
@@ -1157,24 +1177,8 @@ namespace nature_net.user_controls
                         {
                             try
                             {
-                                if (!configurations.activity_icons_loaded)
+                                if (!activity_icons.ContainsKey(ai.activity.id.ToString()))
                                 {
-                                    System.IO.FileStream file_stream = new System.IO.FileStream(configurations.GetAbsoluteImagePath() + ai.activity.id.ToString() + ".png", System.IO.FileMode.OpenOrCreate);
-                                    file_stream.Close();
-                                    System.Net.WebClient client = new System.Net.WebClient();
-                                    client.Headers.Add("user-agent", "Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.2; .NET CLR 1.0.3705;)");
-                                    client.DownloadFile(a.avatar, configurations.GetAbsoluteImagePath() + ai.activity.id.ToString() + ".png");
-                                }
-
-                                try
-                                {
-                                    ImageSource src = new BitmapImage(new Uri(configurations.GetAbsoluteImagePath() + ai.activity.id.ToString() + ".png"));
-                                    src.Freeze();
-                                    ai.img = src;
-                                }
-                                catch (Exception)
-                                {
-                                    //retry
                                     System.IO.FileStream file_stream = new System.IO.FileStream(configurations.GetAbsoluteImagePath() + ai.activity.id.ToString() + ".png", System.IO.FileMode.OpenOrCreate);
                                     file_stream.Close();
                                     System.Net.WebClient client = new System.Net.WebClient();
@@ -1182,7 +1186,12 @@ namespace nature_net.user_controls
                                     client.DownloadFile(a.avatar, configurations.GetAbsoluteImagePath() + ai.activity.id.ToString() + ".png");
                                     ImageSource src = new BitmapImage(new Uri(configurations.GetAbsoluteImagePath() + ai.activity.id.ToString() + ".png"));
                                     src.Freeze();
+                                    activity_icons.Add(ai.activity.id.ToString(), src);
                                     ai.img = src;
+                                }
+                                else
+                                {
+                                    ai.img = activity_icons[ai.activity.id.ToString()];
                                 }
                             }
                             catch (Exception ex) { log.WriteErrorLog(ex); }
